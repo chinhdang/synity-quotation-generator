@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ứng Dụng Tạo Báo Giá - SYNITY v1.4.1</title>
+    <title>Ứng Dụng Tạo Báo Giá - SYNITY v1.4.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,7 +134,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="quotation_number">Số báo giá</label>
-                            <input type="text" id="quotation_number" value="SYN-Q-20240723-001">
+                            <input type="text" id="quotation_number" value="">
                         </div>
                         <div>
                             <label for="date_created">Ngày tạo</label>
@@ -178,14 +178,26 @@
 
                 <div class="form-section">
                     <h2>5. Tham Số Tính Toán</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="exchange_rate">Tỷ giá USD/VND</label>
-                            <input type="number" id="exchange_rate" value="26500">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="exchange_rate">Tỷ giá USD/VND</label>
+                                <input type="number" id="exchange_rate" value="26500">
+                            </div>
+                            <div>
+                                <label for="currency_conversion_fee_percent">Phí chuyển đổi ngoại tệ (%)</label>
+                                <input type="number" id="currency_conversion_fee_percent" value="3" min="0" max="100" step="0.1">
+                            </div>
                         </div>
-                        <div>
-                            <label for="synity_discount_percent">Ưu đãi SYNITY (%)</label>
-                            <input type="number" id="synity_discount_percent" value="10">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="bitrix_discount_percent">Ưu đãi từ Bitrix (%)</label>
+                                <input type="number" id="bitrix_discount_percent" value="0" min="0" max="100">
+                            </div>
+                            <div>
+                                <label for="synity_discount_percent">Ưu đãi từ SYNITY (%)</label>
+                                <input type="number" id="synity_discount_percent" value="10" min="0" max="100">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -339,15 +351,16 @@
                             <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
                                 <td class="p-3 text-center">2</td>
                                 <td class="p-3">
-                                    <p class="font-semibold">Phí chuyển đổi ngoại tệ (3%)</p>
+                                    <p class="font-semibold">Phí chuyển đổi ngoại tệ (${currency_conversion_fee_percent}%)</p>
                                     <p class="text-xs" style="color: var(--text-secondary);">Tỷ giá USD dự kiến: ${exchange_rate_formatted} VNĐ</p>
                                 </td>
                                 <td class="p-3 text-right"></td>
                                 <td class="p-3 text-center">1</td>
                                 <td class="p-3 text-right font-semibold">${currency_conversion_fee}</td>
                             </tr>
+                            ${bitrix_discount_row}
                              <tr class="border-b" style="border-color: var(--border-subtle);">
-                                <td class="p-3 text-center">3</td>
+                                <td class="p-3 text-center">${synity_discount_row_number}</td>
                                 <td class="p-3">
                                     <p class="font-semibold" style="color: var(--accent-main);">Ưu đãi từ SYNITY (${synity_discount_percent}%)</p>
                                 </td>
@@ -409,6 +422,7 @@
                 <section class="mt-8 pt-8 border-t text-sm space-y-6" style="border-color: var(--border-subtle);">
                     <div>
                         <h4 class="font-bold mb-2" style="color: var(--text-main);">ƯU ĐÃI VÀ KHUYẾN MÃI</h4>
+                        ${bitrix_discount_info}
                         <p style="color: var(--text-secondary);">Ưu đãi từ SYNITY: <strong style="color: var(--accent-main);">Giảm ${synity_discount_percent}%</strong> chi phí bản quyền Bitrix24 trong ${bitrix_months} tháng.</p>
                     </div>
                     <div>
@@ -444,8 +458,11 @@
         /**
          * CHANGE LOG v1.4.2
          * --------------------
-         * - UI Tweak: Restructured payment schedule notes into two separate lines for better readability.
-         * - Logic Tweak: Removed the redundant "(đã bao gồm VAT)" text from individual installment descriptions.
+         * - Feature: Added customizable currency conversion fee percentage input
+         * - Feature: Added Bitrix discount percentage separate from SYNITY discount
+         * - Logic: Updated pricing formula to include both Bitrix and SYNITY discounts
+         * - Logic: Auto-generate quotation number with format SYN-Q-YYMMDD-01
+         * - UI: Reorganized discount fields for better clarity
          *
          * CHANGE LOG v1.4.1
          * --------------------
@@ -484,6 +501,8 @@
                 date_created: document.getElementById('date_created'),
                 closed_date: document.getElementById('closed_date'),
                 exchange_rate: document.getElementById('exchange_rate'),
+                currency_conversion_fee_percent: document.getElementById('currency_conversion_fee_percent'),
+                bitrix_discount_percent: document.getElementById('bitrix_discount_percent'),
                 synity_discount_percent: document.getElementById('synity_discount_percent'),
                 bitrix_version_select: document.getElementById('bitrix_version_select'),
                 bitrix_price_usd: document.getElementById('bitrix_price_usd'),
@@ -595,15 +614,18 @@
                 const exchange_rate = parseFloat(data.exchange_rate) || 0;
                 const bitrix_price_usd = parseFloat(data.bitrix_price_usd) || 0;
                 const bitrix_months = bitrixPricingData[data.bitrix_version_select]?.months || 0;
+                const currency_conversion_fee_percent = parseFloat(data.currency_conversion_fee_percent) || 3;
+                const bitrix_discount_percent = parseFloat(data.bitrix_discount_percent) || 0;
                 const synity_discount_percent = parseFloat(data.synity_discount_percent) || 0;
                 const implementation_fee = parseFloat(data.implementation_fee) || 0;
 
                 const bitrix_unit_price_vnd = bitrix_price_usd * exchange_rate;
                 const bitrix_total_price_vnd = bitrix_unit_price_vnd * bitrix_months;
-                const currency_conversion_fee = bitrix_total_price_vnd * 0.03;
+                const currency_conversion_fee = bitrix_total_price_vnd * (currency_conversion_fee_percent / 100);
+                const bitrix_discount_amount = bitrix_total_price_vnd * (bitrix_discount_percent / 100);
                 const synity_discount_amount = bitrix_total_price_vnd * (synity_discount_percent / 100);
 
-                const total_license_fee_A = bitrix_total_price_vnd + currency_conversion_fee - synity_discount_amount;
+                const total_license_fee_A = bitrix_total_price_vnd + currency_conversion_fee - bitrix_discount_amount - synity_discount_amount;
                 const total_implementation_fee_B = implementation_fee;
                 
                 const sub_total = total_license_fee_A + total_implementation_fee_B;
@@ -689,6 +711,29 @@
                     </table>
                 `;
 
+                // Generate Bitrix discount row if applicable
+                let bitrix_discount_row = '';
+                let synity_discount_row_number = '3';
+                if (bitrix_discount_percent > 0) {
+                    bitrix_discount_row = `
+                            <tr class="border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center">3</td>
+                                <td class="p-3">
+                                    <p class="font-semibold" style="color: #2563EB;">Ưu đãi từ Bitrix (${bitrix_discount_percent}%)</p>
+                                </td>
+                                <td class="p-3 text-right"></td>
+                                <td class="p-3 text-center">1</td>
+                                <td class="p-3 text-right font-semibold" style="color: #2563EB;">(${formatCurrency(bitrix_discount_amount)})</td>
+                            </tr>`;
+                    synity_discount_row_number = '4';
+                }
+
+                // Generate Bitrix discount info for promotions section
+                let bitrix_discount_info = '';
+                if (bitrix_discount_percent > 0) {
+                    bitrix_discount_info = `<p style="color: var(--text-secondary);">Ưu đãi từ Bitrix: <strong style="color: #2563EB;">Giảm ${bitrix_discount_percent}%</strong> chi phí bản quyền Bitrix24 trong ${bitrix_months} tháng.</p>`;
+                }
+
                 const templateData = {
                     ...data,
                     bitrix_months: bitrix_months,
@@ -698,13 +743,17 @@
                     bitrix_unit_price_vnd: formatCurrency(bitrix_unit_price_vnd),
                     bitrix_total_price_vnd: formatCurrency(bitrix_total_price_vnd),
                     currency_conversion_fee: formatCurrency(currency_conversion_fee),
+                    bitrix_discount_amount: formatCurrency(bitrix_discount_amount),
+                    bitrix_discount_row: bitrix_discount_row,
+                    bitrix_discount_info: bitrix_discount_info,
                     synity_discount_amount: formatCurrency(synity_discount_amount),
+                    synity_discount_row_number: synity_discount_row_number,
                     implementation_fee: formatCurrency(implementation_fee),
                     sub_total: formatCurrency(sub_total),
                     vat_amount: formatCurrency(vat_amount),
                     grand_total: formatCurrency(grand_total),
                     payment_schedule_table: paymentScheduleTable,
-                    // UPDATE v1.5.0: Pass post-tax totals for A and B
+                    // UPDATE v1.4.2: Pass post-tax totals for A and B
                     total_A_post_tax: formatCurrency(post_tax_A),
                     total_B_post_tax: formatCurrency(post_tax_B),
                 };
@@ -744,12 +793,23 @@
                 }
             };
 
+            const generateQuotationNumber = () => {
+                const today = new Date();
+                const year = today.getFullYear().toString().slice(-2);
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `SYN-Q-${year}${month}${day}-01`;
+            };
+
             const init = () => {
                 const today = new Date();
                 inputs.date_created.valueAsDate = today;
                 const thirtyDaysLater = new Date();
                 thirtyDaysLater.setDate(today.getDate() + 30);
                 inputs.closed_date.valueAsDate = thirtyDaysLater;
+                
+                // Set auto-generated quotation number
+                inputs.quotation_number.value = generateQuotationNumber();
 
                 for (const version in bitrixPricingData) {
                     const option = document.createElement('option');
