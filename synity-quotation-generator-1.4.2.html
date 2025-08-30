@@ -67,6 +67,25 @@
             border: 1px solid #e5e7eb;
             text-align: right;
         }
+        
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .toggle-switch input:checked + div > div:first-child {
+            background-color: #0D9488;
+        }
+        
+        .toggle-switch input:checked + div > div:last-child {
+            transform: translateX(100%);
+        }
+        
+        .toggle-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -151,8 +170,18 @@
                     <h2>4. Sản Phẩm & Dịch Vụ</h2>
                     <div class="space-y-4">
                         <fieldset class="border p-4 rounded-lg">
-                            <legend class="text-lg font-semibold px-2">Bản quyền Bitrix24</legend>
-                            <div class="space-y-4 mt-2">
+                            <div class="flex items-center justify-between mb-3">
+                                <legend class="text-lg font-semibold px-2">A. Bản quyền Bitrix24</legend>
+                                <label class="flex items-center cursor-pointer toggle-switch">
+                                    <input type="checkbox" id="include_bitrix_license" class="sr-only" checked>
+                                    <div class="relative">
+                                        <div class="w-12 h-6 bg-gray-300 rounded-full shadow-inner transition-colors duration-200"></div>
+                                        <div class="absolute left-0 top-0 w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-200 translate-x-0"></div>
+                                    </div>
+                                    <span class="ml-3 text-sm text-gray-700">Bao gồm bản quyền</span>
+                                </label>
+                            </div>
+                            <div id="bitrix_license_container" class="space-y-4 mt-2">
                                 <div>
                                     <label for="bitrix_version_select">Chọn phiên bản</label>
                                     <select id="bitrix_version_select"></select>
@@ -169,9 +198,22 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <div>
-                            <label for="implementation_fee">Phí triển khai & đồng hành (VNĐ)</label>
-                            <input type="number" id="implementation_fee" value="392000000">
+                        <div class="border-t pt-4 mt-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="text-lg font-semibold text-gray-800">B. Phí Triển Khai & Đồng Hành</label>
+                                <label class="flex items-center cursor-pointer toggle-switch">
+                                    <input type="checkbox" id="include_implementation_fee" class="sr-only" checked>
+                                    <div class="relative">
+                                        <div class="w-12 h-6 bg-gray-300 rounded-full shadow-inner transition-colors duration-200"></div>
+                                        <div class="absolute left-0 top-0 w-6 h-6 bg-white rounded-full shadow transform transition-transform duration-200 translate-x-0"></div>
+                                    </div>
+                                    <span class="ml-3 text-sm text-gray-700">Bao gồm phí triển khai</span>
+                                </label>
+                            </div>
+                            <div id="implementation_fee_container">
+                                <label for="implementation_fee">Phí triển khai & đồng hành (VNĐ)</label>
+                                <input type="number" id="implementation_fee" value="392000000">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -333,49 +375,9 @@
                             </tr>
                         </thead>
                         <tbody style="color: var(--text-main);">
-                            <tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">A. CHI PHÍ BẢN QUYỀN BITRIX24 - CLOUD</td></tr>
-                            <tr class="border-b" style="border-color: var(--border-subtle);">
-                                <td class="p-3 text-center">1</td>
-                                <td class="p-3">
-                                    <p class="font-semibold">${bitrix_version_select}</p>
-                                    <p class="text-xs" style="color: var(--text-secondary);">Đơn vị tính: $${bitrix_price_usd}/tháng</p>
-                                </td>
-                                <td class="p-3 text-right">${bitrix_unit_price_vnd}</td>
-                                <td class="p-3 text-center">${bitrix_months}</td>
-                                <td class="p-3 text-right font-semibold">${bitrix_total_price_vnd}</td>
-                            </tr>
-                            <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
-                                <td class="p-3 text-center">2</td>
-                                <td class="p-3">
-                                    <p class="font-semibold">Phí chuyển đổi ngoại tệ (${currency_conversion_fee_percent}%)</p>
-                                    <p class="text-xs" style="color: var(--text-secondary);">Tỷ giá USD dự kiến: ${exchange_rate_formatted} VNĐ</p>
-                                </td>
-                                <td class="p-3 text-right"></td>
-                                <td class="p-3 text-center">1</td>
-                                <td class="p-3 text-right font-semibold">${currency_conversion_fee}</td>
-                            </tr>
+                            <!-- BITRIX_SECTION_PLACEHOLDER -->
                             <!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->
-                            <tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">B. PHÍ TRIỂN KHAI & ĐỒNG HÀNH CHUYỂN ĐỔI SỐ</td></tr>
-                            <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
-                                <td class="p-3 text-center align-top">4</td>
-                                <td class="p-3">
-                                    <p class="font-semibold">Gói "Đồng Hành & Chia Sẻ Thành Công"</p>
-                                    <ol class="list-decimal list-inside text-xs mt-2 space-y-1 pl-2" style="color: var(--text-secondary);">
-                                        <li>Cố vấn Chiến lược Công nghệ - CTO as a Service™</li>
-                                        <li>Giao tiếp & Cộng tác 4.0 - AI CoPilot Hỗ trợ</li>
-                                        <li>Triển khai Bitrix24 CRM - Cỗ máy Bán hàng Tinh nhuệ</li>
-                                        <li>Nền tảng Dữ liệu Hợp nhất - Single Source of Truth</li>
-                                        <li>Tự động hóa Quy trình Toàn diện - Automation Ecosystem™</li>
-                                        <li>Khai phóng Sức mạnh AI Agents - "Bộ Não Thứ Hai"</li>
-                                        <li>Hệ thống Báo cáo Quản trị Thông minh (BI Dashboard)</li>
-                                        <li>Bảo trì & Phát triển Liên tục - Evolution System™</li>
-                                        <li>Truy cập Mạng lưới Chuyên gia SYNITY</li>
-                                    </ol>
-                                </td>
-                                <td class="p-3 text-right align-top"></td>
-                                <td class="p-3 text-center align-top">1</td>
-                                <td class="p-3 text-right font-semibold align-top">${implementation_fee}</td>
-                            </tr>
+                            <!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->
                         </tbody>
                     </table>
                 </section>
@@ -445,9 +447,17 @@
          * CHANGE LOG v1.4.3 (DRAFT)
          * --------------------
          * - Feature: Consolidated discount inputs - merged Bitrix and SYNITY discounts into single "Tổng ưu đãi" field
+         * - Feature: Added toggle button to enable/disable implementation fee section "B. PHÍ TRIỂN KHAI & ĐỒNG HÀNH CHUYỂN ĐỔI SỐ"
+         * - Feature: Added toggle button to enable/disable Bitrix license section "A. CHI PHÍ BẢN QUYỀN BITRIX24 - CLOUD"
          * - Logic: Simplified discount calculation logic - single discount percentage applied to license cost
+         * - Logic: Conditional implementation fee - section only appears in quotation when toggle is enabled
+         * - Logic: Conditional Bitrix license - section only appears in quotation when toggle is enabled
          * - UI: Cleaner interface with one discount input instead of two separate fields
+         * - UI: Toggle switch with visual feedback for implementation fee inclusion
+         * - UI: Toggle switch with visual feedback for Bitrix license inclusion
          * - Template: Updated quotation template to show single discount row instead of multiple discount rows
+         * - Template: Dynamic implementation section rendering based on toggle state
+         * - Template: Dynamic Bitrix license section rendering based on toggle state
          * - Maintenance: Reduced code complexity and improved maintainability
          * 
          * CHANGE LOG v1.4.2
@@ -501,6 +511,8 @@
                 bitrix_price_usd: document.getElementById('bitrix_price_usd'),
                 bitrix_months: document.getElementById('bitrix_months'),
                 implementation_fee: document.getElementById('implementation_fee'),
+                include_implementation_fee: document.getElementById('include_implementation_fee'),
+                include_bitrix_license: document.getElementById('include_bitrix_license'),
             };
             const generateBtn = document.getElementById('generate-btn');
             const exportBtn = document.getElementById('export-btn');
@@ -512,6 +524,8 @@
             const installmentsDetailsContainer = document.getElementById('installments_details_container');
             const validationMessageDiv = document.getElementById('installments_validation_message');
             const mergePaymentsCheckbox = document.getElementById('merge_payments_checkbox');
+            const implementationFeeContainer = document.getElementById('implementation_fee_container');
+            const bitrixLicenseContainer = document.getElementById('bitrix_license_container');
 
             const formatCurrency = (num) => {
                 if (isNaN(num)) return '0';
@@ -530,9 +544,47 @@
             const getFormValues = () => {
                 const values = {};
                 for (const key in inputs) {
-                    values[key] = inputs[key].value;
+                    if (inputs[key].type === 'checkbox') {
+                        values[key] = inputs[key].checked;
+                    } else {
+                        values[key] = inputs[key].value;
+                    }
                 }
                 return values;
+            };
+
+            const handleImplementationFeeToggle = () => {
+                const isEnabled = inputs.include_implementation_fee.checked;
+                
+                if (isEnabled) {
+                    implementationFeeContainer.classList.remove('toggle-disabled');
+                    inputs.implementation_fee.disabled = false;
+                } else {
+                    implementationFeeContainer.classList.add('toggle-disabled');
+                    inputs.implementation_fee.disabled = true;
+                }
+                
+                validateInstallments();
+                updatePreview();
+            };
+
+            const handleBitrixLicenseToggle = () => {
+                const isEnabled = inputs.include_bitrix_license.checked;
+                
+                if (isEnabled) {
+                    bitrixLicenseContainer.classList.remove('toggle-disabled');
+                    inputs.bitrix_version_select.disabled = false;
+                    inputs.bitrix_price_usd.disabled = false;
+                    inputs.bitrix_months.disabled = false;
+                } else {
+                    bitrixLicenseContainer.classList.add('toggle-disabled');
+                    inputs.bitrix_version_select.disabled = true;
+                    inputs.bitrix_price_usd.disabled = true;
+                    inputs.bitrix_months.disabled = true;
+                }
+                
+                validateInstallments();
+                updatePreview();
             };
 
             const renderInstallmentInputs = () => {
@@ -605,11 +657,13 @@
                 const data = getFormValues();
 
                 const exchange_rate = parseFloat(data.exchange_rate) || 0;
-                const bitrix_price_usd = parseFloat(data.bitrix_price_usd) || 0;
-                const bitrix_months = bitrixPricingData[data.bitrix_version_select]?.months || 0;
+                const include_bitrix_license = data.include_bitrix_license || false;
+                const bitrix_price_usd = include_bitrix_license ? (parseFloat(data.bitrix_price_usd) || 0) : 0;
+                const bitrix_months = include_bitrix_license ? (bitrixPricingData[data.bitrix_version_select]?.months || 0) : 0;
                 const currency_conversion_fee_percent = parseFloat(data.currency_conversion_fee_percent) || 3;
                 const discount_percent = parseFloat(data.discount_percent) || 0;
-                const implementation_fee = parseFloat(data.implementation_fee) || 0;
+                const include_implementation_fee = data.include_implementation_fee || false;
+                const implementation_fee = include_implementation_fee ? (parseFloat(data.implementation_fee) || 0) : 0;
 
                 const bitrix_unit_price_vnd = bitrix_price_usd * exchange_rate;
                 const bitrix_total_price_vnd = bitrix_unit_price_vnd * bitrix_months;
@@ -702,9 +756,9 @@
                     </table>
                 `;
 
-                // Generate discount row if applicable
+                // Generate discount row if applicable (only when Bitrix license is enabled)
                 let discount_row = '';
-                if (discount_percent > 0) {
+                if (include_bitrix_license && discount_percent > 0 && total_discount_amount > 0) {
                     discount_row = `<tr class="border-b" style="border-color: var(--border-subtle);">
                                 <td class="p-3 text-center">3</td>
                                 <td class="p-3">
@@ -718,8 +772,60 @@
 
                 // Generate discount info for promotions section
                 let discount_info = '';
-                if (discount_percent > 0) {
+                if (include_bitrix_license && discount_percent > 0) {
                     discount_info = `<p style="color: var(--text-secondary);">Ưu đãi từ SYNITY: <strong style="color: var(--accent-main);">Giảm ${discount_percent}%</strong> chi phí bản quyền Bitrix24 trong ${bitrix_months} tháng.</p>`;
+                }
+
+                // Generate Bitrix license section if enabled
+                let bitrix_section = '';
+                if (include_bitrix_license && bitrix_total_price_vnd > 0) {
+                    bitrix_section = `<tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">A. CHI PHÍ BẢN QUYỀN BITRIX24 - CLOUD</td></tr>
+                            <tr class="border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center">1</td>
+                                <td class="p-3">
+                                    <p class="font-semibold">${data.bitrix_version_select}</p>
+                                    <p class="text-xs" style="color: var(--text-secondary);">Đơn vị tính: $${bitrix_price_usd}/tháng</p>
+                                </td>
+                                <td class="p-3 text-right">${formatCurrency(bitrix_unit_price_vnd)}</td>
+                                <td class="p-3 text-center">${bitrix_months}</td>
+                                <td class="p-3 text-right font-semibold">${formatCurrency(bitrix_total_price_vnd)}</td>
+                            </tr>
+                            <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center">2</td>
+                                <td class="p-3">
+                                    <p class="font-semibold">Phí chuyển đổi ngoại tệ (${currency_conversion_fee_percent}%)</p>
+                                    <p class="text-xs" style="color: var(--text-secondary);">Tỷ giá USD dự kiến: ${formatCurrency(exchange_rate)} VNĐ</p>
+                                </td>
+                                <td class="p-3 text-right"></td>
+                                <td class="p-3 text-center">1</td>
+                                <td class="p-3 text-right font-semibold">${formatCurrency(currency_conversion_fee)}</td>
+                            </tr>`;
+                }
+
+                // Generate implementation section if enabled
+                let implementation_section = '';
+                if (include_implementation_fee && implementation_fee > 0) {
+                    implementation_section = `<tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">B. PHÍ TRIỂN KHAI & ĐỒNG HÀNH CHUYỂN ĐỔI SỐ</td></tr>
+                            <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center align-top">4</td>
+                                <td class="p-3">
+                                    <p class="font-semibold">Gói "Đồng Hành & Chia Sẻ Thành Công"</p>
+                                    <ol class="list-decimal list-inside text-xs mt-2 space-y-1 pl-2" style="color: var(--text-secondary);">
+                                        <li>Cố vấn Chiến lược Công nghệ - CTO as a Service™</li>
+                                        <li>Giao tiếp & Cộng tác 4.0 - AI CoPilot Hỗ trợ</li>
+                                        <li>Triển khai Bitrix24 CRM - Cỗ máy Bán hàng Tinh nhuệ</li>
+                                        <li>Nền tảng Dữ liệu Hợp nhất - Single Source of Truth</li>
+                                        <li>Tự động hóa Quy trình Toàn diện - Automation Ecosystem™</li>
+                                        <li>Khai phóng Sức mạnh AI Agents - "Bộ Não Thứ Hai"</li>
+                                        <li>Hệ thống Báo cáo Quản trị Thông minh (BI Dashboard)</li>
+                                        <li>Bảo trì & Phát triển Liên tục - Evolution System™</li>
+                                        <li>Truy cập Mạng lưới Chuyên gia SYNITY</li>
+                                    </ol>
+                                </td>
+                                <td class="p-3 text-right align-top"></td>
+                                <td class="p-3 text-center align-top">1</td>
+                                <td class="p-3 text-right font-semibold align-top">${formatCurrency(implementation_fee)}</td>
+                            </tr>`;
                 }
 
                 const templateData = {
@@ -734,6 +840,8 @@
                     total_discount_amount: formatCurrency(total_discount_amount),
                     discount_info: discount_info,
                     implementation_fee: formatCurrency(implementation_fee),
+                    include_implementation_fee: include_implementation_fee,
+                    include_bitrix_license: include_bitrix_license,
                     sub_total: formatCurrency(sub_total),
                     vat_amount: formatCurrency(vat_amount),
                     grand_total: formatCurrency(grand_total),
@@ -748,8 +856,14 @@
                     finalHtml = finalHtml.replace(new RegExp(`\\\$\\\{${key}\\\}`, 'g'), templateData[key]);
                 }
                 
+                // Replace the Bitrix section placeholder
+                finalHtml = finalHtml.replace('<!-- BITRIX_SECTION_PLACEHOLDER -->', bitrix_section);
+                
                 // Replace the discount row placeholder
                 finalHtml = finalHtml.replace('<!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->', discount_row);
+                
+                // Replace the implementation section placeholder
+                finalHtml = finalHtml.replace('<!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->', implementation_section);
                 
                 return finalHtml;
             };
@@ -816,6 +930,8 @@
                 installmentsDetailsContainer.addEventListener('input', validateInstallments);
                 inputs.implementation_fee.addEventListener('input', validateInstallments);
                 inputs.bitrix_version_select.addEventListener('change', handleVersionChange);
+                inputs.include_implementation_fee.addEventListener('change', handleImplementationFeeToggle);
+                inputs.include_bitrix_license.addEventListener('change', handleBitrixLicenseToggle);
 
                 handleVersionChange(); 
                 renderInstallmentInputs();
