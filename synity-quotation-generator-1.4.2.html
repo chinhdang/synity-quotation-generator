@@ -332,14 +332,23 @@
                 </div>
                 <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm mb-10">
                     <div class="bg-gray-50 p-4 rounded-lg" style="background-color: var(--bg-secondary); border: 1px solid var(--border-subtle);">
-                        <h3 class="font-bold mb-2" style="color: var(--text-main);">Gửi đến:</h3>
-                        <p class="font-semibold" style="color: var(--text-main);">${clientCompanyName}</p>
-                        <p style="color: var(--text-secondary);"><b>Địa chỉ:</b> ${client_address}</p>
-                        <p style="color: var(--text-secondary);"><b>MST:</b> ${client_tax_code}</p>
+                        <div class="grid grid-cols-2 gap-y-1">
+                            <p class="font-bold" style="color: var(--text-secondary);">Gửi đến:</p>
+                            <p class="font-semibold text-right" style="color: var(--text-main);">${clientCompanyName}</p>
+                            <p class="font-bold" style="color: var(--text-secondary);">Địa chỉ:</p>
+                            <p class="text-right" style="color: var(--text-main);">${client_address}</p>
+                            <p class="font-bold" style="color: var(--text-secondary);">MST:</p>
+                            <p class="text-right" style="color: var(--text-main);">${client_tax_code}</p>
+                        </div>
                         <hr class="my-2">
-                        <p style="color: var(--text-secondary);"><b>Người liên hệ:</b> ${contact_name}</p>
-                        <p style="color: var(--text-secondary);"><b>SĐT:</b> ${contact_phone}</p>
-                        <p style="color: var(--text-secondary);"><b>Email:</b> ${contact_email}</p>
+                        <div class="grid grid-cols-2 gap-y-1">
+                            <p class="font-bold" style="color: var(--text-secondary);">Người liên hệ:</p>
+                            <p class="text-right" style="color: var(--text-main);">${contact_name}</p>
+                            <p class="font-bold" style="color: var(--text-secondary);">Phone:</p>
+                            <p class="text-right" style="color: var(--text-main);">${contact_phone}</p>
+                            <p class="font-bold" style="color: var(--text-secondary);">Email:</p>
+                            <p class="text-right" style="color: var(--text-main);">${contact_email}</p>
+                        </div>
                     </div>
                     <div class="bg-gray-50 p-4 rounded-lg" style="background-color: var(--bg-secondary); border: 1px solid var(--border-subtle);">
                         <div class="grid grid-cols-2 gap-y-1">
