@@ -358,8 +358,8 @@
                                 <td class="p-3 text-center">1</td>
                                 <td class="p-3 text-right font-semibold">${currency_conversion_fee}</td>
                             </tr>
-                            ${bitrix_discount_row}
-                             <tr class="border-b" style="border-color: var(--border-subtle);">
+                            <!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->
+                            <tr class="border-b" style="border-color: var(--border-subtle);">
                                 <td class="p-3 text-center">${synity_discount_row_number}</td>
                                 <td class="p-3">
                                     <p class="font-semibold" style="color: var(--accent-main);">Ưu đãi từ SYNITY (${synity_discount_percent}%)</p>
@@ -370,7 +370,7 @@
                             </tr>
                             <tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">B. PHÍ TRIỂN KHAI & ĐỒNG HÀNH CHUYỂN ĐỔI SỐ</td></tr>
                             <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
-                                <td class="p-3 text-center align-top">4</td>
+                                <td class="p-3 text-center align-top">${implementation_row_number}</td>
                                 <td class="p-3">
                                     <p class="font-semibold">Gói "Đồng Hành & Chia Sẻ Thành Công"</p>
                                     <ol class="list-decimal list-inside text-xs mt-2 space-y-1 pl-2" style="color: var(--text-secondary);">
@@ -714,9 +714,9 @@
                 // Generate Bitrix discount row if applicable
                 let bitrix_discount_row = '';
                 let synity_discount_row_number = '3';
+                let implementation_row_number = '4';
                 if (bitrix_discount_percent > 0) {
-                    bitrix_discount_row = `
-                            <tr class="border-b" style="border-color: var(--border-subtle);">
+                    bitrix_discount_row = `<tr class="border-b" style="border-color: var(--border-subtle);">
                                 <td class="p-3 text-center">3</td>
                                 <td class="p-3">
                                     <p class="font-semibold" style="color: #2563EB;">Ưu đãi từ Bitrix (${bitrix_discount_percent}%)</p>
@@ -726,6 +726,7 @@
                                 <td class="p-3 text-right font-semibold" style="color: #2563EB;">(${formatCurrency(bitrix_discount_amount)})</td>
                             </tr>`;
                     synity_discount_row_number = '4';
+                    implementation_row_number = '5';
                 }
 
                 // Generate Bitrix discount info for promotions section
@@ -744,10 +745,10 @@
                     bitrix_total_price_vnd: formatCurrency(bitrix_total_price_vnd),
                     currency_conversion_fee: formatCurrency(currency_conversion_fee),
                     bitrix_discount_amount: formatCurrency(bitrix_discount_amount),
-                    bitrix_discount_row: bitrix_discount_row,
                     bitrix_discount_info: bitrix_discount_info,
                     synity_discount_amount: formatCurrency(synity_discount_amount),
                     synity_discount_row_number: synity_discount_row_number,
+                    implementation_row_number: implementation_row_number,
                     implementation_fee: formatCurrency(implementation_fee),
                     sub_total: formatCurrency(sub_total),
                     vat_amount: formatCurrency(vat_amount),
@@ -762,6 +763,9 @@
                 for (const key in templateData) {
                     finalHtml = finalHtml.replace(new RegExp(`\\\$\\\{${key}\\\}`, 'g'), templateData[key]);
                 }
+                
+                // Replace the Bitrix discount row placeholder
+                finalHtml = finalHtml.replace('<!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->', bitrix_discount_row);
                 
                 return finalHtml;
             };
