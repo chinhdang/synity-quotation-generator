@@ -15,8 +15,17 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     contact_name = 'Nguyễn Văn A',
     contact_phone = '0123456789',
     contact_email = 'contact@abccompany.com',
-    bitrixProducts = []
+    bitrixProducts = [],
+    entityAmount = 0,
+    entityDiscount = 0,
+    entityTax = 0,
+    entityCurrency = 'VND'
   } = crmData;
+
+  // Helper function for currency formatting
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0));
+  };
 
   // Analyze Bitrix products to suggest version
   const suggestedBitrixVersion = analyzeBitrixProducts(bitrixProducts);
@@ -28,111 +37,202 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYNITY Quotation Generator - CRM Integration</title>
     <script src="//api.bitrix24.com/api/v1/"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
-        /* B24UI + SYNITY Design System Integration */
+        /* SYNITY Design System - Optimized Layout */
         :root {
-            --b24-color-primary: #0D9488;
-            --b24-color-secondary: #2563EB;
-            --b24-color-success: #10B981;
-            --b24-color-warning: #F59E0B;
-            --b24-color-danger: #EF4444;
-            --b24-bg-primary: #FFFFFF;
-            --b24-bg-secondary: #F9FAFB;
-            --b24-text-primary: #1F2937;
-            --b24-text-secondary: #6B7280;
-            --b24-border: #E5E7EB;
-            --synity-accent: #0D9488;
+            --synity-primary: #0D9488;
+            --synity-secondary: #2563EB;
+            --synity-success: #10B981;
+            --synity-warning: #F59E0B;
+            --synity-danger: #EF4444;
+            --synity-bg-primary: #FFFFFF;
+            --synity-bg-secondary: #F9FAFB;
+            --synity-text-primary: #1F2937;
+            --synity-text-secondary: #6B7280;
+            --synity-border: #E5E7EB;
         }
 
-        body {
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
             font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--b24-bg-secondary);
+            background: var(--synity-bg-secondary);
+            overflow: hidden;
         }
 
-        /* B24UI Components */
-        .b24-app {
-            min-height: 100vh;
+        /* SYNITY App Container - Optimized for Bitrix Slider */
+        .synity-app {
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            background: var(--synity-bg-primary);
+            min-height: 0;
         }
 
-        .b24-header {
-            background: var(--b24-bg-primary);
-            border-bottom: 1px solid var(--b24-border);
-            padding: 1rem 1.5rem;
+        /* SYNITY App Header */
+        .synity-app-header {
+            background: var(--synity-bg-primary);
+            border-bottom: 1px solid var(--synity-border);
+            padding: 0.75rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
+            min-height: 60px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .b24-header__title {
+        .synity-app-title {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            color: var(--b24-text-primary);
-            font-size: 1.25rem;
+            gap: 0.5rem;
+            color: var(--synity-text-primary);
+            font-size: 1rem;
             font-weight: 700;
             margin: 0;
         }
 
-        .b24-header__status {
-            color: var(--synity-accent);
+        .synity-app-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* SYNITY Status Indicator */
+        .synity-status {
+            background: linear-gradient(135deg, var(--synity-primary), var(--synity-secondary));
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
-        .b24-main {
+        /* SYNITY Compact Buttons */
+        .synity-btn {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .synity-btn--primary {
+            background: var(--synity-primary);
+            color: white;
+        }
+
+        .synity-btn--primary:hover {
+            background: #0d8478;
+            transform: translateY(-1px);
+        }
+
+        .synity-btn--secondary {
+            background: var(--synity-secondary);
+            color: white;
+        }
+
+        .synity-btn--secondary:hover {
+            background: #1d4ed8;
+        }
+
+        .synity-btn--danger {
+            background: var(--synity-danger);
+            color: white;
+        }
+
+        .synity-btn--danger:hover {
+            background: #dc2626;
+        }
+
+        .synity-btn i {
+            font-size: 0.75rem;
+        }
+
+        /* SYNITY App Body */
+        .synity-app-body {
+            display: flex;
             flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 0;
-            min-height: calc(100vh - 80px);
+            min-height: 0;
+            background: var(--synity-bg-secondary);
         }
 
-        .b24-panel {
-            background: var(--b24-bg-primary);
-            padding: 1.5rem;
+        /* SYNITY Sidebar */
+        .synity-sidebar {
+            width: 400px;
+            background: var(--synity-bg-primary);
+            border-right: 1px solid var(--synity-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .synity-sidebar-content {
+            flex: 1;
+            padding: 1rem;
             overflow-y: auto;
         }
 
-        .b24-panel--form {
-            border-right: 1px solid var(--b24-border);
-            max-height: calc(100vh - 80px);
+        /* SYNITY Main Content */
+        .synity-main {
+            flex: 1;
+            background: var(--synity-bg-secondary);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .b24-panel--preview {
-            background: #f5f5f5;
-            padding: 0;
+        .synity-main-content {
+            flex: 1;
+            padding: 1rem;
+            overflow: hidden;
         }
 
         /* SYNITY Form Components */
         .synity-form-section {
-            background: var(--b24-bg-primary);
-            border: 1px solid var(--b24-border);
+            background: var(--synity-bg-primary);
+            border: 1px solid var(--synity-border);
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .synity-form-section h3 {
-            color: var(--synity-accent);
-            font-size: 1.125rem;
+        .synity-form-header {
+            color: var(--synity-primary);
+            font-size: 1rem;
             font-weight: 700;
-            margin: 0 0 1rem 0;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--b24-border);
+            margin: 0;
+            padding: 1rem 1rem 0.75rem 1rem;
+            border-bottom: 2px solid var(--synity-border);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
+        .synity-form-body {
+            padding: 1rem;
+        }
+
         .synity-form-row {
             margin-bottom: 1rem;
+        }
+
+        .synity-form-row:last-child {
+            margin-bottom: 0;
         }
 
         .synity-form-row--grid {
@@ -144,7 +244,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
         .synity-label {
             display: block;
             font-weight: 600;
-            color: var(--b24-text-primary);
+            color: var(--synity-text-primary);
             margin-bottom: 0.5rem;
             font-size: 0.875rem;
         }
@@ -152,356 +252,421 @@ export function getSYNITYCRMTemplate(crmData = {}) {
         .synity-input {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--b24-border);
+            border: 1px solid var(--synity-border);
             border-radius: 6px;
             font-size: 0.875rem;
             transition: all 0.2s ease;
-            background: var(--b24-bg-primary);
-            color: var(--b24-text-primary);
+            background: var(--synity-bg-primary);
+            color: var(--synity-text-primary);
         }
 
         .synity-input:focus {
             outline: none;
-            border-color: var(--synity-accent);
+            border-color: var(--synity-primary);
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
         }
 
         .synity-input:read-only {
-            background: var(--b24-bg-secondary);
-            color: var(--b24-text-secondary);
+            background: var(--synity-bg-secondary);
+            color: var(--synity-text-secondary);
             cursor: not-allowed;
         }
 
-        /* Toggle Components */
-        .synity-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin: 1rem 0;
-        }
-
-        .synity-toggle input[type="checkbox"] {
-            width: 48px;
-            height: 24px;
-            appearance: none;
-            background: #cbd5e1;
-            border-radius: 12px;
-            position: relative;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .synity-toggle input[type="checkbox"]:checked {
-            background: var(--synity-accent);
-        }
-
-        .synity-toggle input[type="checkbox"]::before {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 10px;
-            background: white;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .synity-toggle input[type="checkbox"]:checked::before {
-            transform: translateX(24px);
-        }
-
-        /* Action Buttons */
-        .synity-actions {
-            position: sticky;
-            bottom: 0;
-            background: var(--b24-bg-primary);
-            padding: 1.5rem;
-            border-top: 1px solid var(--b24-border);
-            margin: 0 -1.5rem -1.5rem -1.5rem;
-        }
-
-        .synity-btn {
+        .synity-select {
             width: 100%;
-            padding: 0.875rem 1.5rem;
-            border: none;
+            padding: 0.75rem;
+            border: 1px solid var(--synity-border);
             border-radius: 6px;
-            font-weight: 600;
             font-size: 0.875rem;
+            background: var(--synity-bg-primary);
+            color: var(--synity-text-primary);
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            text-decoration: none;
         }
 
-        .synity-btn--primary {
-            background: var(--synity-accent);
-            color: white;
+        .synity-select:focus {
+            outline: none;
+            border-color: var(--synity-primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
         }
 
-        .synity-btn--primary:hover {
-            background: #0d8478;
-            transform: translateY(-1px);
-        }
-
-        .synity-btn--secondary {
-            background: var(--b24-color-secondary);
-            color: white;
-            margin-top: 0.5rem;
-        }
-
-        .synity-btn--danger {
-            background: var(--b24-color-danger);
-            color: white;
-            margin-top: 0.5rem;
-        }
-
-        /* Preview iframe */
+        /* SYNITY Preview Frame */
         .synity-preview {
             width: 100%;
             height: 100%;
-            border: none;
+            border: 1px solid var(--synity-border);
+            border-radius: 8px;
             background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* CRM Data indicator */
-        .crm-data-indicator {
-            background: linear-gradient(135deg, var(--synity-accent), var(--b24-color-secondary));
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
+        /* SYNITY Compact Form Styling */
+        .synity-compact-section {
+            background: var(--synity-bg-primary);
+            border: 1px solid var(--synity-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .synity-compact-title {
+            color: var(--synity-primary);
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 0.75rem 0;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        /* Scrollbar styling */
+        /* SYNITY CRM Data Display */
+        .synity-crm-indicator {
+            background: linear-gradient(135deg, var(--synity-primary), var(--synity-secondary));
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .synity-sidebar {
+                width: 300px;
+            }
+            
+            .synity-app-title {
+                font-size: 0.875rem;
+            }
+            
+            .synity-btn {
+                padding: 0.375rem 0.5rem;
+                font-size: 0.6875rem;
+            }
+        }
+
+        /* SYNITY Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--b24-bg-secondary);
+            background: var(--synity-bg-secondary);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--b24-border);
+            background: var(--synity-border);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--b24-text-secondary);
+            background: var(--synity-text-secondary);
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .b24-main {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-            }
-            
-            .b24-panel--form {
-                border-right: none;
-                border-bottom: 1px solid var(--b24-border);
-                max-height: 50vh;
-            }
+        /* Phase 2 Optimizations */
+        .synity-readonly-display {
+            background: var(--synity-bg-secondary);
+            border: 1px solid var(--synity-border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            color: var(--synity-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .synity-readonly-display i {
+            color: var(--synity-primary);
+        }
+
+        /* Phase 3: CRM Product Table Styles */
+        .synity-products-table {
+            margin-top: 0.75rem;
+            overflow-x: auto;
+        }
+
+        .synity-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            background: var(--synity-bg-primary);
+        }
+
+        .synity-table th {
+            background: var(--synity-bg-secondary);
+            padding: 0.5rem 0.375rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--synity-text-primary);
+            border-bottom: 1px solid var(--synity-border);
+        }
+
+        .synity-table td {
+            padding: 0.5rem 0.375rem;
+            border-bottom: 1px solid var(--synity-border);
+            color: var(--synity-text-secondary);
+        }
+
+        .synity-table tr:hover {
+            background: var(--synity-bg-secondary);
+        }
+
+        .synity-product-name {
+            font-weight: 500;
+            color: var(--synity-text-primary) !important;
+            max-width: 120px;
+            word-wrap: break-word;
+        }
+
+        .synity-product-qty {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .synity-product-price,
+        .synity-product-total {
+            text-align: right;
+            font-weight: 500;
+            font-family: 'Consolas', monospace;
+        }
+
+        /* Phase 4: Financial Summary Styles */
+        .synity-financial-summary {
+            margin-top: 0.75rem;
+        }
+
+        .synity-financial-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--synity-border);
+            font-size: 0.875rem;
+        }
+
+        .synity-financial-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            color: var(--synity-text-primary);
+        }
+
+        .synity-amount {
+            font-weight: 700;
+            color: var(--synity-primary);
+            font-family: 'Consolas', monospace;
+        }
+
+        .synity-discount {
+            font-weight: 600;
+            color: var(--synity-danger);
+            font-family: 'Consolas', monospace;
+        }
+
+        .synity-tax {
+            font-weight: 600;
+            color: var(--synity-warning);
+            font-family: 'Consolas', monospace;
         }
     </style>
 </head>
 
-<body>
-    <div class="b24-app">
-        <!-- Header -->
-        <header class="b24-header">
-            <h1 class="b24-header__title">
+<body data-entity-amount="${entityAmount || 0}" data-entity-discount="${entityDiscount || 0}" data-entity-tax="${entityTax || 0}" data-entity-currency="${entityCurrency || 'VND'}">
+    <div class="synity-app">
+        <!-- SYNITY App Header -->
+        <header class="synity-app-header">
+            <h1 class="synity-app-title">
                 <i class="bi bi-file-earmark-text"></i>
                 SYNITY Quotation Generator
             </h1>
-            <div class="b24-header__status" id="crmStatus">
-                CRM Integration Active
+            <div class="synity-app-actions">
+                <span class="synity-status">
+                    <i class="bi bi-check-circle-fill"></i>
+                    CRM Connected
+                </span>
+                <button class="synity-btn synity-btn--primary" id="generate-btn">
+                    <i class="bi bi-play-fill"></i>
+                    Tạo
+                </button>
+                <button class="synity-btn synity-btn--secondary" id="export-btn">
+                    <i class="bi bi-download"></i>
+                    Xuất
+                </button>
+                <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="b24-main">
-            <!-- Form Panel -->
-            <section class="b24-panel b24-panel--form">
-                <!-- CRM Data Indicator -->
-                <div class="crm-data-indicator">
-                    <i class="bi bi-database-check"></i>
-                    <span>Dữ liệu đã được tải từ Bitrix24 CRM</span>
-                </div>
+        <!-- SYNITY App Body -->
+        <div class="synity-app-body">
+            <!-- Sidebar với Form - Phase 2 Simplified -->
+            <aside class="synity-sidebar">
+                <div class="synity-sidebar-content">
+                    <!-- CRM Status Indicator -->
+                    <div class="synity-crm-indicator">
+                        <i class="bi bi-database-check"></i>
+                        <span>Dữ liệu đã được tải từ Bitrix24 CRM</span>
+                    </div>
 
-                <!-- Form Sections -->
-                <div class="synity-form-section">
-                    <h3><i class="bi bi-person-badge"></i> Thông Tin Người Thực Hiện</h3>
-                    <div class="synity-form-row">
-                        <label class="synity-label">Họ và tên</label>
-                        <input type="text" class="synity-input" id="responsiblePersonName" 
-                               value="${responsiblePersonName}" readonly>
-                    </div>
-                    <div class="synity-form-row synity-form-row--grid">
-                        <div>
-                            <label class="synity-label">Số điện thoại</label>
-                            <input type="tel" class="synity-input" id="responsiblePersonPhone" 
-                                   value="${responsiblePersonPhone}" readonly>
-                        </div>
-                        <div>
-                            <label class="synity-label">Email</label>
-                            <input type="email" class="synity-input" id="responsiblePersonEmail" 
-                                   value="${responsiblePersonEmail}" readonly>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="synity-form-section">
-                    <h3><i class="bi bi-building"></i> Thông Tin Khách Hàng</h3>
-                    <div class="synity-form-row">
-                        <label class="synity-label">Tên công ty khách hàng</label>
-                        <input type="text" class="synity-input" id="clientCompanyName" 
-                               value="${clientCompanyName}">
-                    </div>
-                    <div class="synity-form-row">
-                        <label class="synity-label">Địa chỉ công ty</label>
-                        <input type="text" class="synity-input" id="client_address" 
-                               value="${client_address}">
-                    </div>
-                    <div class="synity-form-row synity-form-row--grid">
-                        <div>
-                            <label class="synity-label">Mã số thuế</label>
-                            <input type="text" class="synity-input" id="client_tax_code" 
-                                   value="${client_tax_code}">
-                        </div>
-                        <div>
-                            <label class="synity-label">Người liên hệ</label>
-                            <input type="text" class="synity-input" id="contact_name" 
-                                   value="${contact_name}">
-                        </div>
-                    </div>
-                    <div class="synity-form-row synity-form-row--grid">
-                        <div>
-                            <label class="synity-label">SĐT người liên hệ</label>
-                            <input type="tel" class="synity-input" id="contact_phone" 
-                                   value="${contact_phone}">
-                        </div>
-                        <div>
-                            <label class="synity-label">Email người liên hệ</label>
-                            <input type="email" class="synity-input" id="contact_email" 
-                                   value="${contact_email}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="synity-form-section">
-                    <h3><i class="bi bi-calendar3"></i> Thông Tin Báo Giá</h3>
-                    <div class="synity-form-row synity-form-row--grid">
-                        <div>
+                    <!-- Phase 2: Only Essential Quote Info -->
+                    <div class="synity-compact-section">
+                        <h3 class="synity-compact-title">
+                            <i class="bi bi-calendar3"></i>
+                            Thông Tin Báo Giá
+                        </h3>
+                        <div class="synity-form-row">
                             <label class="synity-label">Số báo giá</label>
                             <input type="text" class="synity-input" id="quotation_number">
                         </div>
-                        <div>
-                            <label class="synity-label">Ngày tạo</label>
-                            <input type="date" class="synity-input" id="date_created">
+                        <div class="synity-form-row synity-form-row--grid">
+                            <div>
+                                <label class="synity-label">Ngày tạo</label>
+                                <input type="date" class="synity-input" id="date_created">
+                            </div>
+                            <div>
+                                <label class="synity-label">Hiệu lực đến</label>
+                                <input type="date" class="synity-input" id="closed_date">
+                            </div>
                         </div>
                     </div>
-                    <div class="synity-form-row">
-                        <label class="synity-label">Hiệu lực đến</label>
-                        <input type="date" class="synity-input" id="closed_date">
-                    </div>
-                </div>
 
-                <div class="synity-form-section">
-                    <h3><i class="bi bi-box-seam"></i> Sản Phẩm & Dịch Vụ</h3>
-                    
-                    <!-- Bitrix24 License Section -->
-                    <div class="synity-toggle">
-                        <input type="checkbox" id="include_bitrix_license" checked>
-                        <label class="synity-label">Bao gồm bản quyền Bitrix24</label>
-                    </div>
-                    
-                    <div id="bitrix_license_container">
+                    <!-- Phase 2: CRM Data Display Only -->
+                    <div class="synity-compact-section">
+                        <h3 class="synity-compact-title">
+                            <i class="bi bi-building"></i>
+                            Từ CRM
+                        </h3>
                         <div class="synity-form-row">
-                            <label class="synity-label">Chọn phiên bản Bitrix24</label>
-                            <select class="synity-input" id="bitrix_version_select">
-                                <option value="Bitrix24 Professional (12-Month)">Bitrix24 Professional (12-Month)</option>
-                                <option value="Bitrix24 Standard (12-Month)">Bitrix24 Standard (12-Month)</option>
-                                <option value="Bitrix24 Enterprise (12-Month)">Bitrix24 Enterprise (12-Month)</option>
+                            <label class="synity-label">Khách hàng</label>
+                            <div class="synity-readonly-display">
+                                <i class="bi bi-building-fill"></i>
+                                ${clientCompanyName}
+                            </div>
+                        </div>
+                        <div class="synity-form-row">
+                            <label class="synity-label">Phụ trách</label>
+                            <div class="synity-readonly-display">
+                                <i class="bi bi-person-fill"></i>
+                                ${responsiblePersonName}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: CRM Products Table -->
+                    ${bitrixProducts && bitrixProducts.length > 0 ? `
+                    <div class="synity-compact-section">
+                        <h3 class="synity-compact-title">
+                            <i class="bi bi-box-seam-fill"></i>
+                            Sản Phẩm CRM (${bitrixProducts.length})
+                        </h3>
+                        <div class="synity-products-table">
+                            <table class="synity-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>SL</th>
+                                        <th>Giá</th>
+                                        <th>Tổng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${bitrixProducts.map(product => `
+                                        <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" data-discount-sum="${product.DISCOUNT_SUM || 0}">
+                                            <td class="synity-product-name">${product.PRODUCT_NAME || 'Unknown Product'}</td>
+                                            <td class="synity-product-qty">${product.QUANTITY || 1}</td>
+                                            <td class="synity-product-price">${formatCurrency(product.PRICE || 0)}</td>
+                                            <td class="synity-product-total">${formatCurrency((product.PRICE || 0) * (product.QUANTITY || 1))}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Phase 4: CRM Financial Summary -->
+                    <div class="synity-compact-section">
+                        <h3 class="synity-compact-title">
+                            <i class="bi bi-calculator-fill"></i>
+                            Tổng Từ CRM
+                        </h3>
+                        <div class="synity-financial-summary">
+                            <div class="synity-financial-row">
+                                <span>Tổng giá trị:</span>
+                                <span class="synity-amount">${formatCurrency(entityAmount || 0)} ${entityCurrency || 'VND'}</span>
+                            </div>
+                            ${entityDiscount > 0 ? `
+                            <div class="synity-financial-row">
+                                <span>Giảm giá:</span>
+                                <span class="synity-discount">-${formatCurrency(entityDiscount)} ${entityCurrency || 'VND'}</span>
+                            </div>
+                            ` : ''}
+                            ${entityTax > 0 ? `
+                            <div class="synity-financial-row">
+                                <span>Thuế:</span>
+                                <span class="synity-tax">${formatCurrency(entityTax)} ${entityCurrency || 'VND'}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Minimal Settings Only -->
+                    <div class="synity-compact-section">
+                        <h3 class="synity-compact-title">
+                            <i class="bi bi-gear-fill"></i>
+                            Cài Đặt
+                        </h3>
+                        <div class="synity-form-row">
+                            <label class="synity-label">Phiên bản Bitrix24</label>
+                            <select class="synity-select" id="bitrix_version_select">
+                                <option value="Bitrix24 Professional (12-Month)">Professional (12 tháng)</option>
+                                <option value="Bitrix24 Standard (12-Month)">Standard (12 tháng)</option>
+                                <option value="Bitrix24 Enterprise (12-Month)">Enterprise (12 tháng)</option>
                             </select>
                         </div>
                         <div class="synity-form-row synity-form-row--grid">
                             <div>
-                                <label class="synity-label">Giá (USD/tháng)</label>
-                                <input type="number" class="synity-input" id="bitrix_price_usd" readonly>
+                                <label class="synity-label">Tỷ giá USD</label>
+                                <input type="number" class="synity-input" id="exchange_rate" value="26500">
                             </div>
                             <div>
-                                <label class="synity-label">Số tháng</label>
-                                <input type="text" class="synity-input" id="bitrix_months" readonly>
+                                <label class="synity-label">Ưu đãi (%)</label>
+                                <input type="number" class="synity-input" id="discount_percent" value="10" min="0" max="100">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Implementation Fee Section -->
-                    <div class="synity-toggle">
-                        <input type="checkbox" id="include_implementation_fee" checked>
-                        <label class="synity-label">Bao gồm phí triển khai & đồng hành</label>
-                    </div>
-                    
-                    <div id="implementation_fee_container">
-                        <div class="synity-form-row">
-                            <label class="synity-label">Phí triển khai & đồng hành (VNĐ)</label>
-                            <input type="number" class="synity-input" id="implementation_fee" value="392000000">
-                        </div>
-                    </div>
+                    <!-- Hidden fields with all CRM data -->
+                    <input type="hidden" id="responsiblePersonPhone" value="${responsiblePersonPhone}">
+                    <input type="hidden" id="responsiblePersonEmail" value="${responsiblePersonEmail}">
+                    <input type="hidden" id="clientCompanyName" value="${clientCompanyName}">
+                    <input type="hidden" id="client_address" value="${client_address}">
+                    <input type="hidden" id="client_tax_code" value="${client_tax_code}">
+                    <input type="hidden" id="contact_name" value="${contact_name}">
+                    <input type="hidden" id="contact_phone" value="${contact_phone}">
+                    <input type="hidden" id="contact_email" value="${contact_email}">
+                    <input type="hidden" id="bitrix_price_usd" value="249">
+                    <input type="hidden" id="bitrix_months" value="12 tháng">
+                    <input type="hidden" id="implementation_fee" value="392000000">
+                    <input type="hidden" id="currency_conversion_fee_percent" value="3">
+                    <input type="hidden" id="include_bitrix_license" value="true">
+                    <input type="hidden" id="include_implementation_fee" value="true">
                 </div>
+            </aside>
 
-                <div class="synity-form-section">
-                    <h3><i class="bi bi-calculator"></i> Tham Số Tính Toán</h3>
-                    <div class="synity-form-row synity-form-row--grid">
-                        <div>
-                            <label class="synity-label">Tỷ giá USD/VND</label>
-                            <input type="number" class="synity-input" id="exchange_rate" value="26500">
-                        </div>
-                        <div>
-                            <label class="synity-label">Phí chuyển đổi ngoại tệ (%)</label>
-                            <input type="number" class="synity-input" id="currency_conversion_fee_percent" 
-                                   value="3" min="0" max="100" step="0.1">
-                        </div>
-                    </div>
-                    <div class="synity-form-row">
-                        <label class="synity-label">Tổng ưu đãi (%)</label>
-                        <input type="number" class="synity-input" id="discount_percent" 
-                               value="10" min="0" max="100">
-                    </div>
+            <!-- Main Content với Preview -->
+            <main class="synity-main">
+                <div class="synity-main-content">
+                    <iframe id="preview-frame" class="synity-preview"></iframe>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="synity-actions">
-                    <button class="synity-btn synity-btn--primary" id="generate-btn">
-                        <i class="bi bi-file-earmark-plus"></i>
-                        Tạo Báo Giá
-                    </button>
-                    <button class="synity-btn synity-btn--secondary" id="export-btn">
-                        <i class="bi bi-download"></i>
-                        Xuất File HTML  
-                    </button>
-                    <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()">
-                        <i class="bi bi-x-circle"></i>
-                        Đóng
-                    </button>
-                </div>
-            </section>
-
-            <!-- Preview Panel -->
-            <section class="b24-panel b24-panel--preview">
-                <iframe id="preview-frame" class="synity-preview"></iframe>
-            </section>
-        </main>
+            </main>
+        </div>
     </div>
 
     <!-- SYNITY Quotation Template -->
@@ -632,6 +797,7 @@ function getQuotationTemplate() {
                     <!-- BITRIX_SECTION_PLACEHOLDER -->
                     <!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->
                     <!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->
+                    <!-- CRM_PRODUCTS_SECTION_PLACEHOLDER -->
                 </tbody>
             </table>
         </section>
@@ -830,6 +996,58 @@ function getSYNITYQuotationScript() {
             });
         }
 
+        // CRM Product calculation functions
+        const calculateProductsTotal = () => {
+            const productRowsForCalc = document.querySelectorAll('.synity-products-table tbody tr');
+            let total = 0;
+            
+            productRowsForCalc.forEach(row => {
+                const priceText = row.querySelector('.synity-product-price')?.textContent || '0';
+                const qtyText = row.querySelector('.synity-product-qty')?.textContent || '1';
+                
+                // Extract numbers from formatted text
+                const price = parseFloat(priceText.replace(/[^0-9.-]+/g, '')) || 0;
+                const qty = parseFloat(qtyText) || 1;
+                
+                total += price * qty;
+            });
+            
+            return total;
+        };
+
+        const updateFinancialSummary = () => {
+            const productsTotal = calculateProductsTotal();
+            
+            // Get CRM data from data attributes on the body element
+            const entityAmount = parseFloat(document.body.getAttribute('data-entity-amount')) || 0;
+            const entityDiscount = parseFloat(document.body.getAttribute('data-entity-discount')) || 0;
+            const entityTax = parseFloat(document.body.getAttribute('data-entity-tax')) || 0;
+            const entityCurrency = document.body.getAttribute('data-entity-currency') || 'VND';
+            
+            // Update financial summary display
+            const amountElement = document.querySelector('.synity-amount');
+            const discountElement = document.querySelector('.synity-discount');
+            const taxElement = document.querySelector('.synity-tax');
+            
+            if (amountElement) {
+                const displayAmount = productsTotal > 0 ? productsTotal : entityAmount;
+                amountElement.textContent = formatCurrency(displayAmount) + ' ' + entityCurrency;
+            }
+            
+            if (discountElement && entityDiscount > 0) {
+                discountElement.textContent = '-' + formatCurrency(entityDiscount) + ' ' + entityCurrency;
+            }
+            
+            if (taxElement && entityTax > 0) {
+                taxElement.textContent = formatCurrency(entityTax) + ' ' + entityCurrency;
+            }
+        };
+
+        // Initialize product calculations on load
+        setTimeout(() => {
+            updateFinancialSummary();
+        }, 100);
+
         // Generate quotation function
         window.generateQuotation = function() {
             console.log('🚀 Starting quotation generation...');
@@ -857,8 +1075,44 @@ function getSYNITYQuotationScript() {
             const total_license_fee_A = bitrix_total_price_vnd + currency_conversion_fee - total_discount_amount;
             const total_implementation_fee_B = implementation_fee;
             
-            const sub_total = total_license_fee_A + total_implementation_fee_B;
-            const vat_amount = sub_total * 0.10;
+            // Calculate totals from CRM product sections
+            let crm_license_total = 0;
+            let crm_implementation_total = 0;
+            let crm_discount_total = 0;
+            
+            // Get totals from classified CRM products
+            const productRowsForTotal = document.querySelectorAll('.synity-products-table tbody tr');
+            productRowsForTotal.forEach(row => {
+                const productName = row.querySelector('.synity-product-name')?.textContent || '';
+                const totalText = row.querySelector('.synity-product-total')?.textContent || '0';
+                const discountSum = parseFloat(row.getAttribute('data-discount-sum') || '0');
+                
+                // Extract numeric value from formatted text
+                const total = parseFloat(totalText.replace(/[^0-9.-]+/g, '')) || 0;
+                
+                // Classify product and add to appropriate total
+                const isLicense = ['bitrix24', 'license', 'subscription', 'bản quyền', 'phần mềm', 'chuyển đổi ngoại tệ', 'conversion']
+                    .some(keyword => productName.toLowerCase().includes(keyword.toLowerCase()));
+                const isImplementation = ['triển khai', 'implementation', 'đồng hành', 'training', 'hỗ trợ', 'tư vấn', 'setup']
+                    .some(keyword => productName.toLowerCase().includes(keyword.toLowerCase()));
+                
+                if (isLicense || !isImplementation) {
+                    crm_license_total += total;
+                } else if (isImplementation) {
+                    crm_implementation_total += total;
+                }
+                
+                // Add discount amount
+                crm_discount_total += discountSum;
+            });
+            
+            // Calculate final totals using CRM data if available, otherwise use form data
+            const section_A_total = crm_license_total > 0 ? (crm_license_total - crm_discount_total) : total_license_fee_A;
+            const section_B_total = crm_implementation_total > 0 ? crm_implementation_total : total_implementation_fee_B;
+            
+            const sub_total = section_A_total + section_B_total;
+            const crm_entity_tax = parseFloat(document.body.getAttribute('data-entity-tax')) || 0;
+            const vat_amount = crm_entity_tax > 0 ? crm_entity_tax : (sub_total * 0.10);
             const grand_total = sub_total + vat_amount;
 
             // Generate payment schedule (simplified - 2 payments: license first, then implementation)
@@ -974,6 +1228,149 @@ function getSYNITYQuotationScript() {
                         </tr>\`;
             }
 
+            // Classify and generate CRM Products sections
+            let crm_license_section = '';
+            let crm_implementation_section = '';
+            const productRowsForSection = document.querySelectorAll('.synity-products-table tbody tr');
+            
+            if (productRowsForSection.length > 0) {
+                let licenseProducts = [];
+                let implementationProducts = [];
+                let totalDiscount = 0;
+                let discountRate = 0;
+                
+                // Helper function to classify products
+                const isLicenseProduct = (productName) => {
+                    const licensKeywords = ['bitrix24', 'license', 'subscription', 'bản quyền', 'phần mềm', 'chuyển đổi ngoại tệ', 'conversion'];
+                    return licensKeywords.some(keyword => 
+                        productName.toLowerCase().includes(keyword.toLowerCase())
+                    );
+                };
+                
+                const isImplementationProduct = (productName) => {
+                    const implKeywords = ['triển khai', 'implementation', 'đồng hành', 'training', 'hỗ trợ', 'tư vấn', 'setup'];
+                    return implKeywords.some(keyword => 
+                        productName.toLowerCase().includes(keyword.toLowerCase())
+                    );
+                };
+                
+                // Classify products into categories
+                productRowsForSection.forEach(row => {
+                    const productName = row.querySelector('.synity-product-name')?.textContent || 'Unknown Product';
+                    const qty = row.querySelector('.synity-product-qty')?.textContent || '1';
+                    const priceText = row.querySelector('.synity-product-price')?.textContent || '0';
+                    const totalText = row.querySelector('.synity-product-total')?.textContent || '0';
+                    
+                    // Extract discount info from data attributes if available
+                    const discountRateAttr = row.getAttribute('data-discount-rate');
+                    const discountSumAttr = row.getAttribute('data-discount-sum');
+                    
+                    if (discountRateAttr) discountRate = Math.max(discountRate, parseFloat(discountRateAttr));
+                    if (discountSumAttr) totalDiscount += parseFloat(discountSumAttr);
+                    
+                    const product = {
+                        name: productName,
+                        qty: qty,
+                        price: priceText,
+                        total: totalText
+                    };
+                    
+                    if (isLicenseProduct(productName)) {
+                        licenseProducts.push(product);
+                    } else if (isImplementationProduct(productName)) {
+                        implementationProducts.push(product);
+                    } else {
+                        // Default to license if unclear
+                        licenseProducts.push(product);
+                    }
+                });
+                
+                // Generate License Section A
+                if (licenseProducts.length > 0) {
+                    let licenseRowsHtml = '';
+                    let itemNumber = 1;
+                    
+                    licenseProducts.forEach(product => {
+                        licenseRowsHtml += \`
+                            <tr class="border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center">\${itemNumber}</td>
+                                <td class="p-3">
+                                    <p class="font-semibold">\${product.name}</p>
+                                    <p class="text-xs" style="color: var(--text-secondary);">Từ dữ liệu CRM</p>
+                                </td>
+                                <td class="p-3 text-right">\${product.price}</td>
+                                <td class="p-3 text-center">\${product.qty}</td>
+                                <td class="p-3 text-right font-semibold">\${product.total}</td>
+                            </tr>
+                        \`;
+                        itemNumber++;
+                    });
+                    
+                    // Add discount row if available
+                    let discountRowHtml = '';
+                    if (totalDiscount > 0 || discountRate > 0) {
+                        const discountText = discountRate > 0 ? \`\${discountRate}%\` : '';
+                        const discountAmount = totalDiscount > 0 ? formatCurrency(totalDiscount) : '';
+                        
+                        discountRowHtml = \`
+                            <tr class="border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center">\${itemNumber}</td>
+                                <td class="p-3">
+                                    <p class="font-semibold" style="color: var(--accent-main);">Ưu đãi SYNITY (\${discountText})</p>
+                                    <p class="text-xs" style="color: var(--text-secondary);">Từ dữ liệu CRM</p>
+                                </td>
+                                <td class="p-3 text-right"></td>
+                                <td class="p-3 text-center">1</td>
+                                <td class="p-3 text-right font-semibold" style="color: var(--accent-main);">(\${discountAmount})</td>
+                            </tr>
+                        \`;
+                    }
+                    
+                    crm_license_section = \`
+                        <tr class="bg-blue-50">
+                            <td class="p-3 font-bold text-blue-800" colspan="5">A. CHI PHÍ BẢN QUYỀN - TỪ CRM</td>
+                        </tr>
+                        \${licenseRowsHtml}
+                        \${discountRowHtml}
+                    \`;
+                    
+                    // Replace generic Bitrix section with CRM license products
+                    bitrix_section = '';
+                }
+                
+                // Generate Implementation Section B (only if products exist)
+                if (implementationProducts.length > 0) {
+                    let implRowsHtml = '';
+                    let itemNumber = 1;
+                    
+                    implementationProducts.forEach(product => {
+                        implRowsHtml += \`
+                            <tr class="border-b" style="border-color: var(--border-subtle);">
+                                <td class="p-3 text-center">\${itemNumber}</td>
+                                <td class="p-3">
+                                    <p class="font-semibold">\${product.name}</p>
+                                    <p class="text-xs" style="color: var(--text-secondary);">Từ dữ liệu CRM</p>
+                                </td>
+                                <td class="p-3 text-right">\${product.price}</td>
+                                <td class="p-3 text-center">\${product.qty}</td>
+                                <td class="p-3 text-right font-semibold">\${product.total}</td>
+                            </tr>
+                        \`;
+                        itemNumber++;
+                    });
+                    
+                    crm_implementation_section = \`
+                        <tr class="bg-blue-50">
+                            <td class="p-3 font-bold text-blue-800" colspan="5">B. PHÍ TRIỂN KHAI - TỪ CRM</td>
+                        </tr>
+                        \${implRowsHtml}
+                    \`;
+                    
+                    // Replace generic implementation section with CRM implementation products
+                    implementation_section = '';
+                }
+            }
+
             // Prepare template data
             const templateData = {
                 ...data,
@@ -1003,10 +1400,13 @@ function getSYNITYQuotationScript() {
                 finalHtml = finalHtml.replace(regex, templateData[key] || '');
             }
 
-            // Replace section placeholders
-            finalHtml = finalHtml.replace('<!-- BITRIX_SECTION_PLACEHOLDER -->', bitrix_section);
+            // Replace section placeholders with classified CRM sections
+            // Section A: License products from CRM or generic Bitrix section
+            finalHtml = finalHtml.replace('<!-- BITRIX_SECTION_PLACEHOLDER -->', crm_license_section || bitrix_section);
             finalHtml = finalHtml.replace('<!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->', '');
-            finalHtml = finalHtml.replace('<!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->', implementation_section);
+            // Section B: Implementation products from CRM or generic implementation section  
+            finalHtml = finalHtml.replace('<!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->', crm_implementation_section || implementation_section);
+            finalHtml = finalHtml.replace('<!-- CRM_PRODUCTS_SECTION_PLACEHOLDER -->', '');
 
             // Display in preview
             const previewFrame = document.getElementById('preview-frame');

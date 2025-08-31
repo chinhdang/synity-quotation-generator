@@ -420,10 +420,24 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
 
     // Extract placement information
     const placement = postData.PLACEMENT || url.searchParams.get('PLACEMENT');
-    const domain = postData.DOMAIN || url.searchParams.get('DOMAIN');
+    let domain = postData.DOMAIN || url.searchParams.get('DOMAIN');
     const placementOptions = postData.PLACEMENT_OPTIONS ? 
       JSON.parse(postData.PLACEMENT_OPTIONS) : 
       (url.searchParams.get('PLACEMENT_OPTIONS') ? JSON.parse(url.searchParams.get('PLACEMENT_OPTIONS')) : {});
+    
+    // For widgets, domain might not be in POST data, try to extract from referer or use default
+    if (!domain) {
+      const referer = req.headers.get('referer');
+      if (referer) {
+        const refererUrl = new URL(referer);
+        domain = refererUrl.hostname;
+        console.log('Extracted domain from referer:', domain);
+      } else {
+        // Fallback to a known domain from previous logs
+        domain = 'tamgiac.bitrix24.com';
+        console.log('Using fallback domain:', domain);
+      }
+    }
     
     console.log('Widget placement info:', {
       placement,
@@ -453,11 +467,30 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
       console.log('⚠️ No entity ID provided - this might be a list view action without selection');
     }
 
-    // Create Bitrix24 client to fetch CRM data
+    // Create Bitrix24 client from widget POST data
     let client;
     try {
-      client = await Bitrix24Client.createFromStoredSettings(env);
-      console.log('Bitrix24Client created for widget');
+      // Extract auth info from POST data
+      const authId = postData.AUTH_ID;
+      const refreshId = postData.REFRESH_ID;
+      const memberId = postData.member_id;
+      
+      if (!authId || !domain) {
+        console.error('Missing required auth data for widget');
+        return new Response('Missing authentication data', { status: 400 });
+      }
+      
+      // Create client with widget auth data
+      const auth = {
+        access_token: authId,
+        refresh_token: refreshId,
+        domain: domain,
+        member_id: memberId,
+        client_endpoint: `https://${domain}/rest/`
+      };
+      
+      client = new Bitrix24Client(auth, env);
+      console.log('Bitrix24Client created for widget with domain:', domain);
     } catch (error) {
       console.error('Failed to create Bitrix24Client for widget:', error);
       return new Response('Failed to initialize Bitrix24 client', { status: 500 });
@@ -490,7 +523,14 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
     }
 
     // Generate SYNITY quotation interface with pre-filled CRM data
-    const synityCRMHtml = await generateSYNITYCRMInterface(crmData);
+    let synityCRMHtml;
+    try {
+      synityCRMHtml = await generateSYNITYCRMInterface(crmData);
+      console.log('✅ Generated SYNITY CRM interface successfully');
+    } catch (error) {
+      console.error('❌ Failed to generate SYNITY CRM interface:', error);
+      return new Response(`Template generation failed: ${error.message}`, { status: 500 });
+    }
 
     console.log('Returning SYNITY CRM interface');
     
@@ -538,7 +578,11 @@ async function fetchCRMEntityData(client, entityType, entityId) {
     contact_name: '',
     contact_phone: '',
     contact_email: '',
-    bitrixProducts: []
+    bitrixProducts: [],
+    entityAmount: 0,
+    entityDiscount: 0,
+    entityTax: 0,
+    entityCurrency: 'VND'
   };
 
   try {
@@ -618,13 +662,46 @@ async function fetchCRMEntityData(client, entityType, entityId) {
         }
       }
 
-      // Get product rows
-      if (entityType === 'deal') {
-        const products = await client.call('crm.deal.productrows.get', { id: entityId });
-        if (products.result) {
-          data.bitrixProducts = products.result;
+      // Get product rows based on entity type
+      try {
+        let products = null;
+        switch (entityType) {
+          case 'deal':
+            products = await client.call('crm.deal.productrows.get', { id: entityId });
+            break;
+          case 'lead':
+            products = await client.call('crm.lead.productrows.get', { id: entityId });
+            break;
+          case 'invoice':
+            // For Smart Invoice, try to get product rows
+            products = await client.call('crm.item.productrows.get', { 
+              entityTypeId: 31,
+              id: entityId 
+            });
+            break;
         }
+        
+        if (products && products.result) {
+          data.bitrixProducts = products.result;
+          console.log(`Got ${products.result.length} products for ${entityType} ${entityId}`);
+        }
+      } catch (productError) {
+        console.error('Failed to fetch product rows:', productError);
+        data.bitrixProducts = [];
       }
+
+      // Extract entity financial data
+      data.entityAmount = parseFloat(entityData.OPPORTUNITY || entityData.AMOUNT || 0);
+      data.entityDiscount = parseFloat(entityData.DISCOUNT_AMOUNT || 0);
+      data.entityTax = parseFloat(entityData.TAX_VALUE || 0);
+      data.entityCurrency = entityData.CURRENCY_ID || 'VND';
+      
+      console.log('Entity financial data:', {
+        amount: data.entityAmount,
+        discount: data.entityDiscount,
+        tax: data.entityTax,
+        currency: data.entityCurrency
+      });
     }
 
   } catch (error) {
