@@ -1,0 +1,18 @@
+name = "bx-app-quotation"
+main = "src/worker.js"
+compatibility_date = "2025-08-31"
+
+[site]
+bucket = "./public"
+
+# Thay đổi route theo domain của bạn
+routes = [
+    { pattern = "https://bx-app-quotation-generator.hicomta.workers.dev/", custom_domain = true }
+]
+
+# Hoặc sử dụng workers.dev domain
+# workers_dev = true
+
+# Environment variables (nếu cần)
+[vars]
+APP_NAME = "Hello World Bitrix24 App"

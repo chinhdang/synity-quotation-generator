@@ -173,3 +173,6 @@ dist
 .env*
 !.env.example
 .wrangler/
+ 
+# Bitrix24 Settings  
+settings.json 

@@ -10,30 +10,45 @@
 
 // Cloudflare Worker cho Bitrix24 App
 
+import { installHandler, indexHandler } from './bitrix/handlers.js';
+
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
-        
-        // CORS headers cho Bitrix24
-        const corsHeaders = {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            'Access-Control-Max-Age': '86400',
-        };
 
-        // Handle OPTIONS request (CORS preflight)
+        // --- ROUTER ---
+        // The main router logic to dispatch requests to the correct handler.
+
+        // 1. Handle CORS preflight requests
         if (request.method === 'OPTIONS') {
-            return new Response(null, { headers: corsHeaders });
+            return new Response(null, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Bitrix-Signature',
+                    'Access-Control-Max-Age': '86400',
+                }
+            });
         }
 
-        // API Routes
+        // 2. Handle Bitrix24 App Installation
+        if (url.pathname === '/install' && request.method === 'POST') {
+            return installHandler({ req: request, env, ctx });
+        }
+
+        // 3. Handle API Routes
         if (url.pathname.startsWith('/api/')) {
+            const corsHeaders = {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            };
             return handleAPI(request, url.pathname, corsHeaders, env);
         }
 
-        // Serve static files (HTML, CSS, JS)
-        return env.ASSETS.fetch(request);
+        // 4. For all other requests, serve the frontend application.
+        // This handles GET requests for the app's assets and the initial POST from Bitrix24.
+        return indexHandler({ req: request, env, ctx });
     }
 };
 
