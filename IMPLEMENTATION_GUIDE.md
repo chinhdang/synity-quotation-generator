@@ -678,3 +678,354 @@ Total implementation time: ~4 hours với debugging và optimization.
 Result: Fully functional Bitrix24 app chạy trên edge computing platform.
 
 **🚀 Ready for production deployment và feature expansion!**
+
+## 🎨 B24UI Design System Implementation
+
+### **Phase 6: Advanced UI/UX với B24UI**
+
+Trong phase này, chúng ta đã nâng cấp giao diện từ basic HTML lên professional B24UI Design System với horizontal-optimized layout.
+
+#### 6.1 B24UI Architecture
+```
+B24UI Design System
+├── CSS Variables System
+│   ├── Primary Colors (#2066b0, #004f69, #1a5490)
+│   ├── Status Colors (Success, Error, Warning, Info)
+│   ├── Typography Scale (12px - 24px)
+│   ├── Spacing System (4px - 32px)
+│   └── Shadow & Border Radius
+├── Component Library
+│   ├── B24 Buttons (.b24-btn--primary)
+│   ├── Card Components (.b24-card)
+│   ├── Console Terminal (.b24-console)
+│   └── User Info Panel (.b24-user-info)
+└── Layout System
+    ├── Horizontal Grid (2fr 3fr)
+    ├── Responsive Breakpoints
+    └── Sticky Positioning
+```
+
+#### 6.2 B24UI Template Structure (src/bitrix/b24ui-template.js)
+```javascript
+// B24UI Template - Complete HTML content for Bitrix24 app
+export function getB24UITemplate() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bitrix24 Quotation Generator - B24UI</title>
+    <!-- Bitrix24 JS SDK -->
+    <script src="//api.bitrix24.com/api/v1/"></script>
+    <!-- B24 Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        /* B24UI Design System - CSS Variables */
+        :root {
+            --b24-color-primary: #2066b0;
+            --b24-color-primary-hover: #004f69;
+            --b24-color-primary-active: #1a5490;
+            --b24-font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            /* ... Complete CSS Variables System ... */
+        }
+        
+        /* B24UI Layout System - Horizontal Optimized */
+        .b24-main {
+            display: grid;
+            grid-template-columns: 2fr 3fr;
+            gap: var(--b24-space-xl);
+            align-items: start;
+        }
+        
+        .b24-actions {
+            position: sticky;
+            top: var(--b24-space-lg);
+            height: fit-content;
+        }
+        
+        /* Enhanced UI Controller với Loading States */
+        /* Animation System & Responsive Design */
+    </style>
+</head>
+<body>
+    <!-- B24UI App Container -->
+    <div class="b24-app">
+        <!-- Header với Status Indicator -->
+        <header class="b24-header">
+            <h1 class="b24-header__title">
+                <i class="bi bi-laptop"></i>
+                Bitrix24 Quotation Generator
+            </h1>
+            <div class="b24-header__status" id="status">
+                <i class="bi bi-circle-fill animate-pulse"></i>
+                Initializing...
+            </div>
+            <div class="b24-header__info">
+                <div>Cloudflare Worker</div>
+                <div>B24UI Design System</div>
+            </div>
+        </header>
+
+        <!-- Horizontal Layout - Main Content -->
+        <main class="b24-main">
+            <!-- Left Panel - Actions -->
+            <aside class="b24-actions">
+                <h2 class="b24-actions__title">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    Available Actions
+                </h2>
+                <div class="b24-button-grid">
+                    <!-- 6 Professional B24UI Buttons -->
+                    <button class="b24-btn b24-btn--primary">
+                        <i class="bi bi-person-circle"></i>
+                        Get User Information
+                    </button>
+                    <!-- ... 5 other buttons ... -->
+                </div>
+            </aside>
+
+            <!-- Right Panel - Console & User Info -->
+            <section class="b24-output-panel">
+                <!-- Professional Console Output -->
+                <div class="b24-card">
+                    <div class="b24-card__header">
+                        <h3 class="b24-card__title">
+                            <i class="bi bi-terminal"></i>
+                            Console Output
+                        </h3>
+                    </div>
+                    <div class="b24-card__content">
+                        <div class="b24-console"></div>
+                    </div>
+                </div>
+
+                <!-- Dynamic User Information Panel -->
+                <div class="b24-user-info animate-fade-in">
+                    <div class="b24-user-info__grid">
+                        <!-- Dynamic user data với icons -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // B24UI Enhanced JavaScript Controller
+        class B24UIController {
+            constructor() {
+                this.init();
+            }
+            
+            updateStatus(text, type) {
+                // Dynamic status với animated icons
+            }
+            
+            log(message, type, details) {
+                // Enhanced console với color coding
+            }
+            
+            setButtonLoading(buttonId, loading) {
+                // Professional loading states với spinners
+            }
+            
+            showUserInfo(userData) {
+                // Grid layout với icons và animations
+            }
+            
+            async executeWithLoading(buttonId, asyncFunc, actionName) {
+                // Unified loading và error handling
+            }
+        }
+    </script>
+</body>
+</html>`;
+}
+```
+
+#### 6.3 Key B24UI Features
+
+**🎨 Professional Visual Design**
+- **Color System**: Official Bitrix24 primary blues (#2066b0)
+- **Typography**: Segoe UI font stack với proper hierarchy
+- **Spacing**: Consistent 8px grid system
+- **Shadows**: Subtle elevation system
+- **Icons**: Bootstrap Icons integration
+
+**📐 Horizontal-Optimized Layout**
+- **2fr + 3fr Grid**: Action panel (trái) + Output panel (phải)
+- **Sticky Positioning**: Action panel luôn visible khi scroll
+- **Responsive Design**: Mobile stack vertically, Desktop horizontal
+
+**⚡ Enhanced UX Features**
+- **Loading States**: Button spinners và status indicators
+- **Animations**: Fade-in, pulse, smooth transitions
+- **Terminal Console**: Professional dark theme với syntax highlighting
+- **Status Management**: Dynamic icons và color-coded states
+
+**🏗️ Component Architecture**
+- **B24 Buttons**: Primary style với hover/active/focus states
+- **Card Components**: Header/content structure với proper shadows
+- **User Info Panel**: Grid layout với gradient backgrounds
+- **Console Output**: Monospace font với color-coded messages
+
+### **UI/UX Improvements Summary**
+
+| **Aspect** | **Before (Basic)** | **After (B24UI)** |
+|------------|-------------------|-------------------|
+| **Layout** | Single column vertical | Horizontal 2-panel (2fr + 3fr) |
+| **Buttons** | Basic HTML buttons | Professional B24UI với icons |
+| **Output** | Plain text area | Terminal console với color coding |
+| **User Info** | Simple list | Grid layout với icons và animations |
+| **Typography** | Default system fonts | Segoe UI với proper hierarchy |
+| **Colors** | Generic colors | Official Bitrix24 palette |
+| **Interactions** | Static | Loading states, hover effects, transitions |
+| **Responsive** | Basic | Professional breakpoints (1024px, 768px) |
+| **Visual Hierarchy** | Flat | Proper elevation với shadows |
+| **Professional Level** | Basic prototype | Enterprise-grade UI |
+
+## 📱 Static File Serving & HTML Content Management
+
+### **Phase 7: HTML Content Synchronization**
+
+Trong quá trình development, chúng ta cần đảm bảo content được serve correctly từ Worker và sync với public/index.html.
+
+#### 7.1 File Structure
+```
+bx-app-quotation-generator/
+├── public/
+│   └── index.html          # Static HTML file (for reference)
+├── src/
+│   ├── index.js           # Main Worker router
+│   └── bitrix/
+│       ├── handlers.js    # App & Install handlers
+│       └── b24ui-template.js  # B24UI HTML template
+```
+
+#### 7.2 HTML Content Flow
+```
+Browser Request → Worker Router → Handler Selection
+     ↓
+1. GET / or /app → indexHandler()
+     ↓
+2. getLatestHTMLContent() → getB24UITemplate()
+     ↓
+3. Return Response with HTML + CORS headers
+     ↓
+4. Browser renders B24UI interface
+```
+
+#### 7.3 Content Synchronization Strategy
+
+**Problem**: Worker serves content differently than static files
+**Solution**: Centralized template system
+
+```javascript
+// src/bitrix/handlers.js
+import { getB24UITemplate } from './b24ui-template.js';
+
+async function getLatestHTMLContent() {
+  return getB24UITemplate();
+}
+
+export async function indexHandler({ req, env, ctx }) {
+  try {
+    // Serve HTML content directly for all app requests  
+    if (assetRequest.url.includes('/app') || 
+        assetRequest.url.endsWith('/') || 
+        assetRequest.url.endsWith('/index.html')) {
+      
+      // Load fresh HTML content
+      const htmlContent = await getLatestHTMLContent();
+
+      const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Bitrix-Signature',
+        'Content-Security-Policy': "frame-ancestors *; default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'ETag': `"${new Date().getTime()}"`
+      };
+
+      return new Response(htmlContent, {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          ...corsHeaders
+        }
+      });
+    }
+  } catch (error) {
+    console.error('HTML serving error:', error);
+    return new Response('Server Error', { status: 500 });
+  }
+}
+```
+
+#### 7.4 Development Workflow
+
+**For UI Changes:**
+1. **Update Template**: Modify `src/bitrix/b24ui-template.js`
+2. **Sync Public File**: Copy content to `public/index.html` (for reference)
+3. **Deploy Worker**: `wrangler deploy`
+4. **Test**: Verify content serves correctly
+
+**For Testing:**
+1. **Direct Access**: `https://worker.workers.dev/` → Shows worker-served content
+2. **Bitrix24 Iframe**: App menu → Shows same content via iframe
+3. **Local Development**: `npm run dev` → Tests locally
+
+#### 7.5 CORS Configuration for Iframe
+
+**Critical CORS Headers:**
+```javascript
+const corsHeaders = {
+  // Allow any origin (for iframe embedding)
+  'Access-Control-Allow-Origin': '*',
+  
+  // Support all HTTP methods
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  
+  // Allow Bitrix24 headers
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Bitrix-Signature',
+  
+  // Allow iframe embedding from any origin
+  'Content-Security-Policy': "frame-ancestors *; default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
+  
+  // Prevent caching issues during development
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+  'ETag': `"${new Date().getTime()}"`
+};
+```
+
+#### 7.6 Troubleshooting HTML Issues
+
+**Issue 1: Content Not Updating**
+- **Symptoms**: Changes không reflect sau deploy
+- **Solution**: Check cache headers, add ETag với timestamp
+
+**Issue 2: Iframe Blocked**
+- **Symptoms**: X-Frame-Options errors
+- **Solution**: Use `frame-ancestors *` trong CSP thay vì X-Frame-Options
+
+**Issue 3: JavaScript Not Loading**
+- **Symptoms**: BX24 SDK không khởi tạo
+- **Solution**: Check `'unsafe-inline' 'unsafe-eval'` trong CSP
+
+**Issue 4: Icon/CSS Not Loading**
+- **Symptoms**: Bootstrap icons không hiển thị
+- **Solution**: Verify CDN links và CSP cho external resources
+
+### **Benefits của Template System**
+
+✅ **Single Source of Truth**: Một template cho tất cả environments
+✅ **Easy Updates**: Chỉ cần update một file
+✅ **Version Control**: Template changes được tracked trong git
+✅ **Development Efficiency**: No need sync multiple files
+✅ **Production Ready**: Optimized CORS và caching headers
+
+---
+
+**🎯 Final Result**: Professional B24UI interface với perfect HTML serving pipeline!**

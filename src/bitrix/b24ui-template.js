@@ -1,4 +1,6 @@
-<!doctype html>
+// B24UI Template - Complete HTML content for Bitrix24 app
+export function getB24UITemplate() {
+  return `<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -516,11 +518,11 @@
                     info: 'var(--b24-color-primary)'
                 };
                 
-                this.status.innerHTML = `
-                    <i class="${iconMap[type] || iconMap.info}" 
-                       style="font-size: 8px; margin-right: 4px; color: ${colorMap[type]}"></i>
-                    ${text}
-                `;
+                this.status.innerHTML = \`
+                    <i class="\${iconMap[type] || iconMap.info}" 
+                       style="font-size: 8px; margin-right: 4px; color: \${colorMap[type]}"></i>
+                    \${text}
+                \`;
                 this.status.style.borderColor = colorMap[type];
             }
             
@@ -534,11 +536,11 @@
                 };
                 
                 const config = typeMap[type] || typeMap.info;
-                const detailsText = details ? `\n  └─ ${details}` : '';
+                const detailsText = details ? \`\\n  └─ \${details}\` : '';
                 
-                this.output.innerHTML += `<span class="${config.class}">
-[${timestamp}] ${config.icon} ${message}${detailsText}
-</span>`;
+                this.output.innerHTML += \`<span class="\${config.class}">
+[\${timestamp}] \${config.icon} \${message}\${detailsText}
+</span>\`;
                 this.output.scrollTop = this.output.scrollHeight;
                 
                 // Auto-scroll animation
@@ -560,7 +562,7 @@
             
             showUserInfo(userData) {
                 const userItems = [
-                    { icon: 'bi bi-person-fill', label: 'Full Name', value: `${userData.NAME} ${userData.LAST_NAME}` },
+                    { icon: 'bi bi-person-fill', label: 'Full Name', value: \`\${userData.NAME} \${userData.LAST_NAME}\` },
                     { icon: 'bi bi-envelope-fill', label: 'Email', value: userData.EMAIL },
                     { icon: 'bi bi-hash', label: 'User ID', value: userData.ID },
                     { icon: 'bi bi-telephone-fill', label: 'Phone', value: userData.WORK_PHONE || 'Not provided' },
@@ -568,13 +570,13 @@
                     { icon: 'bi bi-calendar-fill', label: 'Last Login', value: new Date().toLocaleDateString() }
                 ];
                 
-                this.userContent.innerHTML = userItems.map(item => `
+                this.userContent.innerHTML = userItems.map(item => \`
                     <div class="b24-user-info__item">
-                        <i class="${item.icon}" style="color: var(--b24-color-primary);"></i>
-                        <span class="b24-user-info__label">${item.label}:</span>
-                        <span class="b24-user-info__value">${item.value}</span>
+                        <i class="\${item.icon}" style="color: var(--b24-color-primary);"></i>
+                        <span class="b24-user-info__label">\${item.label}:</span>
+                        <span class="b24-user-info__value">\${item.value}</span>
                     </div>
-                `).join('');
+                \`).join('');
                 
                 this.userSection.style.display = 'block';
                 this.userSection.classList.add('animate-fade-in');
@@ -582,14 +584,14 @@
             
             async executeWithLoading(buttonId, asyncFunc, actionName) {
                 this.setButtonLoading(buttonId, true);
-                this.updateStatus(`${actionName}...`, 'loading');
-                this.log(`🔄 ${actionName}...`, 'info');
+                this.updateStatus(\`\${actionName}...\`, 'loading');
+                this.log(\`🔄 \${actionName}...\`, 'info');
                 
                 try {
                     await asyncFunc();
                     this.updateStatus('Ready', 'success');
                 } catch (error) {
-                    this.log(`❌ Error in ${actionName}: ${error.message}`, 'error');
+                    this.log(\`❌ Error in \${actionName}: \${error.message}\`, 'error');
                     this.updateStatus('Error occurred', 'error');
                 } finally {
                     this.setButtonLoading(buttonId, false);
@@ -613,7 +615,7 @@
             // Update status with B24UI
             ui.updateStatus('Connected to Bitrix24', 'success');
             ui.log('🚀 Bitrix24 SDK initialized successfully', 'success', 'B24UI Design System Active');
-            ui.log(`🌐 Domain: ${bx24Info.domain}`, 'info', `Language: ${bx24Info.lang} | Admin: ${bx24Info.isAdmin ? 'Yes' : 'No'}`);
+            ui.log(\`🌐 Domain: \${bx24Info.domain}\`, 'info', \`Language: \${bx24Info.lang} | Admin: \${bx24Info.isAdmin ? 'Yes' : 'No'}\`);
 
             // Button 1: Get User Information
             document.getElementById('btnGetUser').addEventListener('click', () => {
@@ -626,7 +628,7 @@
                             } else {
                                 const user = result.data();
                                 ui.log('User information retrieved successfully', 'success', 
-                                      `${user.NAME} ${user.LAST_NAME} (${user.EMAIL})`);
+                                      \`\${user.NAME} \${user.LAST_NAME} (\${user.EMAIL})\`);
                                 ui.showUserInfo(user);
                                 resolve();
                             }
@@ -652,7 +654,7 @@
                     const data = await response.json();
                     ui.log('Random UUID generated', 'success', data.uuid);
                     ui.log('Generation timestamp', 'info', data.timestamp);
-                    ui.log('Random number', 'info', `Additional random: ${data.random || 'N/A'}`);
+                    ui.log('Random number', 'info', \`Additional random: \${data.random || 'N/A'}\`);
                 }, 'Generating Random UUID');
             });
 
@@ -666,12 +668,12 @@
                                 reject(new Error(result.error()));
                             } else {
                                 const departments = result.data();
-                                ui.log(`Departments loaded successfully`, 'success', `Found ${departments.length} departments`);
+                                ui.log(\`Departments loaded successfully\`, 'success', \`Found \${departments.length} departments\`);
                                 departments.slice(0, 10).forEach((dept, index) => {
-                                    ui.log(`Department ${index + 1}`, 'info', `${dept.NAME} (ID: ${dept.ID})`);
+                                    ui.log(\`Department \${index + 1}\`, 'info', \`\${dept.NAME} (ID: \${dept.ID})\`);
                                 });
                                 if (departments.length > 10) {
-                                    ui.log(`... and ${departments.length - 10} more departments`, 'info');
+                                    ui.log(\`... and \${departments.length - 10} more departments\`, 'info');
                                 }
                                 resolve();
                             }
@@ -694,12 +696,12 @@
                                 reject(new Error(result.error()));
                             } else {
                                 const tasks = result.data().tasks || [];
-                                ui.log(`Tasks retrieved successfully`, 'success', `Found ${tasks.length} active tasks`);
+                                ui.log(\`Tasks retrieved successfully\`, 'success', \`Found \${tasks.length} active tasks\`);
                                 tasks.slice(0, 5).forEach((task, index) => {
-                                    ui.log(`Task ${index + 1}`, 'info', `${task.title} (Status: ${task.status})`);
+                                    ui.log(\`Task \${index + 1}\`, 'info', \`\${task.title} (Status: \${task.status})\`);
                                 });
                                 if (tasks.length > 5) {
-                                    ui.log(`... and ${tasks.length - 5} more tasks`, 'info');
+                                    ui.log(\`... and \${tasks.length - 5} more tasks\`, 'info');
                                 }
                                 resolve();
                             }
@@ -728,7 +730,7 @@
                                     body: JSON.stringify({
                                         user: {
                                             id: user.ID,
-                                            name: `${user.NAME} ${user.LAST_NAME}`,
+                                            name: \`\${user.NAME} \${user.LAST_NAME}\`,
                                             email: user.EMAIL
                                         },
                                         domain: BX24.getDomain(),
@@ -738,7 +740,7 @@
                                 
                                 const data = await response.json();
                                 ui.log('Worker API called successfully', 'success', data.message || 'API Response received');
-                                ui.log('Processing performance', 'info', `Processing time: ${data.duration || 'N/A'}ms`);
+                                ui.log('Processing performance', 'info', \`Processing time: \${data.duration || 'N/A'}ms\`);
                                 resolve();
                             } catch (error) {
                                 ui.log('Worker API call failed', 'error', error.message);
@@ -751,4 +753,5 @@
         });
     </script>
 </body>
-</html>
+</html>`;
+}
