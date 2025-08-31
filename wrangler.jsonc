@@ -17,6 +17,15 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	"kv_namespaces": [
+		{
+			"binding": "BITRIX_KV",
+			"id": "f6a4d0e328454bf989e51003978b9c4d"
+		}
+	],
+	"vars": {
+		"APP_NAME": "Bitrix24 Quotation Generator"
 	}
 	/**
 	 * Smart Placement

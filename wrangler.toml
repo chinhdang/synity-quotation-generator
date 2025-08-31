@@ -1,18 +1,15 @@
-name = "bx-app-quotation"
-main = "src/worker.js"
+name = "bx-app-quotation-generator"
+main = "src/index.js"
 compatibility_date = "2025-08-31"
 
-[site]
-bucket = "./public"
+# KV Storage for Bitrix24 auth data
+[[kv_namespaces]]
+binding = "BITRIX_KV"
+id = "f6a4d0e328454bf989e51003978b9c4d"
 
-# Thay đổi route theo domain của bạn
-routes = [
-    { pattern = "https://bx-app-quotation-generator.hicomta.workers.dev/", custom_domain = true }
-]
-
-# Hoặc sử dụng workers.dev domain
-# workers_dev = true
-
-# Environment variables (nếu cần)
+# Environment variables
 [vars]
-APP_NAME = "Hello World Bitrix24 App"
+APP_NAME = "Bitrix24 Quotation Generator"
+
+# Use Workers dev domain (remove routes to avoid conflicts)
+workers_dev = true

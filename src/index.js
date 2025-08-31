@@ -11,10 +11,21 @@
 // Cloudflare Worker cho Bitrix24 App
 
 import { installHandler, indexHandler } from './bitrix/handlers.js';
+import { healthCheck, quickHealthCheck } from './bitrix/health.js';
 
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
+        
+        // Log all requests for debugging
+        console.log('🚀 WORKER REQUEST:', {
+            url: request.url,
+            method: request.method,
+            pathname: url.pathname,
+            userAgent: request.headers.get('user-agent'),
+            referer: request.headers.get('referer'),
+            timestamp: new Date().toISOString()
+        });
 
         // --- ROUTER ---
         // The main router logic to dispatch requests to the correct handler.
@@ -36,6 +47,16 @@ export default {
             return installHandler({ req: request, env, ctx });
         }
 
+        // 2.5. Handle Bitrix24 App Main Page (both GET and POST)
+        if (url.pathname === '/app' || url.pathname === '/') {
+            console.log('📱 APP PAGE REQUEST:', {
+                pathname: url.pathname,
+                method: request.method,
+                queryParams: Object.fromEntries(url.searchParams)
+            });
+            return indexHandler({ req: request, env, ctx });
+        }
+
         // 3. Handle API Routes
         if (url.pathname.startsWith('/api/')) {
             const corsHeaders = {
@@ -48,6 +69,11 @@ export default {
 
         // 4. For all other requests, serve the frontend application.
         // This handles GET requests for the app's assets and the initial POST from Bitrix24.
+        console.log('📍 ROUTING TO indexHandler for:', {
+            pathname: url.pathname,
+            method: request.method,
+            queryParams: Object.fromEntries(url.searchParams)
+        });
         return indexHandler({ req: request, env, ctx });
     }
 };
@@ -128,13 +154,22 @@ async function handleAPI(request, pathname, corsHeaders, env) {
             return new Response(JSON.stringify(response), { headers });
         }
 
-        // GET /api/health - Health check endpoint
+        // GET /api/health - Comprehensive health check endpoint
         if (pathname === '/api/health' && request.method === 'GET') {
-            return new Response(JSON.stringify({
-                status: 'healthy',
-                timestamp: new Date().toISOString(),
-                version: '1.0.0'
-            }), { headers });
+            const healthData = await healthCheck(env);
+            const statusCode = healthData.status === 'critical' ? 503 : 
+                              healthData.status === 'degraded' ? 200 : 200;
+            
+            return new Response(JSON.stringify(healthData), { 
+                status: statusCode,
+                headers 
+            });
+        }
+
+        // GET /api/health/quick - Quick health check endpoint
+        if (pathname === '/api/health/quick' && request.method === 'GET') {
+            const healthData = await quickHealthCheck(env);
+            return new Response(JSON.stringify(healthData), { headers });
         }
 
         // 404 cho các route không tồn tại
