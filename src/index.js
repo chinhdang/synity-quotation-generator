@@ -10,7 +10,7 @@
 
 // Cloudflare Worker cho Bitrix24 App
 
-import { installHandler, indexHandler } from './bitrix/handlers.js';
+import { installHandler, indexHandler, widgetQuotationHandler, debugPlacementsHandler } from './bitrix/handlers.js';
 import { healthCheck, quickHealthCheck } from './bitrix/health.js';
 
 export default {
@@ -47,7 +47,17 @@ export default {
             return installHandler({ req: request, env, ctx });
         }
 
-        // 2.5. Handle Bitrix24 App Main Page (both GET and POST)
+        // 2.5. Handle Widget Quotation Endpoint (support both GET and POST)
+        if (url.pathname === '/widget/quotation') {
+            console.log('🎯 WIDGET QUOTATION REQUEST:', {
+                pathname: url.pathname,
+                method: request.method,
+                queryParams: Object.fromEntries(url.searchParams)
+            });
+            return widgetQuotationHandler({ req: request, env, ctx });
+        }
+
+        // 2.6. Handle Bitrix24 App Main Page (both GET and POST)
         if (url.pathname === '/app' || url.pathname === '/') {
             console.log('📱 APP PAGE REQUEST:', {
                 pathname: url.pathname,
@@ -55,6 +65,11 @@ export default {
                 queryParams: Object.fromEntries(url.searchParams)
             });
             return indexHandler({ req: request, env, ctx });
+        }
+
+        // 2.7. Debug Placements Endpoint
+        if (url.pathname === '/debug/placements' && request.method === 'GET') {
+            return debugPlacementsHandler({ req: request, env, ctx });
         }
 
         // 3. Handle API Routes

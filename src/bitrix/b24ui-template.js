@@ -448,6 +448,10 @@ export function getB24UITemplate() {
                         <i class="bi bi-arrow-repeat"></i>
                         Call Worker API
                     </button>
+                    <button id="btnCheckPlacements" class="b24-btn b24-btn--warning" type="button" onclick="checkPlacements()">
+                        <i class="bi bi-bug"></i>
+                        Check Widget Placements
+                    </button>
                 </div>
             </aside>
 
@@ -482,6 +486,22 @@ export function getB24UITemplate() {
         console.log('🔍 User Agent:', navigator.userAgent);
         console.log('🌐 Location:', window.location.href);
         console.log('🎨 B24UI Design System Activated');
+        
+        // Function to check widget placements
+        function checkPlacements() {
+            console.log('🔧 Checking widget placements...');
+            
+            if (typeof BX24 !== 'undefined') {
+                BX24.getAuth(function(auth) {
+                    // Open debug page with auth
+                    const debugUrl = '/debug/placements?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                    window.open(debugUrl, '_blank');
+                });
+            } else {
+                // Fallback - open without auth
+                window.open('/debug/placements', '_blank');
+            }
+        }
         
         // Enhanced UI Controller
         class B24UIController {
