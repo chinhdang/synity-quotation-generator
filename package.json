@@ -1,0 +1,19 @@
+{
+	"name": "bx-app-quotation-generator",
+	"version": "0.0.0",
+	"description": "Bitrix24 Local App with Cloudflare Worker",
+	"main": "src/worker.js",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"tail": "wrangler tail"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"vitest": "~3.2.0",
+		"wrangler": "^4.33.1"
+	}
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello World - Bitrix24 App</title>
+    <!-- Thêm Bitrix24 JS SDK -->
+    <script src="//api.bitrix24.com/api/v1/"></script>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p>Đây là ứng dụng Bitrix24 local của bạn</p>
+    
+    <button id="button" type="button">Lấy thông tin người dùng</button>
+    <output id="userInfo" for="button"></output>
+    
+    <script>
+        // Khởi tạo Bitrix24 SDK
+        BX24.init(function(){
+            console.log('Bitrix24 SDK đã sẵn sàng!');
+            
+            // Lấy thông tin người dùng hiện tại khi click button
+            const button = document.getElementById("button");
+            button.addEventListener("click", () => {
+                BX24.callMethod(
+                    'user.current',
+                    {},
+                    function(result) {
+                        if(result.error()) {
+                            console.error(result.error());
+                        } else {
+                            const user = result.data();
+                            const userInfo = document.getElementById('userInfo');
+                            userInfo.innerHTML = `
+                                <p>Xin chào: ${user.NAME} ${user.LAST_NAME}</p>
+                                <p>Email: ${user.EMAIL}</p>
+                            `;
+                        }
+                    }
+                );
+            });
+        });
+    </script>
+</body>
+</html>
