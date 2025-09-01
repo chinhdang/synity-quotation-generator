@@ -239,6 +239,9 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .synity-label {
@@ -258,6 +261,8 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             transition: all 0.2s ease;
             background: var(--synity-bg-primary);
             color: var(--synity-text-primary);
+            box-sizing: border-box;
+            max-width: 100%;
         }
 
         .synity-input:focus {
@@ -282,6 +287,8 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             color: var(--synity-text-primary);
             cursor: pointer;
             transition: all 0.2s ease;
+            box-sizing: border-box;
+            max-width: 100%;
         }
 
         .synity-select:focus {
@@ -308,6 +315,10 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .synity-compact-title {
@@ -505,16 +516,10 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 
         <!-- SYNITY App Body -->
         <div class="synity-app-body">
-            <!-- Sidebar với Form - Phase 2 Simplified -->
-            <aside class="synity-sidebar">
+            <!-- Compact Form Panel -->
+            <aside class="synity-sidebar" style="width: 320px;">
                 <div class="synity-sidebar-content">
-                    <!-- CRM Status Indicator -->
-                    <div class="synity-crm-indicator">
-                        <i class="bi bi-database-check"></i>
-                        <span>Dữ liệu đã được tải từ Bitrix24 CRM</span>
-                    </div>
-
-                    <!-- Phase 2: Only Essential Quote Info -->
+                    <!-- Essential Quotation Info -->
                     <div class="synity-compact-section">
                         <h3 class="synity-compact-title">
                             <i class="bi bi-calendar3"></i>
@@ -535,128 +540,6 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Phase 2: CRM Data Display Only -->
-                    <div class="synity-compact-section">
-                        <h3 class="synity-compact-title">
-                            <i class="bi bi-building"></i>
-                            Từ CRM
-                        </h3>
-                        <div class="synity-form-row">
-                            <label class="synity-label">Khách hàng</label>
-                            <div class="synity-readonly-display">
-                                <i class="bi bi-building-fill"></i>
-                                ${clientCompanyName}
-                            </div>
-                        </div>
-                        <div class="synity-form-row">
-                            <label class="synity-label">Phụ trách</label>
-                            <div class="synity-readonly-display">
-                                <i class="bi bi-person-fill"></i>
-                                ${responsiblePersonName}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Phase 3: CRM Products Table -->
-                    ${bitrixProducts && bitrixProducts.length > 0 ? `
-                    <div class="synity-compact-section">
-                        <h3 class="synity-compact-title">
-                            <i class="bi bi-box-seam-fill"></i>
-                            Sản Phẩm CRM (${bitrixProducts.length})
-                        </h3>
-                        <div class="synity-products-table">
-                            <table class="synity-table">
-                                <thead>
-                                    <tr>
-                                        <th>Sản phẩm</th>
-                                        <th>SL</th>
-                                        <th>Giá</th>
-                                        <th>Tổng</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${bitrixProducts.map(product => `
-                                        <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" data-discount-sum="${product.DISCOUNT_SUM || 0}">
-                                            <td class="synity-product-name">${product.PRODUCT_NAME || 'Unknown Product'}</td>
-                                            <td class="synity-product-qty">${product.QUANTITY || 1}</td>
-                                            <td class="synity-product-price">${formatCurrency(product.PRICE || 0)}</td>
-                                            <td class="synity-product-total">${formatCurrency((product.PRICE || 0) * (product.QUANTITY || 1))}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    ` : ''}
-
-                    <!-- Phase 4: CRM Financial Summary -->
-                    <div class="synity-compact-section">
-                        <h3 class="synity-compact-title">
-                            <i class="bi bi-calculator-fill"></i>
-                            Tổng Từ CRM
-                        </h3>
-                        <div class="synity-financial-summary">
-                            <div class="synity-financial-row">
-                                <span>Tổng giá trị:</span>
-                                <span class="synity-amount">${formatCurrency(entityAmount || 0)} ${entityCurrency || 'VND'}</span>
-                            </div>
-                            ${entityDiscount > 0 ? `
-                            <div class="synity-financial-row">
-                                <span>Giảm giá:</span>
-                                <span class="synity-discount">-${formatCurrency(entityDiscount)} ${entityCurrency || 'VND'}</span>
-                            </div>
-                            ` : ''}
-                            ${entityTax > 0 ? `
-                            <div class="synity-financial-row">
-                                <span>Thuế:</span>
-                                <span class="synity-tax">${formatCurrency(entityTax)} ${entityCurrency || 'VND'}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-
-                    <!-- Phase 2: Minimal Settings Only -->
-                    <div class="synity-compact-section">
-                        <h3 class="synity-compact-title">
-                            <i class="bi bi-gear-fill"></i>
-                            Cài Đặt
-                        </h3>
-                        <div class="synity-form-row">
-                            <label class="synity-label">Phiên bản Bitrix24</label>
-                            <select class="synity-select" id="bitrix_version_select">
-                                <option value="Bitrix24 Professional (12-Month)">Professional (12 tháng)</option>
-                                <option value="Bitrix24 Standard (12-Month)">Standard (12 tháng)</option>
-                                <option value="Bitrix24 Enterprise (12-Month)">Enterprise (12 tháng)</option>
-                            </select>
-                        </div>
-                        <div class="synity-form-row synity-form-row--grid">
-                            <div>
-                                <label class="synity-label">Tỷ giá USD</label>
-                                <input type="number" class="synity-input" id="exchange_rate" value="26500">
-                            </div>
-                            <div>
-                                <label class="synity-label">Ưu đãi (%)</label>
-                                <input type="number" class="synity-input" id="discount_percent" value="10" min="0" max="100">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hidden fields with all CRM data -->
-                    <input type="hidden" id="responsiblePersonPhone" value="${responsiblePersonPhone}">
-                    <input type="hidden" id="responsiblePersonEmail" value="${responsiblePersonEmail}">
-                    <input type="hidden" id="clientCompanyName" value="${clientCompanyName}">
-                    <input type="hidden" id="client_address" value="${client_address}">
-                    <input type="hidden" id="client_tax_code" value="${client_tax_code}">
-                    <input type="hidden" id="contact_name" value="${contact_name}">
-                    <input type="hidden" id="contact_phone" value="${contact_phone}">
-                    <input type="hidden" id="contact_email" value="${contact_email}">
-                    <input type="hidden" id="bitrix_price_usd" value="249">
-                    <input type="hidden" id="bitrix_months" value="12 tháng">
-                    <input type="hidden" id="implementation_fee" value="392000000">
-                    <input type="hidden" id="currency_conversion_fee_percent" value="3">
-                    <input type="hidden" id="include_bitrix_license" value="true">
-                    <input type="hidden" id="include_implementation_fee" value="true">
                 </div>
             </aside>
 
@@ -666,6 +549,49 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                     <iframe id="preview-frame" class="synity-preview"></iframe>
                 </div>
             </main>
+
+            <!-- Hidden CRM products data for JavaScript processing -->
+            ${bitrixProducts && bitrixProducts.length > 0 ? 
+                bitrixProducts.map(product => `
+                    <div class="synity-products-table" style="display:none;">
+                        <table class="synity-table">
+                            <tbody>
+                                <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" 
+                                    data-discount-sum="${product.DISCOUNT_SUM || 0}"
+                                    data-price="${product.PRICE || 0}"
+                                    data-price-netto="${product.PRICE_NETTO || 0}"
+                                    data-tax-rate="${product.TAX_RATE || 0}"
+                                    data-tax-included="${product.TAX_INCLUDED || 'N'}">
+                                    <td class="synity-product-name">${product.PRODUCT_NAME || 'Unknown Product'}</td>
+                                    <td class="synity-product-qty">${product.QUANTITY || 1}</td>
+                                    <td class="synity-product-price">${formatCurrency(product.PRICE || 0)}</td>
+                                    <td class="synity-product-total">${formatCurrency(product.PRICE_NETTO || 0)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `).join('')
+            : ''}
+
+            <!-- Hidden fields with all CRM data -->
+            <input type="hidden" id="responsiblePersonName" value="${responsiblePersonName}">
+            <input type="hidden" id="responsiblePersonPhone" value="${responsiblePersonPhone}">
+            <input type="hidden" id="responsiblePersonEmail" value="${responsiblePersonEmail}">
+            <input type="hidden" id="clientCompanyName" value="${clientCompanyName}">
+            <input type="hidden" id="client_address" value="${client_address}">
+            <input type="hidden" id="client_tax_code" value="${client_tax_code}">
+            <input type="hidden" id="contact_name" value="${contact_name}">
+            <input type="hidden" id="contact_phone" value="${contact_phone}">
+            <input type="hidden" id="contact_email" value="${contact_email}">
+            <input type="hidden" id="bitrix_price_usd" value="249">
+            <input type="hidden" id="bitrix_months" value="12 tháng">
+            <input type="hidden" id="implementation_fee" value="392000000">
+            <input type="hidden" id="currency_conversion_fee_percent" value="3">
+            <input type="hidden" id="include_bitrix_license" value="true">
+            <input type="hidden" id="include_implementation_fee" value="true">
+            <input type="hidden" id="exchange_rate" value="26500">
+            <input type="hidden" id="discount_percent" value="10">
+            <input type="hidden" id="bitrix_version_select" value="Bitrix24 Professional (12-Month)">
         </div>
     </div>
 
@@ -678,6 +604,24 @@ export function getSYNITYCRMTemplate(crmData = {}) {
         // Initialize B24 and SYNITY integration
         BX24.init(function() {
             console.log('🎯 SYNITY CRM Integration initialized');
+            
+            // Smart resize widget to expand for better UX in slider
+            setTimeout(function() {
+                // Get current scroll dimensions
+                const scrollSize = BX24.getScrollSize();
+                console.log('📏 Current scroll size:', scrollSize);
+                
+                // Calculate optimal dimensions for quotation generator
+                const targetWidth = Math.min(1400, Math.max(1200, scrollSize.scrollWidth + 100));
+                const targetHeight = Math.min(900, Math.max(800, scrollSize.scrollHeight + 50));
+                
+                console.log('📏 Resizing to:', targetWidth, 'x', targetHeight);
+                
+                BX24.resizeWindow(targetWidth, targetHeight, function() {
+                    console.log('✅ Widget resized successfully');
+                });
+            }, 100); // Small delay to ensure DOM is ready
+            
             initializeSYNITYQuotation();
         });
 
@@ -905,11 +849,22 @@ function getSYNITYQuotationScript() {
 
         // Initialize default values
         const today = new Date();
-        if (inputs.date_created) inputs.date_created.valueAsDate = today;
+        
+        // For visible date inputs, use valueAsDate
+        if (inputs.date_created && inputs.date_created.type === 'date') {
+            inputs.date_created.valueAsDate = today;
+        } else if (inputs.date_created) {
+            // For hidden inputs, use string value
+            inputs.date_created.value = today.toISOString().split('T')[0];
+        }
         
         const thirtyDaysLater = new Date();
         thirtyDaysLater.setDate(today.getDate() + 30);
-        if (inputs.closed_date) inputs.closed_date.valueAsDate = thirtyDaysLater;
+        if (inputs.closed_date && inputs.closed_date.type === 'date') {
+            inputs.closed_date.valueAsDate = thirtyDaysLater;
+        } else if (inputs.closed_date) {
+            inputs.closed_date.value = thirtyDaysLater.toISOString().split('T')[0];
+        }
         
         // Generate quotation number
         const year = today.getFullYear().toString().slice(-2);
@@ -996,29 +951,41 @@ function getSYNITYQuotationScript() {
             });
         }
 
-        // CRM Product calculation functions
+        // CRM Product calculation functions using Bitrix24 fields
         const calculateProductsTotal = () => {
             const productRowsForCalc = document.querySelectorAll('.synity-products-table tbody tr');
-            let total = 0;
+            let totalPriceNetto = 0;
+            let totalDiscountSum = 0;
+            let totalTax = 0;
             
             productRowsForCalc.forEach(row => {
-                const priceText = row.querySelector('.synity-product-price')?.textContent || '0';
-                const qtyText = row.querySelector('.synity-product-qty')?.textContent || '1';
+                // Use PRICE_NETTO from data attributes (more accurate than parsing display text)
+                const priceNetto = parseFloat(row.getAttribute('data-price-netto')) || 0;
+                const discountSum = parseFloat(row.getAttribute('data-discount-sum')) || 0;
+                const price = parseFloat(row.getAttribute('data-price')) || 0;
+                const taxRate = parseFloat(row.getAttribute('data-tax-rate')) || 0;
                 
-                // Extract numbers from formatted text
-                const price = parseFloat(priceText.replace(/[^0-9.-]+/g, '')) || 0;
-                const qty = parseFloat(qtyText) || 1;
+                // Calculate tax: TAX = PRICE + PRICE * TAX_RATE(%)
+                const tax = price + (price * (taxRate / 100));
                 
-                total += price * qty;
+                totalPriceNetto += priceNetto;
+                totalDiscountSum += discountSum;
+                totalTax += tax;
             });
             
-            return total;
+            return {
+                priceNetto: totalPriceNetto,
+                discountSum: totalDiscountSum,
+                tax: totalTax,
+                subtotal: totalPriceNetto - totalDiscountSum, // Tổng cộng = sum of PRICE_NETTO - sum of DISCOUNT_SUM
+                grandTotal: (totalPriceNetto - totalDiscountSum) + totalTax // TỔNG THANH TOÁN = Tổng cộng + TAX
+            };
         };
 
         const updateFinancialSummary = () => {
             const productsTotal = calculateProductsTotal();
             
-            // Get CRM data from data attributes on the body element
+            // Get CRM data from data attributes on the body element  
             const entityAmount = parseFloat(document.body.getAttribute('data-entity-amount')) || 0;
             const entityDiscount = parseFloat(document.body.getAttribute('data-entity-discount')) || 0;
             const entityTax = parseFloat(document.body.getAttribute('data-entity-tax')) || 0;
@@ -1029,17 +996,24 @@ function getSYNITYQuotationScript() {
             const discountElement = document.querySelector('.synity-discount');
             const taxElement = document.querySelector('.synity-tax');
             
+            // Use calculated product totals if available, otherwise use entity data
             if (amountElement) {
-                const displayAmount = productsTotal > 0 ? productsTotal : entityAmount;
+                const displayAmount = productsTotal.subtotal > 0 ? productsTotal.subtotal : entityAmount;
                 amountElement.textContent = formatCurrency(displayAmount) + ' ' + entityCurrency;
             }
             
-            if (discountElement && entityDiscount > 0) {
-                discountElement.textContent = '-' + formatCurrency(entityDiscount) + ' ' + entityCurrency;
+            if (discountElement) {
+                const displayDiscount = productsTotal.discountSum > 0 ? productsTotal.discountSum : entityDiscount;
+                if (displayDiscount > 0) {
+                    discountElement.textContent = '-' + formatCurrency(displayDiscount) + ' ' + entityCurrency;
+                }
             }
             
-            if (taxElement && entityTax > 0) {
-                taxElement.textContent = formatCurrency(entityTax) + ' ' + entityCurrency;
+            if (taxElement) {
+                const displayTax = productsTotal.tax > 0 ? productsTotal.tax : entityTax;
+                if (displayTax > 0) {
+                    taxElement.textContent = formatCurrency(displayTax) + ' ' + entityCurrency;
+                }
             }
         };
 
@@ -1080,15 +1054,19 @@ function getSYNITYQuotationScript() {
             let crm_implementation_total = 0;
             let crm_discount_total = 0;
             
-            // Get totals from classified CRM products
+            // Get totals using correct Bitrix24 calculation method
             const productRowsForTotal = document.querySelectorAll('.synity-products-table tbody tr');
             productRowsForTotal.forEach(row => {
                 const productName = row.querySelector('.synity-product-name')?.textContent || '';
-                const totalText = row.querySelector('.synity-product-total')?.textContent || '0';
-                const discountSum = parseFloat(row.getAttribute('data-discount-sum') || '0');
                 
-                // Extract numeric value from formatted text
-                const total = parseFloat(totalText.replace(/[^0-9.-]+/g, '')) || 0;
+                // Use PRICE_NETTO and proper Bitrix24 fields
+                const priceNetto = parseFloat(row.getAttribute('data-price-netto')) || 0;
+                const discountSum = parseFloat(row.getAttribute('data-discount-sum') || '0');
+                const price = parseFloat(row.getAttribute('data-price')) || 0;
+                const taxRate = parseFloat(row.getAttribute('data-tax-rate')) || 0;
+                
+                // Calculate tax: TAX = PRICE + PRICE * TAX_RATE(%)
+                const tax = price + (price * (taxRate / 100));
                 
                 // Classify product and add to appropriate total
                 const isLicense = ['bitrix24', 'license', 'subscription', 'bản quyền', 'phần mềm', 'chuyển đổi ngoại tệ', 'conversion']
@@ -1097,23 +1075,35 @@ function getSYNITYQuotationScript() {
                     .some(keyword => productName.toLowerCase().includes(keyword.toLowerCase()));
                 
                 if (isLicense || !isImplementation) {
-                    crm_license_total += total;
+                    crm_license_total += priceNetto; // Use PRICE_NETTO instead of calculated total
                 } else if (isImplementation) {
-                    crm_implementation_total += total;
+                    crm_implementation_total += priceNetto; // Use PRICE_NETTO instead of calculated total
                 }
                 
                 // Add discount amount
                 crm_discount_total += discountSum;
             });
             
-            // Calculate final totals using CRM data if available, otherwise use form data
-            const section_A_total = crm_license_total > 0 ? (crm_license_total - crm_discount_total) : total_license_fee_A;
-            const section_B_total = crm_implementation_total > 0 ? crm_implementation_total : total_implementation_fee_B;
-            
-            const sub_total = section_A_total + section_B_total;
+            // Use CRM entity data for financial calculations
+            const crm_entity_amount = parseFloat(document.body.getAttribute('data-entity-amount')) || 0;
+            const crm_entity_discount = parseFloat(document.body.getAttribute('data-entity-discount')) || 0;
             const crm_entity_tax = parseFloat(document.body.getAttribute('data-entity-tax')) || 0;
-            const vat_amount = crm_entity_tax > 0 ? crm_entity_tax : (sub_total * 0.10);
-            const grand_total = sub_total + vat_amount;
+            
+            // If CRM data exists, use it directly; otherwise fallback to calculated values
+            let sub_total, vat_amount, grand_total;
+            
+            if (crm_entity_amount > 0) {
+                // Use CRM entity financial data
+                sub_total = crm_entity_amount - crm_entity_discount;
+                vat_amount = crm_entity_tax;
+                grand_total = crm_entity_amount + crm_entity_tax;
+            } else {
+                // Fallback to calculated values from form inputs (Section A only, no Section B)
+                const section_A_total = crm_license_total > 0 ? (crm_license_total - crm_discount_total) : total_license_fee_A;
+                sub_total = section_A_total; // No Section B
+                vat_amount = sub_total * 0.10;
+                grand_total = sub_total + vat_amount;
+            }
 
             // Generate payment schedule (simplified - 2 payments: license first, then implementation)
             let payment_schedule_table = '';
@@ -1202,31 +1192,8 @@ function getSYNITYQuotationScript() {
                 }
             }
 
-            // Generate implementation section
+            // Section B completely removed - no implementation section
             let implementation_section = '';
-            if (include_implementation_fee && implementation_fee > 0) {
-                implementation_section = \`<tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">B. PHÍ TRIỂN KHAI & ĐỒNG HÀNH CHUYỂN ĐỔI SỐ</td></tr>
-                        <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
-                            <td class="p-3 text-center align-top">4</td>
-                            <td class="p-3">
-                                <p class="font-semibold">Gói "Đồng Hành & Chia Sẻ Thành Công"</p>
-                                <ol class="list-decimal list-inside text-xs mt-2 space-y-1 pl-2" style="color: var(--text-secondary);">
-                                    <li>Cố vấn Chiến lược Công nghệ - CTO as a Service™</li>
-                                    <li>Giao tiếp & Cộng tác 4.0 - AI CoPilot Hỗ trợ</li>
-                                    <li>Triển khai Bitrix24 CRM - Cỗ máy Bán hàng Tinh nhuệ</li>
-                                    <li>Nền tảng Dữ liệu Hợp nhất - Single Source of Truth</li>
-                                    <li>Tự động hóa Quy trình Toàn diện - Automation Ecosystem™</li>
-                                    <li>Khai phóng Sức mạnh AI Agents - "Bộ Não Thứ Hai"</li>
-                                    <li>Hệ thống Báo cáo Quản trị Thông minh (BI Dashboard)</li>
-                                    <li>Bảo trì & Phát triển Liên tục - Evolution System™</li>
-                                    <li>Truy cập Mạng lưới Chuyên gia SYNITY</li>
-                                </ol>
-                            </td>
-                            <td class="p-3 text-right align-top"></td>
-                            <td class="p-3 text-center align-top">1</td>
-                            <td class="p-3 text-right font-semibold align-top">\${formatCurrency(implementation_fee)}</td>
-                        </tr>\`;
-            }
 
             // Classify and generate CRM Products sections
             let crm_license_section = '';
@@ -1259,7 +1226,10 @@ function getSYNITYQuotationScript() {
                     const productName = row.querySelector('.synity-product-name')?.textContent || 'Unknown Product';
                     const qty = row.querySelector('.synity-product-qty')?.textContent || '1';
                     const priceText = row.querySelector('.synity-product-price')?.textContent || '0';
-                    const totalText = row.querySelector('.synity-product-total')?.textContent || '0';
+                    
+                    // Use PRICE_NETTO for the total column (THÀNH TIỀN)
+                    const priceNetto = parseFloat(row.getAttribute('data-price-netto')) || 0;
+                    const totalText = formatCurrency(priceNetto);
                     
                     // Extract discount info from data attributes if available
                     const discountRateAttr = row.getAttribute('data-discount-rate');
@@ -1338,37 +1308,7 @@ function getSYNITYQuotationScript() {
                     bitrix_section = '';
                 }
                 
-                // Generate Implementation Section B (only if products exist)
-                if (implementationProducts.length > 0) {
-                    let implRowsHtml = '';
-                    let itemNumber = 1;
-                    
-                    implementationProducts.forEach(product => {
-                        implRowsHtml += \`
-                            <tr class="border-b" style="border-color: var(--border-subtle);">
-                                <td class="p-3 text-center">\${itemNumber}</td>
-                                <td class="p-3">
-                                    <p class="font-semibold">\${product.name}</p>
-                                    <p class="text-xs" style="color: var(--text-secondary);">Từ dữ liệu CRM</p>
-                                </td>
-                                <td class="p-3 text-right">\${product.price}</td>
-                                <td class="p-3 text-center">\${product.qty}</td>
-                                <td class="p-3 text-right font-semibold">\${product.total}</td>
-                            </tr>
-                        \`;
-                        itemNumber++;
-                    });
-                    
-                    crm_implementation_section = \`
-                        <tr class="bg-blue-50">
-                            <td class="p-3 font-bold text-blue-800" colspan="5">B. PHÍ TRIỂN KHAI - TỪ CRM</td>
-                        </tr>
-                        \${implRowsHtml}
-                    \`;
-                    
-                    // Replace generic implementation section with CRM implementation products
-                    implementation_section = '';
-                }
+                // Section B completely removed - no CRM implementation section generated
             }
 
             // Prepare template data
@@ -1404,8 +1344,8 @@ function getSYNITYQuotationScript() {
             // Section A: License products from CRM or generic Bitrix section
             finalHtml = finalHtml.replace('<!-- BITRIX_SECTION_PLACEHOLDER -->', crm_license_section || bitrix_section);
             finalHtml = finalHtml.replace('<!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->', '');
-            // Section B: Implementation products from CRM or generic implementation section  
-            finalHtml = finalHtml.replace('<!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->', crm_implementation_section || implementation_section);
+            // Section B: Completely removed - no implementation section
+            finalHtml = finalHtml.replace('<!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->', '');
             finalHtml = finalHtml.replace('<!-- CRM_PRODUCTS_SECTION_PLACEHOLDER -->', '');
 
             // Display in preview
