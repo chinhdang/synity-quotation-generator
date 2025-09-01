@@ -1,15 +1,35 @@
+# Production configuration (default)
 name = "bx-app-quotation-generator"
 main = "src/index.js"
 compatibility_date = "2025-08-31"
 
-# KV Storage for Bitrix24 auth data
+# Production KV Storage for Bitrix24 auth data
 [[kv_namespaces]]
 binding = "BITRIX_KV"
 id = "f6a4d0e328454bf989e51003978b9c4d"
 
-# Environment variables
+# Production environment variables
 [vars]
 APP_NAME = "Bitrix24 Quotation Generator"
+APP_ENV = "production"
+LOG_LEVEL = "error"
 
-# Use Workers dev domain (remove routes to avoid conflicts)
+# Use Workers dev domain
 workers_dev = true
+
+# ============================================
+# Development Environment Configuration
+# ============================================
+[env.dev]
+name = "bx-app-quotation-generator-dev"
+
+# Development environment variables
+[env.dev.vars]
+APP_NAME = "Bitrix24 Quotation Generator (DEV)"
+APP_ENV = "development"
+LOG_LEVEL = "debug"
+
+# Development KV namespace
+[[env.dev.kv_namespaces]]
+binding = "BITRIX_KV"
+id = "85003fd422584962bc9b51fa0ca7b980"

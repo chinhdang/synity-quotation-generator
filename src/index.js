@@ -17,15 +17,27 @@ export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
         
-        // Log all requests for debugging
-        console.log('🚀 WORKER REQUEST:', {
-            url: request.url,
-            method: request.method,
-            pathname: url.pathname,
-            userAgent: request.headers.get('user-agent'),
-            referer: request.headers.get('referer'),
-            timestamp: new Date().toISOString()
-        });
+        // Environment detection
+        const isDevEnvironment = env.APP_ENV === 'development';
+        const envPrefix = isDevEnvironment ? '[DEV]' : '[PROD]';
+        const logLevel = env.LOG_LEVEL || 'info';
+        
+        // Environment-aware logging
+        if (isDevEnvironment || logLevel === 'debug') {
+            console.log(`${envPrefix} 🚀 WORKER REQUEST:`, {
+                environment: env.APP_ENV,
+                appName: env.APP_NAME,
+                url: request.url,
+                method: request.method,
+                pathname: url.pathname,
+                userAgent: request.headers.get('user-agent'),
+                referer: request.headers.get('referer'),
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            // Production: minimal logging
+            console.log(`${envPrefix} Request: ${request.method} ${url.pathname}`);
+        }
 
         // --- ROUTER ---
         // The main router logic to dispatch requests to the correct handler.

@@ -6,10 +6,15 @@
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
+		"deploy:dev": "wrangler deploy --env dev",
+		"deploy:prod": "wrangler deploy",
+		"dev": "wrangler dev --env dev",
+		"dev:prod": "wrangler dev",
+		"start": "wrangler dev --env dev",
 		"test": "vitest",
-		"tail": "wrangler tail"
+		"tail": "wrangler tail",
+		"tail:dev": "wrangler tail --env dev",
+		"tail:prod": "wrangler tail"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.8.19",

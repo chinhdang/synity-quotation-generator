@@ -6,6 +6,8 @@
 export function getSYNITYCRMTemplate(crmData = {}) {
   // Safely extract CRM data with fallbacks
   const {
+    environment = 'production',
+    appName = 'Bitrix24 Quotation Generator',
     responsiblePersonName = 'Chinh Đặng',
     responsiblePersonPhone = '0947100700', 
     responsiblePersonEmail = 'chinh@synity.vn',
@@ -496,6 +498,13 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     <div class="synity-app">
         <!-- Unified Sidebar - Single Cohesive Experience -->
         <aside class="synity-sidebar">
+            <!-- Development Environment Badge -->
+            ${environment === 'development' ? `
+            <div style="background: #ff6b35; color: white; padding: 8px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 1000; border-radius: 0;">
+                ⚠️ DEV ENVIRONMENT - Testing Only
+            </div>
+            ` : ''}
+            
             <!-- Cohesive Header -->
             <header class="synity-header">
                 <h1 class="synity-header-title">
@@ -504,7 +513,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                 </h1>
                 <div class="synity-header-subtitle">
                     <i class="bi bi-check-circle-fill"></i>
-                    CRM Connected & Ready
+                    CRM Connected & Ready ${environment === 'development' ? '(DEV)' : ''}
                 </div>
             </header>
 

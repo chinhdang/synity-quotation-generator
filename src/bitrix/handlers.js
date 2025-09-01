@@ -8,9 +8,12 @@ async function getLatestHTMLContent() {
 }
 
 // Helper function to get app URL
-function getAppUrl(domain) {
-  // Use the correct production URL
-  return `https://bx-app-quotation-generator.hicomta.workers.dev`;
+function getAppUrl(domain, env) {
+  // Environment-aware URL
+  const isDevEnvironment = env?.APP_ENV === 'development';
+  return isDevEnvironment 
+    ? `https://bx-app-quotation-generator-dev.hicomta.workers.dev`
+    : `https://bx-app-quotation-generator.hicomta.workers.dev`;
 }
 
 /**
@@ -107,7 +110,7 @@ export async function installHandler({ req, env, ctx }) {
 
     console.log('Binding widget placements...');
     try {
-      const appUrl = getAppUrl(auth.domain);
+      const appUrl = getAppUrl(auth.domain, env);
       console.log('App URL for placements:', appUrl);
       
       // Clear existing placements first
@@ -525,7 +528,7 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
     // Generate SYNITY quotation interface with pre-filled CRM data
     let synityCRMHtml;
     try {
-      synityCRMHtml = await generateSYNITYCRMInterface(crmData);
+      synityCRMHtml = await generateSYNITYCRMInterface(crmData, env);
       console.log('✅ Generated SYNITY CRM interface successfully');
     } catch (error) {
       console.error('❌ Failed to generate SYNITY CRM interface:', error);
@@ -712,8 +715,14 @@ async function fetchCRMEntityData(client, entityType, entityId) {
 }
 
 // Function to generate SYNITY CRM interface
-async function generateSYNITYCRMInterface(crmData) {
-  return getSYNITYCRMTemplate(crmData);
+async function generateSYNITYCRMInterface(crmData, env) {
+  // Add environment info to crmData
+  const dataWithEnv = {
+    ...crmData,
+    environment: env?.APP_ENV || 'production',
+    appName: env?.APP_NAME || 'Bitrix24 Quotation Generator'
+  };
+  return getSYNITYCRMTemplate(dataWithEnv);
 }
 
 /**
@@ -798,7 +807,7 @@ export async function debugPlacementsHandler({ req, env, ctx }) {
         
         <h2>Authentication Status</h2>
         <p>${authStatus}</p>
-        <p>App URL: <strong>${getAppUrl('debug')}</strong></p>
+        <p>App URL: <strong>${getAppUrl('debug', env)}</strong></p>
         <p>Total Placements Found: <strong>${placements.length}</strong></p>
         
         <h2>Current Placements</h2>
