@@ -264,7 +264,6 @@ export function getAppUITemplate(crmData = {}) {
     entityDiscount: entityDiscount,
     entityTax: entityTax,
     environment: environment,
-    isDevelopment: isDevelopment,
     hostname: typeof window !== 'undefined' ? window.location?.hostname : 'server-side'
   });
   
