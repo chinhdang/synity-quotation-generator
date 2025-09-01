@@ -20,225 +20,10 @@ function analyzeBitrixProducts(bitrixProducts) {
   return "Bitrix24 Standard (12-Month)";
 }
 
-// Function to generate development info panel
-function getDevInfo() {
-  const now = new Date();
-  const devInfo = {
-    gitCommit: '17d46b8',
-    commitMessage: 'fix: add dev info panel debug logging and auto environment detection',
-    branch: 'feature/dev-prod-environments',
-    deployId: '187ea7de-116c-42e2-8bd9-66dc4696a260',
-    timestamp: now.toLocaleString('vi-VN', {
-      timeZone: 'Asia/Ho_Chi_Minh',
-      year: 'numeric',
-      month: '2-digit', 
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }),
-    changes: [
-      'Fix template placeholder substitution with corrected regex pattern',
-      'Add comprehensive CRM API integration (requisites, addresses, products)',
-      'Implement direct template generator approach eliminating form-based legacy',
-      'Add enterprise-grade dev info panel with git version, deploy ID, and changelog',
-      'Support universal product API with fallbacks across entity types',
-      'Add dynamic quotation number format BX[CODE]-[ID]'
-    ]
-  };
-  
-  // Debug logging for version tracking
-  console.log('🔍 DEV INFO PANEL DEBUG:', devInfo);
-  console.log('🎯 Current Git Version:', devInfo.gitCommit);
-  console.log('🚀 Deploy ID:', devInfo.deployId);
-  console.log('📅 Build Timestamp:', devInfo.timestamp);
-  
-  return devInfo;
-}
-
-// Function to include direct template generator script
-function getDirectTemplateGeneratorScript() {
-  return `
-    // Direct Template Generator - Embedded in UI
-    window.generateQuotationHTML = function(crmData) {
-      // Generate only what's not from CRM
-      const today = new Date();
-      const entityType = crmData.entityType || 'unknown';
-      const entityId = crmData.entityId || '000';
-      
-      const mapping = { 'lead': 'L', 'deal': 'D', 'invoice': 'SI', 'estimate': 'E', 'company': 'CO', 'contact': 'C' };
-      const code = mapping[entityType] || 'UNK';
-      const quotation_number = 'BX' + code + '-' + entityId;
-      
-      const formatDate = function(date) {
-        if (!date) return '';
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return '';
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        return day + '/' + month + '/' + year;
-      };
-      
-      const formatCurrency = function(amount) {
-        if (isNaN(amount)) return '0';
-        return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0));
-      };
-      
-      const date_created = formatDate(today);
-      const closed_date = formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
-      
-      // Calculate totals from CRM products
-      let subtotal = 0, vatAmount = 0;
-      if (crmData.bitrixProducts && crmData.bitrixProducts.length > 0) {
-        crmData.bitrixProducts.forEach(function(product) {
-          const quantity = parseFloat(product.QUANTITY) || 1;
-          const priceExclusive = parseFloat(product.PRICE_EXCLUSIVE || product.PRICE) || 0;
-          const discountSum = parseFloat(product.DISCOUNT_SUM) || 0;
-          const taxRate = parseFloat(product.TAX_RATE) || 0;
-          const lineTotal = (priceExclusive * quantity) - (discountSum * quantity);
-          const lineVat = lineTotal * (taxRate / 100);
-          subtotal += lineTotal;
-          vatAmount += lineVat;
-        });
-      }
-      const grandTotal = subtotal + vatAmount;
-      
-      // Generate products table
-      let productsTableHtml = '';
-      if (!crmData.bitrixProducts || crmData.bitrixProducts.length === 0) {
-        productsTableHtml = '<tr><td colspan="5" style="text-align: center; color: #666; font-style: italic;">Không có sản phẩm nào được tìm thấy</td></tr>';
-      } else {
-        productsTableHtml = crmData.bitrixProducts.map(function(product) {
-          const quantity = parseFloat(product.QUANTITY) || 1;
-          const price = parseFloat(product.PRICE_NETTO || product.PRICE) || 0;
-          const discount = parseFloat(product.DISCOUNT_SUM) || 0;
-          const total = (price * quantity) - (discount * quantity);
-          return '<tr><td>' + (product.PRODUCT_NAME || product.NAME || 'Unknown Product') + '</td><td style="text-align: center;">' + quantity + '</td><td style="text-align: right;">' + formatCurrency(price) + '</td><td style="text-align: right;">' + formatCurrency(discount) + '</td><td style="text-align: right; font-weight: 600;">' + formatCurrency(total) + '</td></tr>';
-        }).join('');
-      }
-      
-      // Direct CRM data usage
-      const clientCompanyName = crmData.clientCompanyName || 'N/A';
-      const client_address = crmData.client_address || 'N/A';
-      const client_tax_code = crmData.client_tax_code || 'N/A';
-      const contact_name = crmData.contact_name || 'N/A';
-      const contact_phone = crmData.contact_phone || 'N/A';
-      const contact_email = crmData.contact_email || 'N/A';
-      const responsiblePersonName = crmData.responsiblePersonName || 'N/A';
-      const responsiblePersonPhone = crmData.responsiblePersonPhone || 'N/A';
-      const responsiblePersonEmail = crmData.responsiblePersonEmail || 'N/A';
-      
-      return \`<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Báo Giá \${quotation_number}</title>
-    <style>
-        :root { --primary-color: #14B8A6; --primary-dark: #0D9488; --text-primary: #0F172A; --text-secondary: #475569; --border-color: #E2E8F0; --bg-secondary: #F8FAFC; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: var(--text-primary); background: white; padding: 20px; }
-        .quotation-container { max-width: 210mm; margin: 0 auto; background: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border-radius: 8px; overflow: hidden; }
-        .quotation-header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: white; padding: 2rem; text-align: center; }
-        .quotation-header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; }
-        .content-section { padding: 2rem; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-        .info-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; }
-        .info-card h3 { color: var(--primary-color); font-size: 1.1rem; margin-bottom: 1rem; font-weight: 600; }
-        .info-card p { margin-bottom: 0.5rem; font-size: 0.95rem; }
-        .section-title { color: var(--primary-color); font-size: 1.3rem; margin-bottom: 1rem; font-weight: 600; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; }
-        .products-table { width: 100%; border-collapse: collapse; margin-top: 1rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); border-radius: 8px; overflow: hidden; }
-        .products-table th { background: var(--primary-color); color: white; padding: 1rem; text-align: left; font-weight: 600; font-size: 0.95rem; }
-        .products-table td { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-        .products-table tr:nth-child(even) { background: var(--bg-secondary); }
-        .totals-section { margin-top: 2rem; text-align: right; }
-        .total-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); }
-        .total-row:last-child { font-size: 1.2rem; font-weight: 700; color: var(--primary-color); background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-bottom: none; }
-        .quotation-footer { background: var(--bg-secondary); padding: 2rem; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        .footer-section h4 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.1rem; }
-        @media print { body { padding: 0; } .quotation-container { box-shadow: none; border-radius: 0; } }
-        @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr; } .quotation-footer { grid-template-columns: 1fr; } .quotation-header h1 { font-size: 2rem; } }
-    </style>
-</head>
-<body>
-    <div class="quotation-container">
-        <header class="quotation-header">
-            <h1>BÁO GIÁ</h1>
-            <div class="quotation-number">Số: \${quotation_number}</div>
-        </header>
-        <div class="content-section">
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>📋 Thông Tin Khách Hàng</h3>
-                    <p><strong>Công ty:</strong> \${clientCompanyName}</p>
-                    <p><strong>Địa chỉ:</strong> \${client_address}</p>
-                    <p><strong>MST:</strong> \${client_tax_code}</p>
-                    <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--border-color);">
-                    <p><strong>Người liên hệ:</strong> \${contact_name}</p>
-                    <p><strong>Điện thoại:</strong> \${contact_phone}</p>
-                    <p><strong>Email:</strong> \${contact_email}</p>
-                </div>
-                <div class="info-card">
-                    <h3>📅 Thông Tin Báo Giá</h3>
-                    <p><strong>Số báo giá:</strong> \${quotation_number}</p>
-                    <p><strong>Ngày tạo:</strong> \${date_created}</p>
-                    <p><strong>Hiệu lực đến:</strong> \${closed_date}</p>
-                    <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--border-color);">
-                    <p><strong>Người phụ trách:</strong> \${responsiblePersonName}</p>
-                    <p><strong>Điện thoại:</strong> \${responsiblePersonPhone}</p>
-                    <p><strong>Email:</strong> \${responsiblePersonEmail}</p>
-                </div>
-            </div>
-            <div class="products-section">
-                <h2 class="section-title">🛍️ Chi Tiết Sản Phẩm & Dịch Vụ</h2>
-                <table class="products-table">
-                    <thead>
-                        <tr>
-                            <th>Sản phẩm/Dịch vụ</th>
-                            <th style="text-align: center;">Số lượng</th>
-                            <th style="text-align: right;">Đơn giá</th>
-                            <th style="text-align: right;">Giảm giá</th>
-                            <th style="text-align: right;">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>\${productsTableHtml}</tbody>
-                </table>
-            </div>
-            <div class="totals-section">
-                <div class="total-row"><span>Tổng cộng:</span><span>\${formatCurrency(subtotal)}</span></div>
-                <div class="total-row"><span>VAT:</span><span>\${formatCurrency(vatAmount)}</span></div>
-                <div class="total-row"><span>TỔNG THANH TOÁN:</span><span>\${formatCurrency(grandTotal)}</span></div>
-            </div>
-        </div>
-        <footer class="quotation-footer">
-            <div class="footer-section">
-                <h4>🏢 SYNITY Co, Ltd</h4>
-                <p>Số 96/54/8 đường Nguyễn Thông</p>
-                <p>Phường Nhiều Lộc, TP. Hồ Chí Minh</p>
-                <p>MST: 0318972367</p>
-            </div>
-            <div class="footer-section">
-                <h4>📞 Liên Hệ</h4>
-                <p><strong>Người phụ trách:</strong> \${responsiblePersonName}</p>
-                <p><strong>Điện thoại:</strong> \${responsiblePersonPhone}</p>
-                <p><strong>Email:</strong> \${responsiblePersonEmail}</p>
-            </div>
-        </footer>
-    </div>
-</body>
-</html>\`;
-    };
-  `;
-}
-
 export function getAppUITemplate(crmData = {}) {
-  // Simple environment detection - just check for development in URL or crmData
-  // This will be evaluated client-side in the browser
-  const environment = 'development'; // Force development for now to debug
-  
-  // Safely extract CRM data with fallbacks  
+  // Safely extract CRM data with fallbacks
   const {
-    // environment = environment, // Use forced environment
+    environment = 'production',
     appName = 'Bitrix24 Quotation Generator',
     responsiblePersonName = 'Chinh Đặng',
     responsiblePersonPhone = '0947100700', 
@@ -256,21 +41,13 @@ export function getAppUITemplate(crmData = {}) {
     entityCurrency = 'VND'
   } = crmData;
 
-  // DEBUG: Log received CRM data and environment detection
+  // DEBUG: Log received CRM data
   console.log('🔍 getAppUITemplate received crmData:', {
     bitrixProducts: bitrixProducts,
     productCount: bitrixProducts?.length || 0,
     entityAmount: entityAmount,
     entityDiscount: entityDiscount,
-    entityTax: entityTax,
-    environment: environment,
-    hostname: typeof window !== 'undefined' ? window.location?.hostname : 'server-side'
-  });
-  
-  console.log('🌍 ENVIRONMENT DEBUG:', {
-    detected: environment,
-    forcedDevelopment: true,
-    willShowDevPanel: environment === 'development'
+    entityTax: entityTax
   });
 
   // Helper function for currency formatting
@@ -280,7 +57,6 @@ export function getAppUITemplate(crmData = {}) {
 
   // Analyze Bitrix products to suggest version
   const suggestedBitrixVersion = analyzeBitrixProducts(bitrixProducts);
-  const devInfo = getDevInfo();
 
   return `<!DOCTYPE html>
 <html lang="vi">
@@ -732,291 +508,18 @@ export function getAppUITemplate(crmData = {}) {
             outline: 2px solid var(--primary-500);
             outline-offset: 2px;
         }
-
-        /* Development Environment Info Panel - Enterprise Grade */
-        .dev-info-panel {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border: 1px solid #475569;
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-md);
-            overflow: hidden;
-            box-shadow: var(--elevation-3);
-            position: relative;
-            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-        }
-
-        .dev-info-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--space-md);
-            background: rgba(15, 23, 42, 0.8);
-            border-bottom: 1px solid #475569;
-        }
-
-        .dev-status-indicator {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .dev-pulse {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            position: relative;
-            animation: dev-pulse 2s infinite;
-        }
-
-        @keyframes dev-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-
-        .dev-label {
-            color: #10b981;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .dev-info-toggle {
-            background: transparent;
-            border: 1px solid #475569;
-            border-radius: var(--radius-md);
-            color: #94a3b8;
-            padding: var(--space-xs);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dev-info-toggle:hover {
-            background: rgba(148, 163, 184, 0.1);
-            border-color: #64748b;
-            color: #e2e8f0;
-        }
-
-        .dev-info-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(30, 41, 59, 0.9);
-        }
-
-        .dev-info-content.expanded {
-            max-height: 400px;
-        }
-
-        .dev-info-grid {
-            padding: var(--space-lg);
-            display: grid;
-            gap: var(--space-md);
-        }
-
-        .dev-info-item {
-            display: grid;
-            grid-template-columns: 100px 1fr;
-            gap: var(--space-sm);
-            align-items: start;
-        }
-
-        .dev-info-description {
-            grid-template-columns: 100px 1fr;
-            align-items: start;
-        }
-
-        .dev-info-label {
-            color: #64748b;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            line-height: 1.2;
-        }
-
-        .dev-info-value {
-            color: #e2e8f0;
-            font-size: 0.875rem;
-            font-weight: 500;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .dev-commit-hash {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            margin-right: var(--space-xs);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .dev-commit-msg {
-            color: #cbd5e1;
-            font-size: 0.8rem;
-        }
-
-        .dev-branch {
-            background: rgba(59, 130, 246, 0.1);
-            color: #60a5fa;
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            display: inline-block;
-        }
-
-        .dev-deploy-id {
-            background: rgba(168, 85, 247, 0.1);
-            color: #c084fc;
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            display: inline-block;
-        }
-
-        .dev-timestamp {
-            background: rgba(245, 158, 11, 0.1);
-            color: #fbbf24;
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            display: inline-block;
-        }
-
-        .dev-change-item {
-            color: #cbd5e1;
-            font-size: 0.8rem;
-            margin-bottom: 4px;
-            padding-left: var(--space-sm);
-            position: relative;
-        }
-
-        .dev-change-item:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Hide dev panel in production */
-        .synity-app:not([data-env="development"]) .dev-info-panel {
-            display: none;
-        }
-
-        /* Responsive adjustments for dev panel */
-        @media (max-width: 1200px) {
-            .dev-info-item {
-                grid-template-columns: 80px 1fr;
-            }
-            
-            .dev-info-description {
-                grid-template-columns: 80px 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .dev-info-item,
-            .dev-info-description {
-                grid-template-columns: 1fr;
-                gap: var(--space-xs);
-            }
-            
-            .dev-info-label {
-                margin-bottom: 2px;
-            }
-        }
     </style>
 </head>
 
 <body data-entity-amount="${entityAmount || 0}" data-entity-discount="${entityDiscount || 0}" data-entity-tax="${entityTax || 0}" data-entity-currency="${entityCurrency || 'VND'}">
-    <div class="synity-app" data-env="${environment}">
+    <div class="synity-app">
         <!-- Unified Sidebar - Single Cohesive Experience -->
         <aside class="synity-sidebar">
-            <!-- Development Environment Info Panel -->
+            <!-- Development Environment Badge -->
             ${environment === 'development' ? `
-            <div class="dev-info-panel">
-                <div class="dev-info-header">
-                    <div class="dev-status-indicator">
-                        <div class="dev-pulse"></div>
-                        <span class="dev-label">DEVELOPMENT</span>
-                    </div>
-                    <button class="dev-info-toggle" onclick="toggleDevInfo()">
-                        <i class="bi bi-info-circle"></i>
-                    </button>
-                </div>
-                
-                <div class="dev-info-content" id="dev-info-content">
-                    <div class="dev-info-grid">
-                        <div class="dev-info-item">
-                            <div class="dev-info-label">Git Commit</div>
-                            <div class="dev-info-value">
-                                <span class="dev-commit-hash">${devInfo.gitCommit}</span>
-                                <span class="dev-commit-msg">${devInfo.commitMessage}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="dev-info-item">
-                            <div class="dev-info-label">Branch</div>
-                            <div class="dev-info-value dev-branch">${devInfo.branch}</div>
-                        </div>
-                        
-                        <div class="dev-info-item">
-                            <div class="dev-info-label">Deploy ID</div>
-                            <div class="dev-info-value dev-deploy-id">${devInfo.deployId}</div>
-                        </div>
-                        
-                        <div class="dev-info-item">
-                            <div class="dev-info-label">Last Update</div>
-                            <div class="dev-info-value dev-timestamp">${devInfo.timestamp}</div>
-                        </div>
-                        
-                        <div class="dev-info-item dev-info-description">
-                            <div class="dev-info-label">Changes</div>
-                            <div class="dev-info-value">
-                                ${devInfo.changes.map(change => `<div class="dev-change-item">✅ ${change}</div>`).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div style="background: #ff6b35; color: white; padding: 8px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 1000; border-radius: 0;">
+                ⚠️ DEV ENVIRONMENT - Testing Only
             </div>
-            
-            <script>
-                function toggleDevInfo() {
-                    const content = document.getElementById('dev-info-content');
-                    const button = document.querySelector('.dev-info-toggle');
-                    const isExpanded = content.classList.contains('expanded');
-                    
-                    if (isExpanded) {
-                        content.classList.remove('expanded');
-                        button.style.transform = 'rotate(0deg)';
-                    } else {
-                        content.classList.add('expanded');
-                        button.style.transform = 'rotate(180deg)';
-                    }
-                }
-                
-                // Auto-collapse after 5 seconds
-                setTimeout(() => {
-                    const content = document.getElementById('dev-info-content');
-                    if (content && content.classList.contains('expanded')) {
-                        content.classList.remove('expanded');
-                        document.querySelector('.dev-info-toggle').style.transform = 'rotate(0deg)';
-                    }
-                }, 5000);
-            </script>
             ` : ''}
             
             <!-- Cohesive Header -->
@@ -1138,29 +641,8 @@ export function getAppUITemplate(crmData = {}) {
     </template>
 
     <script>
-        // Debug logging - App initialization
-        console.log('🚀 SYNITY APP INITIALIZING...');
-        console.log('🌍 Current URL:', window.location.href);
-        console.log('🔧 Environment detection:', window.location.hostname.includes('dev') ? 'DEVELOPMENT' : 'PRODUCTION');
-        
-        // Store CRM data globally for direct template generation
-        window.SYNITY_CRM_DATA = ${JSON.stringify(crmData)};
-        console.log('📊 CRM Data stored globally:', window.SYNITY_CRM_DATA);
-        
-        // Force trigger dev info logging
-        const devInfo = {
-            gitCommit: 'd699823',
-            commitMessage: 'fix: force debug logging and update dev info to latest commit',
-            branch: 'feature/dev-prod-environments',
-            deployId: 'f9df0c79-d2c1-40cc-a891-f72d2cc78220',
-            timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
-        };
-        console.log('🔍 DEV INFO FORCED LOG:', devInfo);
-        
-        // Load direct template generator
-        ${getDirectTemplateGeneratorScript()}
 
-        // Initialize with Unified Design System  
+        // Initialize with Unified Design System
         BX24.init(function() {
             
             // Professional viewport expansion with unified approach
