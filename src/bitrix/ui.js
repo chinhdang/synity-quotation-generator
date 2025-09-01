@@ -23,11 +23,11 @@ function analyzeBitrixProducts(bitrixProducts) {
 // Function to generate development info panel
 function getDevInfo() {
   const now = new Date();
-  return {
-    gitCommit: 'fdadd5d',
-    commitMessage: 'Enhanced CRM Integration',
+  const devInfo = {
+    gitCommit: '7bec089',
+    commitMessage: 'feat: enhance CRM integration and add dev info panel',
     branch: 'feature/dev-prod-environments',
-    deployId: '2e26bf8c-20db-41d9',
+    deployId: 'cb94c08e-9da8-412b-843c-0c12ecaa6e1c',
     timestamp: now.toLocaleString('vi-VN', {
       timeZone: 'Asia/Ho_Chi_Minh',
       year: 'numeric',
@@ -38,12 +38,22 @@ function getDevInfo() {
       second: '2-digit'
     }),
     changes: [
-      'Enhanced CRM API integration',
-      'Direct template generation', 
-      'Universal product API support',
-      'Dynamic quotation numbers'
+      'Fix template placeholder substitution with corrected regex pattern',
+      'Add comprehensive CRM API integration (requisites, addresses, products)',
+      'Implement direct template generator approach eliminating form-based legacy',
+      'Add enterprise-grade dev info panel with git version, deploy ID, and changelog',
+      'Support universal product API with fallbacks across entity types',
+      'Add dynamic quotation number format BX[CODE]-[ID]'
     ]
   };
+  
+  // Debug logging for version tracking
+  console.log('🔍 DEV INFO PANEL DEBUG:', devInfo);
+  console.log('🎯 Current Git Version:', devInfo.gitCommit);
+  console.log('🚀 Deploy ID:', devInfo.deployId);
+  console.log('📅 Build Timestamp:', devInfo.timestamp);
+  
+  return devInfo;
 }
 
 // Function to include direct template generator script
@@ -222,9 +232,14 @@ function getDirectTemplateGeneratorScript() {
 }
 
 export function getAppUITemplate(crmData = {}) {
+  // Environment detection based on URL - automatically detect dev environment
+  const isDevelopment = typeof window !== 'undefined' && window.location?.hostname?.includes('dev') ||
+                        typeof globalThis !== 'undefined' && globalThis.location?.hostname?.includes('dev') ||
+                        crmData.environment === 'development';
+  
   // Safely extract CRM data with fallbacks
   const {
-    environment = 'production',
+    environment = isDevelopment ? 'development' : 'production',
     appName = 'Bitrix24 Quotation Generator',
     responsiblePersonName = 'Chinh Đặng',
     responsiblePersonPhone = '0947100700', 
@@ -242,13 +257,22 @@ export function getAppUITemplate(crmData = {}) {
     entityCurrency = 'VND'
   } = crmData;
 
-  // DEBUG: Log received CRM data
+  // DEBUG: Log received CRM data and environment detection
   console.log('🔍 getAppUITemplate received crmData:', {
     bitrixProducts: bitrixProducts,
     productCount: bitrixProducts?.length || 0,
     entityAmount: entityAmount,
     entityDiscount: entityDiscount,
-    entityTax: entityTax
+    entityTax: entityTax,
+    environment: environment,
+    isDevelopment: isDevelopment,
+    hostname: typeof window !== 'undefined' ? window.location?.hostname : 'server-side'
+  });
+  
+  console.log('🌍 ENVIRONMENT DEBUG:', {
+    detected: environment,
+    isDev: isDevelopment,
+    willShowDevPanel: environment === 'development'
   });
 
   // Helper function for currency formatting
