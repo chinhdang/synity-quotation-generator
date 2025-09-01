@@ -736,155 +736,871 @@ function getQuotationTemplate() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Báo giá - \${clientCompanyName}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #F3F4F6; }
-        @media print { 
-            body { background-color: #FFFFFF; } 
-            .print-container { 
-                box-shadow: none !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                border: none !important;
-            } 
+        /* Unified Design System - Professional Color Palette */
+        :root {
+            /* Primary Palette - 10-step system */
+            --primary-50: #F0FDFA;
+            --primary-100: #CCFBF1;
+            --primary-200: #99F6E4;
+            --primary-300: #5EEAD4;
+            --primary-400: #2DD4BF;
+            --primary-500: #14B8A6;
+            --primary-600: #0D9488;
+            --primary-700: #0F766E;
+            --primary-800: #115E59;
+            --primary-900: #134E4A;
+            
+            /* Neutral Palette */
+            --neutral-50: #FAFAFA;
+            --neutral-100: #F5F5F5;
+            --neutral-200: #E5E5E5;
+            --neutral-300: #D4D4D4;
+            --neutral-400: #A3A3A3;
+            --neutral-500: #737373;
+            --neutral-600: #525252;
+            --neutral-700: #404040;
+            --neutral-800: #262626;
+            --neutral-900: #171717;
+            
+            /* Perfect 8px Spacing Grid - Optimized for Print */
+            --space-xs: 4px;
+            --space-sm: 6px;    /* Reduced from 8px */
+            --space-md: 12px;   /* Reduced from 16px */
+            --space-lg: 18px;   /* Reduced from 24px */
+            --space-xl: 24px;   /* Reduced from 32px */
+            --space-2xl: 32px;  /* Reduced from 48px */
+            --space-3xl: 48px;  /* Reduced from 64px */
+            
+            /* Professional Elevation System */
+            --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --elevation-2: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --elevation-3: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+            --elevation-4: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+            
+            /* Typography Scale */
+            --text-xs: 12px;
+            --text-sm: 14px;
+            --text-base: 16px;
+            --text-lg: 18px;
+            --text-xl: 20px;
+            --text-2xl: 24px;
+            --text-3xl: 32px;
+            --text-4xl: 40px;
+            
+            /* Border Radius */
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
         }
-        :root { --bg-main: #FFFFFF; --bg-secondary: #F9FAFB; --border-subtle: #E5E7EB; --accent-main: #0D9488; --accent-secondary: #2563EB; --text-main: #1F2937; --text-secondary: #6B7280; }
-        .highlight-accent { color: var(--accent-main); }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--neutral-50) 100%);
+            margin: 0;
+            padding: var(--space-md);  /* Reduced padding */
+            color: var(--neutral-800);
+            line-height: 1.5;  /* Reduced line height */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Unified Quotation Document Container */
+        .synity-quotation-document {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--elevation-4);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Professional Header with Gradient */
+        .quotation-header {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+            padding: var(--space-xl) var(--space-xl) var(--space-lg);  /* Reduced padding */
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quotation-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+
+        .company-info h1 {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            margin: 0 0 var(--space-sm);
+            letter-spacing: -0.02em;
+        }
+
+        .company-info p {
+            font-size: var(--text-sm);
+            margin: 0;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .company-logo {
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            font-size: var(--text-lg);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Unified Document Title */
+        .quotation-title {
+            background: white;
+            padding: var(--space-xl) var(--space-xl) var(--space-lg);  /* Reduced padding */
+            text-align: center;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .quotation-title h2 {
+            font-size: var(--text-3xl);  /* Reduced from 4xl */
+            font-weight: 800;
+            color: var(--primary-600);
+            margin: 0 0 var(--space-sm);
+            letter-spacing: -0.03em;
+        }
+
+        .quotation-title p {
+            font-size: var(--text-base);  /* Reduced from lg */
+            color: var(--neutral-600);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Unified Content Container */
+        .quotation-content {
+            padding: var(--space-xl);  /* Reduced from 2xl */
+        }
+
+        /* Client Information Cards */
+        .client-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);  /* Reduced gap */
+            margin-bottom: var(--space-xl);  /* Reduced margin */
+        }
+
+        .info-card {
+            background: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);  /* Reduced padding */
+            position: relative;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-400) 100%);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: var(--space-xs) var(--space-md);  /* Reduced gaps */
+            align-items: center;
+        }
+
+        .info-label {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--neutral-600);
+        }
+
+        .info-value {
+            font-size: var(--text-sm);
+            color: var(--neutral-800);
+            font-weight: 500;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .info-divider {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: var(--neutral-200);
+            margin: var(--space-sm) 0;  /* Reduced margin */
+        }
+
+        /* Introduction Section */
+        .quotation-intro {
+            background: var(--primary-50);
+            border: 1px solid var(--primary-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);  /* Reduced padding */
+            margin-bottom: var(--space-xl);  /* Reduced margin */
+            position: relative;
+        }
+
+        .quotation-intro::before {
+            content: '';
+            position: absolute;
+            top: var(--space-sm);
+            left: var(--space-sm);
+            width: 4px;
+            height: calc(100% - var(--space-md));
+            background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-400) 100%);
+            border-radius: 2px;
+        }
+
+        .quotation-intro p {
+            margin: 0;
+            padding-left: var(--space-lg);
+            font-size: var(--text-base);
+            line-height: 1.5;  /* Reduced line height */
+            color: var(--neutral-700);
+        }
+
+        .quotation-intro .highlight {
+            font-weight: 600;
+            color: var(--primary-700);
+        }
+
+        /* Professional Product Table - Compact Version */
+        .products-section {
+            margin-bottom: var(--space-xl);  /* Reduced margin */
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--elevation-1);
+        }
+
+        .products-table thead {
+            background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-200) 100%);
+        }
+
+        .products-table th {
+            padding: var(--space-md) var(--space-sm);  /* Reduced padding */
+            font-size: var(--text-sm);
+            font-weight: 700;
+            color: var(--neutral-700);
+            text-align: left;
+            border-bottom: 2px solid var(--primary-500);
+        }
+
+        .products-table th:last-child,
+        .products-table th:nth-child(3),
+        .products-table th:nth-child(4) {
+            text-align: right;
+        }
+
+        .products-table th:nth-child(4) {
+            text-align: center;
+        }
+
+        .products-table td {
+            padding: var(--space-sm) var(--space-sm);  /* Significantly reduced padding */
+            font-size: var(--text-sm);
+            color: var(--neutral-800);
+            border-bottom: 1px solid var(--neutral-200);
+            vertical-align: top;
+            line-height: 1.4;  /* Compact line height */
+        }
+
+        .products-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .products-table tr:nth-child(even) {
+            background: var(--neutral-50);
+        }
+
+        .products-table tr:hover {
+            background: var(--primary-50);
+            transition: background-color 0.2s ease;
+        }
+
+        .products-table .text-right {
+            text-align: right;
+        }
+
+        .products-table .text-center {
+            text-align: center;
+        }
+
+        /* Professional Total Summary */
+        .total-summary {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: var(--space-xl);  /* Reduced margin */
+        }
+
+        .total-card {
+            background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+            border: 2px solid var(--primary-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);  /* Reduced padding */
+            min-width: 400px;
+            box-shadow: var(--elevation-2);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-xs) 0;  /* Reduced padding */
+        }
+
+        .total-row.subtotal {
+            border-bottom: 1px solid var(--primary-200);
+            margin-bottom: var(--space-xs);  /* Reduced margin */
+        }
+
+        .total-row.grand-total {
+            border-top: 2px solid var(--primary-600);
+            padding-top: var(--space-sm);  /* Reduced padding */
+            margin-top: var(--space-sm);   /* Reduced margin */
+        }
+
+        .total-label {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+            font-weight: 500;
+        }
+
+        .total-value {
+            font-size: var(--text-sm);
+            color: var(--neutral-800);
+            font-weight: 600;
+        }
+
+        .grand-total .total-label {
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--neutral-800);
+        }
+
+        .grand-total .total-value {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            color: var(--primary-600);
+        }
+
+        /* Compact Section Dividers */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--neutral-300) 50%, transparent 100%);
+            margin: var(--space-lg) 0;  /* Reduced margin significantly */
+        }
+
+        .content-section {
+            margin-bottom: var(--space-lg);  /* Reduced margin */
+        }
+
+        .section-title {
+            font-size: var(--text-lg);  /* Reduced from xl */
+            font-weight: 700;
+            color: var(--neutral-800);
+            margin: 0 0 var(--space-md);  /* Reduced margin */
+            position: relative;
+            padding-left: var(--space-lg);
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            border-radius: 2px;
+        }
+
+        /* Payment Schedule Table - NEW */
+        .payment-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--elevation-1);
+            margin-bottom: var(--space-md);
+        }
+
+        .payment-table thead {
+            background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%);
+        }
+
+        .payment-table th {
+            padding: var(--space-md) var(--space-sm);
+            font-size: var(--text-sm);
+            font-weight: 700;
+            color: var(--primary-700);
+            text-align: left;
+            border-bottom: 2px solid var(--primary-400);
+        }
+
+        .payment-table th:nth-child(2),
+        .payment-table th:nth-child(3),
+        .payment-table th:nth-child(4) {
+            text-align: center;
+        }
+
+        .payment-table th:last-child {
+            text-align: right;
+        }
+
+        .payment-table td {
+            padding: var(--space-sm) var(--space-sm);
+            font-size: var(--text-sm);
+            color: var(--neutral-800);
+            border-bottom: 1px solid var(--neutral-200);
+            vertical-align: top;
+            line-height: 1.4;
+        }
+
+        .payment-table td:nth-child(2),
+        .payment-table td:nth-child(3),
+        .payment-table td:nth-child(4) {
+            text-align: center;
+        }
+
+        .payment-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .payment-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .payment-table tr:nth-child(even) {
+            background: var(--primary-50);
+        }
+
+        .payment-table tr:hover {
+            background: var(--primary-100);
+            transition: background-color 0.2s ease;
+        }
+
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .benefit-list li {
+            padding: var(--space-xs) 0 var(--space-xs) var(--space-lg);  /* Reduced padding */
+            position: relative;
+            font-size: var(--text-sm);
+            color: var(--neutral-700);
+            line-height: 1.4;  /* Reduced line height */
+        }
+
+        .benefit-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: var(--space-xs);
+            width: var(--space-md);
+            height: var(--space-md);
+            background: var(--primary-500);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Professional Footer */
+        .quotation-footer {
+            background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-50) 100%);
+            padding: var(--space-lg);  /* Reduced padding */
+            text-align: center;
+            border-top: 1px solid var(--neutral-200);
+        }
+
+        .footer-thanks {
+            font-size: var(--text-base);  /* Reduced font size */
+            font-weight: 600;
+            color: var(--neutral-800);
+            margin: 0 0 var(--space-sm);  /* Reduced margin */
+        }
+
+        .footer-subtitle {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+            margin: 0 0 var(--space-lg);  /* Reduced margin */
+        }
+
+        .contact-actions {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);  /* Reduced gap */
+            flex-wrap: wrap;
+            margin-bottom: var(--space-lg);  /* Reduced margin */
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);  /* Reduced padding */
+            font-size: var(--text-sm);
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .contact-btn--primary {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: white;
+            box-shadow: var(--elevation-2);
+        }
+
+        .contact-btn--primary:hover {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+            box-shadow: var(--elevation-3);
+            transform: translateY(-1px);
+        }
+
+        .contact-btn--secondary {
+            background: white;
+            color: var(--primary-600);
+            border-color: var(--primary-300);
+        }
+
+        .contact-btn--secondary:hover {
+            background: var(--primary-50);
+            border-color: var(--primary-400);
+            transform: translateY(-1px);
+        }
+
+        .footer-company {
+            font-size: var(--text-sm);
+            color: var(--neutral-500);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Print Optimizations */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .synity-quotation-document {
+                box-shadow: none;
+                max-width: none;
+            }
+
+            .contact-btn {
+                display: none;
+            }
+            
+            .quotation-header::before {
+                display: none;
+            }
+
+            /* Even more compact spacing for print */
+            .section-divider {
+                margin: var(--space-sm) 0;
+            }
+
+            .content-section {
+                margin-bottom: var(--space-md);
+            }
+
+            .quotation-content {
+                padding: var(--space-lg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-sm);
+            }
+
+            .quotation-content {
+                padding: var(--space-md);
+            }
+
+            .client-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .total-card {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .contact-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-btn {
+                width: 200px;
+                justify-content: center;
+            }
+
+            .products-table {
+                font-size: var(--text-xs);
+            }
+
+            .products-table th,
+            .products-table td {
+                padding: var(--space-xs) var(--space-xs);
+            }
+        }
     </style>
 </head>
-<body class="p-4 sm:p-8">
-    <div class="max-w-5xl mx-auto my-8 bg-white shadow-lg rounded-lg p-8 sm:p-12 print-container">
-        <header class="flex justify-between items-start pb-8 border-b-2" style="border-color: var(--accent-main);">
-            <div class="text-sm" style="color: var(--text-secondary);">
-                <p class="font-bold text-base" style="color: var(--text-main);">SYNITY Co, Ltd</p>
-                <p>Số 96/54/8 đường Nguyễn Thông, Phường Nhiêu Lộc, TP. Hồ Chí Minh</p>
-                <p>MST: 0318972367</p>
+<body>
+    <div class="synity-quotation-document">
+        <!-- Professional Header -->
+        <header class="quotation-header">
+            <div class="header-content">
+                <div class="company-info">
+                    <h1>SYNITY Co, Ltd</h1>
+                    <p>Số 96/54/8 đường Nguyễn Thông, Phường Nhiều Lộc, TP. Hồ Chí Minh</p>
+                    <p>MST: 0318972367</p>
+                </div>
+                <div class="company-logo">SYNITY</div>
             </div>
-            <div><img src="https://placehold.co/120x40/0D9488/FFFFFF?text=SYNITY" alt="Logo SYNITY" class="h-10"></div>
         </header>
-        <div class="text-center my-10">
-            <h1 class="text-3xl sm:text-4xl font-extrabold" style="color: var(--accent-main);">BÁO GIÁ</h1>
-            <p class="text-lg mt-2 font-semibold" style="color: var(--text-main);">Hệ Sinh Thái Giải Pháp Chuyển Đổi Số Toàn Diện</p>
-        </div>
-        <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm mb-10">
-            <div class="bg-gray-50 p-4 rounded-lg" style="background-color: var(--bg-secondary); border: 1px solid var(--border-subtle);">
-                <div class="grid grid-cols-2 gap-y-1">
-                    <p class="font-bold" style="color: var(--text-secondary);">Gửi đến:</p>
-                    <p class="font-semibold text-right" style="color: var(--text-main);">\${clientCompanyName}</p>
-                    <p class="font-bold" style="color: var(--text-secondary);">Địa chỉ:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${client_address}</p>
-                    <p class="font-bold" style="color: var(--text-secondary);">MST:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${client_tax_code}</p>
-                </div>
-                <hr class="my-2">
-                <div class="grid grid-cols-2 gap-y-1">
-                    <p class="font-bold" style="color: var(--text-secondary);">Người liên hệ:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${contact_name}</p>
-                    <p class="font-bold" style="color: var(--text-secondary);">Phone:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${contact_phone}</p>
-                    <p class="font-bold" style="color: var(--text-secondary);">Email:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${contact_email}</p>
-                </div>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg" style="background-color: var(--bg-secondary); border: 1px solid var(--border-subtle);">
-                <div class="grid grid-cols-2 gap-y-1">
-                    <p class="font-semibold self-center" style="color: var(--text-secondary);">Số báo giá:</p>
-                    <p class="font-bold text-right break-words" style="color: var(--text-main);">\${quotation_number}</p>
-                    <p class="font-semibold" style="color: var(--text-secondary);">Ngày tạo:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${date_created}</p>
-                    <p class="font-semibold" style="color: var(--text-secondary);">Hiệu lực đến:</p>
-                    <p class="text-right" style="color: var(--text-main);">\${closed_date}</p>
-                </div>
-                 <div class="border-t mt-3 pt-3 grid grid-cols-2" style="border-color: var(--border-subtle);">
-                    <div><p class="font-semibold" style="color: var(--text-secondary);">Phụ trách:</p></div>
-                     <div class="text-right">
-                        <p class="font-bold" style="color: var(--text-main);">\${responsiblePersonName}</p>
-                        <p style="color: var(--text-main);">\${responsiblePersonPhone}</p>
-                        <p style="color: var(--text-main);">\${responsiblePersonEmail}</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <p class="mb-8" style="color: var(--text-main);">
-            SYNITY kính gửi <span class="font-bold">Quý \${clientCompanyName}</span> bảng báo giá chi tiết cho HỆ SINH THÁI GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN SYNITY như sau:
-        </p>
-        <section class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="p-3 font-semibold" style="color: var(--text-secondary);">STT</th>
-                        <th class="p-3 font-semibold" style="color: var(--text-secondary);">HẠNG MỤC TRIỂN KHAI</th>
-                        <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">ĐƠN GIÁ</th>
-                        <th class="p-3 font-semibold text-center" style="color: var(--text-secondary);">SỐ LƯỢNG</th>
-                        <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">THÀNH TIỀN (VNĐ)</th>
-                    </tr>
-                </thead>
-                <tbody style="color: var(--text-main);">
-                    <!-- BITRIX_SECTION_PLACEHOLDER -->
-                    <!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->
-                    <!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->
-                    <!-- CRM_PRODUCTS_SECTION_PLACEHOLDER -->
-                </tbody>
-            </table>
-        </section>
-        <section class="mt-8 flex justify-end">
-            <div class="w-full sm:w-2/5 lg:w-2/5 bg-teal-50 p-4 rounded-lg border-l-4" style="border-color: var(--accent-main);">
-                <div class="text-sm">
-                    <div class="flex justify-between py-2">
-                        <span style="color: var(--text-secondary);">Tổng cộng (A+B):</span>
-                        <span class="font-semibold" style="color: var(--text-main);">\${sub_total}</span>
-                    </div>
-                    <div class="flex justify-between py-2">
-                        <span style="color: var(--text-secondary);">VAT (10%):</span>
-                        <span class="font-semibold" style="color: var(--text-main);">\${vat_amount}</span>
-                    </div>
-                    <div class="flex justify-between py-3 mt-2 border-t-2" style="border-color: var(--text-main);">
-                        <span class="text-base font-bold" style="color: var(--text-main);">TỔNG THANH TOÁN:</span>
-                        <span class="text-base font-bold" style="color: var(--accent-main);">\${grand_total} VNĐ</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <section class="mt-12 pt-8 border-t text-sm space-y-4" style="border-color: var(--border-subtle);">
-            <h4 class="font-bold text-lg" style="color: var(--text-main);">TIẾN ĐỘ THANH TOÁN</h4>
-            \${payment_schedule_table}
-            <p class="mt-2 text-sm italic text-gray-500">
-                * Thời hạn thanh toán chi tiết cho từng đợt sẽ được quy định cụ thể trong hợp đồng.
-            </p>
+
+        <!-- Document Title -->
+        <section class="quotation-title">
+            <h2>BÁO GIÁ</h2>
+            <p>Hệ Sinh Thái Giải Pháp Chuyển Đổi Số Toàn Diện</p>
         </section>
 
-        <section class="mt-8 pt-8 border-t text-sm space-y-6" style="border-color: var(--border-subtle);">
-            <div>
-                <h4 class="font-bold mb-2" style="color: var(--text-main);">ƯU ĐÃI VÀ KHUYẾN MÃI</h4>
+        <!-- Main Content -->
+        <div class="quotation-content">
+            <!-- Client Information Grid -->
+            <section class="client-info-grid">
+                <div class="info-card">
+                    <div class="info-grid">
+                        <span class="info-label">Gửi đến:</span>
+                        <span class="info-value">\${clientCompanyName}</span>
+                        <span class="info-label">Địa chỉ:</span>
+                        <span class="info-value">\${client_address}</span>
+                        <span class="info-label">MST:</span>
+                        <span class="info-value">\${client_tax_code}</span>
+                        
+                        <div class="info-divider"></div>
+                        
+                        <span class="info-label">Người liên hệ:</span>
+                        <span class="info-value">\${contact_name}</span>
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value">\${contact_phone}</span>
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">\${contact_email}</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-grid">
+                        <span class="info-label">Số báo giá:</span>
+                        <span class="info-value">\${quotation_number}</span>
+                        <span class="info-label">Ngày tạo:</span>
+                        <span class="info-value">\${date_created}</span>
+                        <span class="info-label">Hiệu lực đến:</span>
+                        <span class="info-value">\${closed_date}</span>
+                        
+                        <div class="info-divider"></div>
+                        
+                        <span class="info-label">Phụ trách:</span>
+                        <span class="info-value">\${responsiblePersonName}</span>
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value">\${responsiblePersonPhone}</span>
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">\${responsiblePersonEmail}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Introduction -->
+            <section class="quotation-intro">
+                <p>
+                    SYNITY kính gửi <span class="highlight">Quý \${clientCompanyName}</span> bảng báo giá chi tiết cho 
+                    <span class="highlight">HỆ SINH THÁI GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN SYNITY</span> như sau:
+                </p>
+            </section>
+
+            <!-- Products Table -->
+            <section class="products-section">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>HẠNG MỤC TRIỂN KHAI</th>
+                            <th class="text-right">ĐƠN GIÁ</th>
+                            <th class="text-center">SỐ LƯỢNG</th>
+                            <th class="text-right">THÀNH TIỀN (VNĐ)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BITRIX_SECTION_PLACEHOLDER -->
+                        <!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->
+                        <!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->
+                        <!-- CRM_PRODUCTS_SECTION_PLACEHOLDER -->
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Total Summary -->
+            <section class="total-summary">
+                <div class="total-card">
+                    <div class="total-row subtotal">
+                        <span class="total-label">Tổng cộng (A+B):</span>
+                        <span class="total-value">\${sub_total}</span>
+                    </div>
+                    <div class="total-row subtotal">
+                        <span class="total-label">VAT (10%):</span>
+                        <span class="total-value">\${vat_amount}</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span class="total-label">TỔNG THANH TOÁN:</span>
+                        <span class="total-value">\${grand_total} VNĐ</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Payment Schedule Table - NEW IMPLEMENTATION -->
+            <section class="content-section">
+                <h3 class="section-title">TIẾN ĐỘ THANH TOÁN</h3>
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>ĐỢT</th>
+                            <th>THỜI ĐIỂM</th>
+                            <th>TỶ LỆ (%)</th>
+                            <th>MÔ TẢ</th>
+                            <th>SỐ TIỀN (VNĐ)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Ký hợp đồng</td>
+                            <td>30%</td>
+                            <td>Thanh toán sau khi ký hợp đồng</td>
+                            <td class="highlight-amount">30% tổng giá trị</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Triển khai 50%</td>
+                            <td>40%</td>
+                            <td>Hoàn thành 50% dự án</td>
+                            <td class="highlight-amount">40% tổng giá trị</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Nghiệm thu</td>
+                            <td>30%</td>
+                            <td>Hoàn thành và bàn giao hệ thống</td>
+                            <td class="highlight-amount">30% tổng giá trị</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: var(--text-xs); color: var(--neutral-500); font-style: italic; margin-top: var(--space-sm);">
+                    * Thời hạn thanh toán chi tiết cho từng đợt sẽ được quy định cụ thể trong hợp đồng.
+                </p>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <!-- Benefits & Support -->
+            <section class="content-section">
+                <h3 class="section-title">ưu ĐÃI VÀ KHUYẾN MÃI</h3>
                 \${discount_info}
-            </div>
-            <div>
-                <h4 class="font-bold mb-2" style="color: var(--text-main);">CHÍNH SÁCH BẢO HÀNH VÀ HỖ TRỢ</h4>
-                <ul class="list-disc list-inside space-y-1" style="color: var(--text-secondary);">
+            </section>
+
+            <section class="content-section">
+                <h3 class="section-title">CHÍNH SÁCH BẢO HÀNH VÀ HỖ TRỢ</h3>
+                <ul class="benefit-list">
                     <li>Hỗ trợ và hướng dẫn sử dụng qua livechat, điện thoại, và gặp mặt trực tiếp.</li>
                     <li>Cam kết giải đáp các vấn đề, sự cố trong suốt quá trình sử dụng.</li>
                     <li>Cung cấp tài liệu hướng dẫn đầy đủ cho đội ngũ của Quý Công ty.</li>
                 </ul>
-            </div>
-        </section>
-        <footer class="mt-12 pt-8 text-center text-xs border-t" style="border-color: var(--border-subtle); color: var(--text-secondary);">
-            <p class="font-semibold" style="color: var(--text-main);">Cảm ơn sự quan tâm của Quý Công ty.</p>
-            <p>Nếu có bất kỳ câu hỏi nào, xin vui lòng liên hệ với chúng tôi qua:</p>
-            <div class="flex justify-center items-center space-x-4 mt-4">
-                <a href="mailto:\${responsiblePersonEmail}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
-                    Email
+            </section>
+        </div>
+
+        <!-- Professional Footer -->
+        <footer class="quotation-footer">
+            <p class="footer-thanks">Cảm ơn sự quan tâm của Quý Công ty.</p>
+            <p class="footer-subtitle">Nếu có bất kỳ câu hỏi nào, xin vui lòng liên hệ với chúng tôi qua:</p>
+            
+            <div class="contact-actions">
+                <a href="mailto:\${responsiblePersonEmail}" class="contact-btn contact-btn--primary">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                    </svg>
+                    Gửi Email
                 </a>
-                <a href="tel:\${responsiblePersonPhone}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                <a href="tel:\${responsiblePersonPhone}" class="contact-btn contact-btn--secondary">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                    </svg>
                     Gọi điện
                 </a>
             </div>
-            <p class="mt-4">SYNITY Co, Ltd</p>
+            
+            <p class="footer-company">SYNITY Co, Ltd</p>
         </footer>
     </div>
 </body>
