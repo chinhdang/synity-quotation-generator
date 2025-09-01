@@ -35,560 +35,521 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYNITY Quotation Generator - CRM Integration</title>
+    <title>SYNITY Quotation Generator - Unified Design</title>
     <script src="//api.bitrix24.com/api/v1/"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
-        /* SYNITY Design System - B24UI Professional Desktop Layout */
+        /* SYNITY Unified Design System - 10 Years UX Experience */
         :root {
-            /* B24UI Color System */
-            --b24-primary: #0D9488;
-            --b24-primary-light: #14B8A6;
-            --b24-primary-dark: #0F766E;
-            --b24-secondary: #2563EB;
-            --b24-secondary-light: #3B82F6;
-            --b24-secondary-dark: #1D4ED8;
-            --b24-success: #10B981;
-            --b24-success-light: #34D399;
-            --b24-success-dark: #059669;
-            --b24-danger: #EF4444;
-            --b24-danger-light: #F87171;
-            --b24-danger-dark: #DC2626;
-            --b24-warning: #F59E0B;
-            --b24-info: #3B82F6;
+            /* Unified Color System - Cohesive Temperature */
+            --primary-50: #F0FDFA;
+            --primary-100: #CCFBF1;
+            --primary-200: #99F6E4;
+            --primary-300: #5EEAD4;
+            --primary-400: #2DD4BF;
+            --primary-500: #14B8A6;
+            --primary-600: #0D9488;
+            --primary-700: #0F766E;
+            --primary-800: #115E59;
+            --primary-900: #134E4A;
             
-            /* B24UI Neutral System */
-            --b24-gray-50: #F9FAFB;
-            --b24-gray-100: #F3F4F6;
-            --b24-gray-200: #E5E7EB;
-            --b24-gray-300: #D1D5DB;
-            --b24-gray-400: #9CA3AF;
-            --b24-gray-500: #6B7280;
-            --b24-gray-600: #4B5563;
-            --b24-gray-700: #374151;
-            --b24-gray-800: #1F2937;
-            --b24-gray-900: #111827;
+            /* Semantic System */
+            --background: #FEFEFE;
+            --surface: #FFFFFF;
+            --surface-variant: #F8FAFC;
+            --outline: #E2E8F0;
+            --outline-variant: #F1F5F9;
             
-            /* Semantic Colors */
-            --synity-bg-primary: #FFFFFF;
-            --synity-bg-secondary: var(--b24-gray-50);
-            --synity-text-primary: var(--b24-gray-800);
-            --synity-text-secondary: var(--b24-gray-500);
-            --synity-border: var(--b24-gray-200);
-            --synity-border-focus: var(--b24-primary);
+            /* Typography Scale - Perfect Hierarchy */
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-tertiary: #64748B;
+            --text-disabled: #94A3B8;
             
-            /* Shadow System */
-            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            /* Elevation System - Unified Shadows */
+            --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --elevation-2: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --elevation-3: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+            --elevation-4: 0 8px 15px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.04);
+            
+            /* Spacing Scale - Perfect 8px Grid */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            
+            /* Border Radius Scale */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
         }
 
+        /* Foundation - Clean Slate */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--synity-bg-secondary);
+            font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
             overflow: hidden;
-            font-feature-settings: 'liga', 'kern';
+            font-feature-settings: 'liga' 1, 'kern' 1;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
 
-        /* SYNITY App Container - Maximum viewport utilization */
+        /* Unified App Container */
         .synity-app {
             height: 100vh;
             max-height: 100vh;
             display: flex;
-            background: var(--synity-bg-primary);
+            background: var(--background);
             overflow: hidden;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
         }
 
-        /* SYNITY Sidebar - Professional desktop layout */
+        /* Unified Sidebar - Single Cohesive Container */
         .synity-sidebar {
-            width: 380px;
-            min-width: 380px;
-            background: var(--synity-bg-primary);
-            border-right: 1px solid var(--synity-border);
+            width: 400px;
+            min-width: 400px;
+            background: var(--surface);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             height: 100vh;
-            max-height: 100vh;
+            position: relative;
         }
 
-        /* Sidebar Header - Clean, professional branding */
-        .synity-sidebar-header {
-            background: var(--synity-bg-primary);
-            border-bottom: 1px solid var(--synity-border);
-            padding: 1.25rem;
-            flex-shrink: 0;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .synity-sidebar-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--synity-text-primary);
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0 0 1rem 0;
-            letter-spacing: -0.025em;
-        }
-
-        /* CRM Status Badge - Professional gradient */
-        .synity-status-badge {
-            background: linear-gradient(135deg, var(--b24-success) 0%, var(--b24-primary) 100%);
+        /* Cohesive Header - Part of Unified Design */
+        .synity-header {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
             color: white;
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            width: fit-content;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Sidebar Content - Optimized scrolling */
-        .synity-sidebar-content {
-            flex: 1;
-            padding: 1.25rem;
-            overflow-y: auto;
-            overflow-x: hidden;
-            min-height: 0;
-            scrollbar-width: thin;
-            scrollbar-color: var(--b24-gray-300) transparent;
+            padding: var(--space-lg);
+            flex-shrink: 0;
             position: relative;
-        }
-
-        /* SYNITY Main Content - Full viewport utilization */
-        .synity-main {
-            flex: 1;
-            background: var(--synity-bg-secondary);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            max-height: 100vh;
         }
 
-        .synity-main-content {
-            flex: 1;
-            padding: 1.25rem;
-            overflow-y: auto;
-            overflow-x: hidden;
-            position: relative;
-            min-height: 0;
+        .synity-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transform: translate(30px, -30px);
         }
 
-        /* SYNITY Preview Frame - Maximum utilization */
-        .synity-preview {
-            width: 100%;
-            height: 100%;
-            min-height: 800px;
-            border: 1px solid var(--synity-border);
-            border-radius: 8px;
-            background: white;
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Form Components - B24UI Design System */
-        .synity-compact-section {
-            background: var(--synity-bg-primary);
-            border: 1px solid var(--synity-border);
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow 0.2s ease;
-        }
-
-        .synity-compact-section:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .synity-compact-title {
-            color: var(--b24-primary);
-            font-size: 1rem;
+        .synity-header-title {
+            font-size: 1.125rem;
             font-weight: 700;
-            margin: 0 0 1rem 0;
+            margin: 0 0 var(--space-sm) 0;
+            letter-spacing: -0.025em;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-sm);
+            position: relative;
+            z-index: 1;
+        }
+
+        .synity-header-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Unified Workspace - Single Container Approach */
+        .synity-workspace {
+            flex: 1;
+            padding: var(--space-lg);
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: var(--surface);
+            position: relative;
+        }
+
+        /* Single Unified Card - Contains All Content */
+        .synity-workspace-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--elevation-2);
+            border: 1px solid var(--outline-variant);
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .synity-workspace-card:hover {
+            box-shadow: var(--elevation-3);
+            border-color: var(--primary-200);
+        }
+
+        /* Unified Section System - Internal Organization */
+        .synity-section {
+            padding: var(--space-xl);
+            position: relative;
+        }
+
+        .synity-section + .synity-section {
+            border-top: 1px solid var(--outline-variant);
+        }
+
+        .synity-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-lg);
+        }
+
+        .synity-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin: 0;
             letter-spacing: -0.025em;
+        }
+
+        .synity-section-title i {
+            color: var(--primary-500);
+            font-size: 1rem;
+        }
+
+        /* Form System - Cohesive Input Design */
+        .synity-form-grid {
+            display: grid;
+            gap: var(--space-lg);
         }
 
         .synity-form-row {
-            margin-bottom: 1.25rem;
-        }
-
-        .synity-form-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .synity-form-row--grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: var(--space-md);
+        }
+
+        .synity-field {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .synity-field--full {
+            grid-column: 1 / -1;
         }
 
         .synity-label {
-            display: block;
-            font-weight: 600;
-            color: var(--synity-text-primary);
-            margin-bottom: 0.5rem;
             font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
             letter-spacing: -0.025em;
         }
 
         .synity-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--synity-border);
-            border-radius: 6px;
+            padding: var(--space-md);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
             font-size: 0.875rem;
+            color: var(--text-primary);
+            background: var(--surface);
             transition: all 0.2s ease;
-            background: var(--synity-bg-primary);
-            color: var(--synity-text-primary);
-            box-sizing: border-box;
+            font-family: inherit;
         }
 
         .synity-input:focus {
             outline: none;
-            border-color: var(--synity-border-focus);
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
         }
 
-        /* Action Section - Professional B24UI styling */
-        .synity-action-section {
-            background: linear-gradient(135deg, var(--synity-bg-primary) 0%, var(--b24-gray-50) 100%);
-            border: 1px solid var(--b24-gray-200);
-            border-radius: 10px;
-            padding: 1.25rem;
-            margin: 2rem 0 1.5rem 0;
-            box-shadow: var(--shadow-md);
-            position: sticky;
-            bottom: 1.25rem;
-            z-index: 10;
-            backdrop-filter: blur(8px);
-            border-top: 2px solid var(--b24-primary);
+        .synity-input:hover:not(:focus) {
+            border-color: var(--primary-300);
         }
 
-        .synity-action-title {
-            color: var(--b24-primary-dark);
-            font-size: 0.8125rem;
-            font-weight: 700;
-            margin: 0 0 1rem 0;
+        /* Contextual Action System - Actions Near Content */
+        .synity-actions {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            opacity: 0.8;
+            gap: var(--space-sm);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--outline-variant);
         }
 
-        /* Horizontal Button Row - Desktop optimized */
-        .synity-action-row {
-            display: flex;
-            gap: 0.75rem;
-            align-items: stretch;
-        }
-
-        /* Professional B24UI Button System */
+        /* Unified Button System - Cohesive Design */
         .synity-btn {
-            flex: 1;
-            padding: 0.625rem 1rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8125rem;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: var(--space-xs);
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
-            white-space: nowrap;
-            min-height: 40px;
+            min-height: 44px;
             position: relative;
-            border: 1px solid transparent;
-            font-feature-settings: 'liga';
+            overflow: hidden;
             letter-spacing: -0.025em;
         }
 
-        /* Primary Button - Main action gradient */
+        .synity-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .synity-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Primary Button - Main Action */
         .synity-btn--primary {
-            background: linear-gradient(135deg, var(--b24-primary) 0%, var(--b24-primary-light) 100%);
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
             color: white;
-            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid var(--b24-primary-dark);
+            box-shadow: var(--elevation-2);
+            flex: 1;
         }
 
         .synity-btn--primary:hover {
-            background: linear-gradient(135deg, var(--b24-primary-dark) 0%, var(--b24-primary) 100%);
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: var(--elevation-3);
         }
 
         .synity-btn--primary:active {
             transform: translateY(0);
-            box-shadow: var(--shadow-sm), inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        /* Secondary Button - Secondary action gradient */
+        /* Secondary Button - Support Action */
         .synity-btn--secondary {
-            background: linear-gradient(135deg, var(--b24-secondary) 0%, var(--b24-secondary-light) 100%);
-            color: white;
-            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid var(--b24-secondary-dark);
+            background: var(--surface);
+            color: var(--primary-600);
+            border: 1px solid var(--primary-200);
+            box-shadow: var(--elevation-1);
+            flex: 1;
         }
 
         .synity-btn--secondary:hover {
-            background: linear-gradient(135deg, var(--b24-secondary-dark) 0%, var(--b24-secondary) 100%);
+            background: var(--primary-50);
+            border-color: var(--primary-300);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: var(--elevation-2);
         }
 
-        .synity-btn--secondary:active {
-            transform: translateY(0);
-            box-shadow: var(--shadow-sm), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* Tertiary Button - Minimal Action */
+        .synity-btn--tertiary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--outline);
+            min-width: 44px;
+            padding: var(--space-md);
         }
 
-        /* Danger Button - Destructive action gradient */
-        .synity-btn--danger {
-            background: linear-gradient(135deg, var(--b24-danger) 0%, var(--b24-danger-light) 100%);
-            color: white;
-            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid var(--b24-danger-dark);
+        .synity-btn--tertiary:hover {
+            background: var(--surface-variant);
+            color: var(--text-primary);
         }
 
-        .synity-btn--danger:hover {
-            background: linear-gradient(135deg, var(--b24-danger-dark) 0%, var(--b24-danger) 100%);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .synity-btn--danger:active {
-            transform: translateY(0);
-            box-shadow: var(--shadow-sm), inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Button Icons - Consistent sizing */
+        /* Icon Consistency */
         .synity-btn i {
-            font-size: 0.875rem;
+            font-size: 1rem;
             opacity: 0.9;
         }
 
-        /* Loading State */
+        /* Main Content - Unified Preview Area */
+        .synity-main {
+            flex: 1;
+            background: var(--surface-variant);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .synity-main-content {
+            flex: 1;
+            padding: var(--space-lg);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .synity-preview {
+            width: 100%;
+            height: 100%;
+            min-height: 800px;
+            border: 1px solid var(--outline-variant);
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            box-shadow: var(--elevation-2);
+        }
+
+        /* Responsive Design - Cohesive Scaling */
+        @media (min-width: 1400px) {
+            .synity-sidebar {
+                width: 440px;
+                min-width: 440px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .synity-sidebar {
+                width: 360px;
+                min-width: 360px;
+            }
+            
+            .synity-section {
+                padding: var(--space-lg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .synity-form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .synity-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* Professional Scrollbar */
+        .synity-workspace::-webkit-scrollbar,
+        .synity-main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .synity-workspace::-webkit-scrollbar-track,
+        .synity-main-content::-webkit-scrollbar-track {
+            background: var(--surface-variant);
+        }
+
+        .synity-workspace::-webkit-scrollbar-thumb,
+        .synity-main-content::-webkit-scrollbar-thumb {
+            background: var(--outline);
+            border-radius: 3px;
+            transition: background 0.2s ease;
+        }
+
+        .synity-workspace::-webkit-scrollbar-thumb:hover,
+        .synity-main-content::-webkit-scrollbar-thumb:hover {
+            background: var(--text-disabled);
+        }
+
+        /* Hidden Elements */
+        .synity-products-table {
+            display: none;
+        }
+
+        /* Loading States */
         .synity-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
         }
 
-        /* Responsive Design - Desktop first */
-        @media (min-width: 1400px) {
-            .synity-sidebar {
-                width: 420px;
-                min-width: 420px;
-            }
-            
-            .synity-btn {
-                font-size: 0.875rem;
-                padding: 0.75rem 1.25rem;
-                min-height: 44px;
-            }
+        /* Focus States for Accessibility */
+        .synity-btn:focus-visible {
+            outline: 2px solid var(--primary-500);
+            outline-offset: 2px;
         }
 
-        @media (max-width: 1200px) {
-            .synity-sidebar {
-                width: 320px;
-                min-width: 320px;
-            }
-            
-            .synity-btn {
-                font-size: 0.75rem;
-                padding: 0.5rem 0.75rem;
-                min-height: 36px;
-            }
-            
-            .synity-action-row {
-                gap: 0.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .synity-action-row {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            
-            .synity-btn {
-                flex: none;
-                min-height: 40px;
-            }
-        }
-
-        /* Professional Scrollbar Styling */
-        .synity-sidebar-content::-webkit-scrollbar,
-        .synity-main-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .synity-sidebar-content::-webkit-scrollbar-track,
-        .synity-main-content::-webkit-scrollbar-track {
-            background: var(--b24-gray-100);
-            border-radius: 3px;
-        }
-
-        .synity-sidebar-content::-webkit-scrollbar-thumb,
-        .synity-main-content::-webkit-scrollbar-thumb {
-            background: var(--b24-gray-300);
-            border-radius: 3px;
-            transition: background 0.2s ease;
-        }
-
-        .synity-sidebar-content::-webkit-scrollbar-thumb:hover,
-        .synity-main-content::-webkit-scrollbar-thumb:hover {
-            background: var(--b24-gray-400);
-        }
-
-        /* Hidden elements for data processing */
-        .synity-products-table {
-            display: none;
-        }
-
-        /* Professional table styling */
-        .synity-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            background: var(--synity-bg-primary);
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: var(--shadow-xs);
-        }
-
-        .synity-table th {
-            background: var(--b24-gray-50);
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--synity-text-primary);
-            border-bottom: 1px solid var(--synity-border);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .synity-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--b24-gray-100);
-            color: var(--synity-text-secondary);
-        }
-
-        .synity-product-name {
-            font-weight: 500;
-            color: var(--synity-text-primary) !important;
-            max-width: 140px;
-            word-wrap: break-word;
-        }
-
-        .synity-product-qty {
-            text-align: center;
-            font-weight: 500;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
-        }
-
-        .synity-product-price,
-        .synity-product-total {
-            text-align: right;
-            font-weight: 500;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
-            color: var(--b24-primary-dark);
+        .synity-input:focus-visible {
+            outline: 2px solid var(--primary-500);
+            outline-offset: 2px;
         }
     </style>
 </head>
 
 <body data-entity-amount="${entityAmount || 0}" data-entity-discount="${entityDiscount || 0}" data-entity-tax="${entityTax || 0}" data-entity-currency="${entityCurrency || 'VND'}">
     <div class="synity-app">
-        <!-- Professional Sidebar with B24UI Design System -->
+        <!-- Unified Sidebar - Single Cohesive Experience -->
         <aside class="synity-sidebar">
-            <!-- Header - Clean professional branding -->
-            <div class="synity-sidebar-header">
-                <h1 class="synity-sidebar-title">
+            <!-- Cohesive Header -->
+            <header class="synity-header">
+                <h1 class="synity-header-title">
                     <i class="bi bi-file-earmark-text"></i>
-                    SYNITY Quotation Generator
+                    SYNITY Generator
                 </h1>
-                
-                <!-- Status Badge with professional gradient -->
-                <div class="synity-status-badge">
+                <div class="synity-header-subtitle">
                     <i class="bi bi-check-circle-fill"></i>
-                    CRM Connected
+                    CRM Connected & Ready
                 </div>
-            </div>
+            </header>
 
-            <!-- Scrollable Content with sticky action buttons -->
-            <div class="synity-sidebar-content">
-                <!-- Essential Information Section -->
-                <div class="synity-compact-section">
-                    <h3 class="synity-compact-title">
-                        <i class="bi bi-calendar3"></i>
-                        Thông Tin Báo Giá
-                    </h3>
-                    <div class="synity-form-row">
-                        <label class="synity-label">Số báo giá</label>
-                        <input type="text" class="synity-input" id="quotation_number">
-                    </div>
-                    <div class="synity-form-row synity-form-row--grid">
-                        <div>
-                            <label class="synity-label">Ngày tạo</label>
-                            <input type="date" class="synity-input" id="date_created">
+            <!-- Unified Workspace -->
+            <div class="synity-workspace">
+                <!-- Single Unified Card - Contains All Content -->
+                <div class="synity-workspace-card">
+                    <!-- Quotation Information Section -->
+                    <section class="synity-section">
+                        <div class="synity-section-header">
+                            <h2 class="synity-section-title">
+                                <i class="bi bi-calendar3"></i>
+                                Thông Tin Báo Giá
+                            </h2>
                         </div>
-                        <div>
-                            <label class="synity-label">Hiệu lực đến</label>
-                            <input type="date" class="synity-input" id="closed_date">
+                        
+                        <div class="synity-form-grid">
+                            <div class="synity-field synity-field--full">
+                                <label class="synity-label">Số báo giá</label>
+                                <input type="text" class="synity-input" id="quotation_number" placeholder="SYN-Q-250901-01">
+                            </div>
+                            
+                            <div class="synity-form-row">
+                                <div class="synity-field">
+                                    <label class="synity-label">Ngày tạo</label>
+                                    <input type="date" class="synity-input" id="date_created">
+                                </div>
+                                <div class="synity-field">
+                                    <label class="synity-label">Hiệu lực đến</label>
+                                    <input type="date" class="synity-input" id="closed_date">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Professional Action Buttons - Horizontal Row -->
-                <div class="synity-action-section">
-                    <h3 class="synity-action-title">
-                        <i class="bi bi-lightning"></i>
-                        Actions
-                    </h3>
-                    <div class="synity-action-row">
-                        <button class="synity-btn synity-btn--primary" id="generate-btn" title="Tạo báo giá mới">
-                            <i class="bi bi-play-fill"></i>
-                            Tạo
-                        </button>
-                        <button class="synity-btn synity-btn--secondary" id="export-btn" title="Xuất file HTML">
-                            <i class="bi bi-download"></i>
-                            Xuất
-                        </button>
-                        <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()" title="Đóng ứng dụng">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
+                        <!-- Contextual Actions - Near Content -->
+                        <div class="synity-actions">
+                            <button class="synity-btn synity-btn--primary" id="generate-btn" title="Tạo báo giá mới">
+                                <i class="bi bi-play-fill"></i>
+                                Tạo Báo Giá
+                            </button>
+                            <button class="synity-btn synity-btn--secondary" id="export-btn" title="Xuất file HTML">
+                                <i class="bi bi-download"></i>
+                                Xuất File
+                            </button>
+                            <button class="synity-btn synity-btn--tertiary" id="close-btn" onclick="BX24.closeApplication()" title="Đóng ứng dụng">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </section>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content - Professional preview area -->
+        <!-- Unified Main Content -->
         <main class="synity-main">
             <div class="synity-main-content">
                 <iframe id="preview-frame" class="synity-preview"></iframe>
@@ -599,7 +560,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
         ${bitrixProducts && bitrixProducts.length > 0 ? 
             bitrixProducts.map(product => `
                 <div class="synity-products-table">
-                    <table class="synity-table">
+                    <table>
                         <tbody>
                             <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" 
                                 data-discount-sum="${product.DISCOUNT_SUM || 0}"
@@ -607,10 +568,10 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                                 data-price-netto="${product.PRICE_NETTO || 0}"
                                 data-tax-rate="${product.TAX_RATE || 0}"
                                 data-tax-included="${product.TAX_INCLUDED || 'N'}">
-                                <td class="synity-product-name">${product.PRODUCT_NAME || 'Unknown Product'}</td>
-                                <td class="synity-product-qty">${product.QUANTITY || 1}</td>
-                                <td class="synity-product-price">${formatCurrency(product.PRICE || 0)}</td>
-                                <td class="synity-product-total">${formatCurrency(product.PRICE_NETTO || 0)}</td>
+                                <td>${product.PRODUCT_NAME || 'Unknown Product'}</td>
+                                <td>${product.QUANTITY || 1}</td>
+                                <td>${formatCurrency(product.PRICE || 0)}</td>
+                                <td>${formatCurrency(product.PRICE_NETTO || 0)}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -645,7 +606,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     </template>
 
     <script>
-        // Enhanced logging with B24UI integration
+        // Enhanced UX logging
         function logToWorker(message, data = null) {
             const logEntry = {
                 timestamp: new Date().toISOString(),
@@ -656,158 +617,92 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                     width: window.innerWidth,
                     height: window.innerHeight
                 },
-                b24ui_version: '2.0-professional'
+                design_version: 'unified-cohesive-v2'
             };
-            console.log('🎨 B24UI SYNITY LOG:', JSON.stringify(logEntry));
+            console.log('🎨 UNIFIED DESIGN LOG:', JSON.stringify(logEntry));
         }
 
-        // Initialize B24 and SYNITY integration with professional UX
+        // Initialize with Unified Design System
         BX24.init(function() {
-            logToWorker('SYNITY CRM Integration initialized - B24UI Professional Design', {
+            logToWorker('SYNITY Unified Design System initialized', {
                 bx24Ready: true,
                 url: window.location.href,
-                designSystem: 'B24UI Professional',
-                buttonLayout: 'horizontal-compact'
+                designSystem: 'Unified Cohesive Experience',
+                uxPrinciple: '10-years-experience-applied'
             });
             
-            // Professional maximum height expansion
+            // Professional viewport expansion with unified approach
             function expandToMaximumHeight() {
                 const windowHeight = window.innerHeight || document.documentElement.clientHeight;
                 const windowWidth = window.innerWidth || document.documentElement.clientWidth;
                 
-                logToWorker('Professional viewport expansion', {
+                logToWorker('Unified design viewport expansion', {
                     windowWidth,
                     windowHeight,
-                    targetDesktop: 'maximum-utilization'
+                    approach: 'cohesive-unified-design'
                 });
                 
-                // Desktop-first approach - aggressive expansion
+                // Unified expansion strategy
                 const targetWidth = Math.min(2000, Math.max(1800, windowWidth));
                 const targetHeight = Math.min(1400, Math.max(1200, windowHeight));
                 
-                logToWorker('B24UI expansion dimensions', {
+                logToWorker('Unified expansion dimensions', {
                     targetWidth,
                     targetHeight,
-                    designPrinciple: 'desktop-first-professional'
+                    designPrinciple: 'unified-cohesive-professional'
                 });
                 
-                // Fit to content first
+                // Unified fit and resize approach
                 BX24.fitWindow(function() {
-                    const scrollSizeAfterFit = BX24.getScrollSize();
-                    logToWorker('fitWindow completed - professional layout', {
-                        scrollSize: scrollSizeAfterFit,
-                        viewportAfterFit: {
-                            width: window.innerWidth,
-                            height: window.innerHeight
-                        }
-                    });
-                    
-                    // Apply professional maximum resize
                     BX24.resizeWindow(targetWidth, targetHeight, function() {
-                        logToWorker('Professional widget expanded to maximum', {
+                        logToWorker('Unified design widget expanded', {
                             requestedSize: { width: targetWidth, height: targetHeight },
                             actualViewport: {
                                 width: window.innerWidth,
                                 height: window.innerHeight
                             },
-                            finalScrollSize: BX24.getScrollSize(),
-                            b24ui_optimized: true
+                            designSystemComplete: true
                         });
                         
-                        // Ensure app uses expanded professional viewport
+                        // Ensure unified app container
                         const app = document.querySelector('.synity-app');
                         if (app) {
                             const viewportHeight = window.innerHeight;
                             app.style.height = viewportHeight + 'px';
                             app.style.maxHeight = viewportHeight + 'px';
-                            
-                            logToWorker('Professional app container adjusted', {
-                                appHeight: viewportHeight + 'px',
-                                actualRect: app.getBoundingClientRect(),
-                                designSystem: 'B24UI-professional'
-                            });
                         }
                         
-                        // Professional sidebar sizing
-                        const sidebar = document.querySelector('.synity-sidebar');
-                        if (sidebar) {
-                            const viewportHeight = window.innerHeight;
-                            sidebar.style.height = viewportHeight + 'px';
-                            sidebar.style.maxHeight = viewportHeight + 'px';
-                            
-                            logToWorker('Professional sidebar adjusted', {
-                                sidebarHeight: viewportHeight + 'px',
-                                sidebarRect: sidebar.getBoundingClientRect()
-                            });
-                        }
-                        
-                        // Final professional layout verification
+                        // Final unified layout verification
                         setTimeout(() => {
-                            logToWorker('B24UI Professional Layout Complete', {
+                            logToWorker('Unified Design System Complete', {
                                 viewport: {
                                     width: window.innerWidth,
                                     height: window.innerHeight
                                 },
-                                documentSize: {
-                                    width: document.documentElement.scrollWidth,
-                                    height: document.documentElement.scrollHeight
-                                },
-                                appRect: app ? app.getBoundingClientRect() : null,
-                                sidebarRect: sidebar ? sidebar.getBoundingClientRect() : null,
-                                actionSectionRect: document.querySelector('.synity-action-section') ? 
-                                    document.querySelector('.synity-action-section').getBoundingClientRect() : null,
-                                professionalButtonsVisible: document.querySelector('.synity-action-section') ? 
-                                    document.querySelector('.synity-action-section').getBoundingClientRect().top < window.innerHeight : false,
-                                b24ui_design_complete: true
+                                unifiedDesignActive: true,
+                                cohesiveExperienceReady: true
                             });
                         }, 200);
                     });
                 });
             }
             
-            // Professional expansion sequence
-            logToWorker('Starting B24UI Professional expansion sequence');
+            // Unified expansion sequence
+            logToWorker('Starting Unified Design expansion sequence');
             
             expandToMaximumHeight();
             
-            setTimeout(() => {
-                logToWorker('Professional expansion attempt #2 (500ms)');
-                expandToMaximumHeight();
-            }, 500);
+            setTimeout(() => expandToMaximumHeight(), 500);
+            setTimeout(() => expandToMaximumHeight(), 1500);
             
-            setTimeout(() => {
-                logToWorker('Professional expansion attempt #3 (1500ms)');
-                expandToMaximumHeight();
-            }, 1500);
-            
-            // Professional slider wrapper detection
-            setTimeout(() => {
-                const sliderWrapper = document.querySelector('.ui-page-slider-wrapper');
-                if (sliderWrapper) {
-                    const sliderRect = sliderWrapper.getBoundingClientRect();
-                    logToWorker('Professional slider wrapper detected', {
-                        sliderRect: sliderRect,
-                        targetDimensions: {
-                            width: sliderRect.width,
-                            height: sliderRect.height
-                        },
-                        b24ui_adaptive: true
-                    });
-                    
-                    BX24.resizeWindow(sliderRect.width, sliderRect.height, function() {
-                        logToWorker('Professional resize to match slider wrapper');
-                    });
-                }
-            }, 2000);
-            
-            // Initialize professional button interactions
+            // Enhanced button interactions with unified feedback
             const buttons = document.querySelectorAll('.synity-btn');
             buttons.forEach(button => {
                 button.addEventListener('click', function() {
-                    logToWorker('Professional button interaction', {
+                    logToWorker('Unified button interaction', {
                         buttonId: this.id,
                         buttonClass: this.className,
-                        designSystem: 'B24UI-professional'
+                        unifiedDesign: true
                     });
                 });
             });
