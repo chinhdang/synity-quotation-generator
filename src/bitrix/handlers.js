@@ -584,32 +584,58 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
 
 // Helper function to determine entity type from placement
 function getEntityTypeFromPlacement(placement) {
+  // Enhanced mapping with more precision
+  if (placement.includes('SMART_INVOICE')) return 'invoice';
   if (placement.includes('LEAD')) return 'lead';
   if (placement.includes('DEAL')) return 'deal';
   if (placement.includes('INVOICE')) return 'invoice';
+  if (placement.includes('ESTIMATE')) return 'estimate';
   if (placement.includes('CONTACT')) return 'contact';
   if (placement.includes('COMPANY')) return 'company';
-  if (placement.includes('SMART_INVOICE')) return 'smart_invoice';
   return 'unknown';
 }
 
-// Function to fetch CRM entity data
+// Function to generate quotation number based on entity type and ID
+function generateQuotationNumber(entityType, entityId) {
+  const mapping = ENTITY_TYPE_MAPPING[entityType];
+  
+  if (mapping) {
+    return `BX${mapping.code}-${entityId}`;
+  }
+  
+  // Fallback for unknown entity types
+  return `BXUNK-${entityId}`;
+}
+
+// Entity type mapping for quotation numbers and API calls
+const ENTITY_TYPE_MAPPING = {
+  'lead': { code: 'L', ownerType: 'LEAD' },
+  'deal': { code: 'D', ownerType: 'DEAL' },
+  'invoice': { code: 'SI', ownerType: 'SMART_INVOICE' },
+  'estimate': { code: 'E', ownerType: 'ESTIMATE' },
+  'company': { code: 'CO', ownerType: 'COMPANY' },
+  'contact': { code: 'C', ownerType: 'CONTACT' }
+};
+
+// Enhanced function to fetch CRM entity data with requisites and universal product API
 async function fetchCRMEntityData(client, entityType, entityId) {
   const data = {
     responsiblePersonName: '',
     responsiblePersonPhone: '',
     responsiblePersonEmail: '',
     clientCompanyName: '',
-    client_address: '',
-    client_tax_code: '',
+    client_address: '',      // from crm.address.list
+    client_tax_code: '',     // from crm.requisite.list
     contact_name: '',
     contact_phone: '',
     contact_email: '',
-    bitrixProducts: [],
+    bitrixProducts: [],      // from universal API
     entityAmount: 0,
     entityDiscount: 0,
     entityTax: 0,
-    entityCurrency: 'VND'
+    entityCurrency: 'VND',
+    entityType: entityType,  // for quotation number generation
+    entityId: entityId
   };
 
   try {
@@ -649,6 +675,9 @@ async function fetchCRMEntityData(client, entityType, entityId) {
           id: entityId 
         });
         break;
+      case 'estimate':
+        entity = await client.call('crm.estimate.get', { id: entityId });
+        break;
     }
 
     if (entity && entity.result) {
@@ -665,15 +694,31 @@ async function fetchCRMEntityData(client, entityType, entityId) {
         }
       }
 
-      // Get company information
+      // Get company information with enhanced requisites and address
       let companyId = entityData.COMPANY_ID;
       if (companyId) {
         const company = await client.call('crm.company.get', { id: companyId });
         if (company.result) {
           const companyData = company.result;
           data.clientCompanyName = companyData.TITLE || '';
-          data.client_address = companyData.ADDRESS || '';
-          data.client_tax_code = companyData.UF_CRM_TAX_ID || '';
+          
+          // Enhanced: Fetch tax code from requisites API
+          try {
+            const taxCode = await fetchCompanyTaxCode(client, companyId);
+            data.client_tax_code = taxCode;
+          } catch (error) {
+            console.warn('Failed to fetch tax code from requisites:', error);
+            data.client_tax_code = companyData.UF_CRM_TAX_ID || '';
+          }
+          
+          // Enhanced: Fetch address from address API
+          try {
+            const address = await fetchCompanyAddress(client, companyId);
+            data.client_address = address;
+          } catch (error) {
+            console.warn('Failed to fetch address from address API:', error);
+            data.client_address = companyData.ADDRESS || '';
+          }
         }
       }
 
@@ -689,29 +734,11 @@ async function fetchCRMEntityData(client, entityType, entityId) {
         }
       }
 
-      // Get product rows based on entity type
+      // Enhanced: Get product rows using universal API
       try {
-        let products = null;
-        switch (entityType) {
-          case 'deal':
-            products = await client.call('crm.deal.productrows.get', { id: entityId });
-            break;
-          case 'lead':
-            products = await client.call('crm.lead.productrows.get', { id: entityId });
-            break;
-          case 'invoice':
-            // For Smart Invoice, try to get product rows
-            products = await client.call('crm.item.productrows.get', { 
-              entityTypeId: 31,
-              id: entityId 
-            });
-            break;
-        }
-        
-        if (products && products.result) {
-          data.bitrixProducts = products.result;
-          console.log(`Got ${products.result.length} products for ${entityType} ${entityId}`);
-        }
+        const products = await fetchProductRowsUniversal(client, entityType, entityId);
+        data.bitrixProducts = products;
+        console.log(`Got ${products.length} products for ${entityType} ${entityId} using universal API`);
       } catch (productError) {
         console.error('Failed to fetch product rows:', productError);
         data.bitrixProducts = [];
@@ -736,6 +763,134 @@ async function fetchCRMEntityData(client, entityType, entityId) {
   }
 
   return data;
+}
+
+// Helper function to fetch company tax code from requisites
+async function fetchCompanyTaxCode(client, companyId) {
+  try {
+    const requisites = await client.call('crm.requisite.list', {
+      filter: {
+        ENTITY_TYPE_ID: 4, // Company entity type
+        ENTITY_ID: companyId
+      }
+    });
+    
+    if (requisites.result && requisites.result.length > 0) {
+      // Get first requisite or primary requisite
+      const requisite = requisites.result[0];
+      return requisite.RQ_INN || requisite.RQ_KPP || requisite.RQ_OGRNIP || requisite.RQ_TAX_ID || '';
+    }
+    
+    return '';
+  } catch (error) {
+    console.error('Failed to fetch company tax code:', error);
+    return '';
+  }
+}
+
+// Helper function to fetch company address from address API
+async function fetchCompanyAddress(client, companyId) {
+  try {
+    const addresses = await client.call('crm.address.list', {
+      filter: {
+        ENTITY_TYPE_ID: 4, // Company entity type
+        ENTITY_ID: companyId,
+        TYPE_ID: 1 // Primary address type
+      }
+    });
+    
+    if (addresses.result && addresses.result.length > 0) {
+      const addr = addresses.result[0];
+      const addressParts = [
+        addr.ADDRESS_1,
+        addr.ADDRESS_2,
+        addr.CITY,
+        addr.REGION,
+        addr.COUNTRY
+      ].filter(part => part && part.trim()).join(', ');
+      
+      return addressParts || '';
+    }
+    
+    return '';
+  } catch (error) {
+    console.error('Failed to fetch company address:', error);
+    return '';
+  }
+}
+
+// Universal product rows fetching function
+async function fetchProductRowsUniversal(client, entityType, entityId) {
+  try {
+    const mapping = ENTITY_TYPE_MAPPING[entityType];
+    if (!mapping) {
+      console.warn(`Unknown entity type: ${entityType}, falling back to legacy`);
+      return await fetchProductRowsLegacy(client, entityType, entityId);
+    }
+
+    // Try universal API first (recommended approach)
+    try {
+      const products = await client.call('crm.item.productrow.list', {
+        filter: {
+          ownerType: mapping.ownerType,
+          ownerId: entityId
+        }
+      });
+      
+      if (products.result) {
+        console.log(`✅ Universal API success: ${products.result.length} products for ${entityType}`);
+        return products.result;
+      }
+    } catch (universalError) {
+      console.warn('Universal API failed, trying legacy:', universalError);
+      
+      // Fallback to legacy entity-specific API
+      return await fetchProductRowsLegacy(client, entityType, entityId);
+    }
+    
+    return [];
+  } catch (error) {
+    console.error(`Failed to fetch products for ${entityType}:${entityId}`, error);
+    return [];
+  }
+}
+
+// Legacy fallback for product rows
+async function fetchProductRowsLegacy(client, entityType, entityId) {
+  try {
+    let products = null;
+    
+    switch (entityType) {
+      case 'deal':
+        products = await client.call('crm.deal.productrows.get', { id: entityId });
+        break;
+      case 'lead':
+        products = await client.call('crm.lead.productrows.get', { id: entityId });
+        break;
+      case 'invoice':
+        products = await client.call('crm.item.productrows.get', { 
+          entityTypeId: 31, // Smart Invoice
+          id: entityId 
+        });
+        break;
+      case 'estimate':
+        products = await client.call('crm.estimate.productrows.get', { id: entityId });
+        break;
+      default:
+        console.warn(`No legacy API for entity type: ${entityType}`);
+        return [];
+    }
+    
+    if (products && products.result) {
+      console.log(`✅ Legacy API success: ${products.result.length} products for ${entityType}`);
+      return products.result;
+    }
+    
+    return [];
+  } catch (error) {
+    console.error(`Legacy product API failed for ${entityType}:${entityId}`, error);
+    return [];
+  }
 }
 
 // Function to generate SYNITY CRM interface

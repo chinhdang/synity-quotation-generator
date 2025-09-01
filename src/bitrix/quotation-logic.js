@@ -194,16 +194,48 @@ export function getQuotationLogicScript() {
             updateFinancialSummary();
         }, 100);
 
-        // Generate quotation function - CORRECTED CALCULATIONS
+        // Direct template generation function - PURE CRM APPROACH
+        window.generateQuotationDirect = function(crmData) {
+            console.log('🚀 Direct quotation generation from CRM data');
+            console.log('📊 CRM Data received:', crmData);
+            
+            // Import direct template generator
+            const generateQuotationHTML = window.generateQuotationHTML || function(data) {
+                console.error('❌ Direct template generator not loaded');
+                return '<h1>Template generator not available</h1>';
+            };
+            
+            // Generate HTML directly from CRM data - NO INTERMEDIATE PROCESSING
+            const quotationHtml = generateQuotationHTML(crmData);
+            
+            // Display in preview iframe
+            const previewFrame = document.getElementById('preview-frame');
+            if (previewFrame) {
+                previewFrame.srcdoc = quotationHtml;
+                console.log('✅ Direct quotation generated and displayed');
+                
+                // Store for export
+                window.currentQuotationHtml = quotationHtml;
+            } else {
+                console.error('❌ Preview frame not found');
+            }
+        };
+
+        // Legacy generate function - FALLBACK TO OLD APPROACH
         window.generateQuotation = function() {
-            console.log('🚀 Starting quotation generation...');
+            console.log('🔄 Using legacy quotation generation...');
+            
+            // Check if we have CRM data stored
+            if (window.SYNITY_CRM_DATA) {
+                console.log('✅ CRM data available, using direct approach');
+                return window.generateQuotationDirect(window.SYNITY_CRM_DATA);
+            }
+            
+            console.log('⚠️ No CRM data, falling back to form-based approach');
             
             const data = getFormValues();
             console.log('📊 Form data collected:', data);
 
-            // Since we now get all product data directly from CRM, 
-            // we don't need manual Bitrix pricing calculations anymore
-            
             // Calculate totals from CRM product sections using CORRECTED formulas
             const productsTotal = calculateProductsTotal('generateQuotation');
             console.log('📊 Products Total Calculated:', productsTotal);
@@ -213,28 +245,9 @@ export function getQuotationLogicScript() {
             const crm_entity_discount = parseFloat(document.body.getAttribute('data-entity-discount')) || 0;
             const crm_entity_tax = parseFloat(document.body.getAttribute('data-entity-tax')) || 0;
             
-            console.log('📋 CRM Entity Data:', {
-                amount: crm_entity_amount,
-                discount: crm_entity_discount,
-                tax: crm_entity_tax
-            });
-            
-            // Calculate final totals using CRM data only
-            console.log('🎯 Using CRM product data with CORRECTED formulas');
-            const sub_total = productsTotal.subtotal;           // Tổng cộng = sum(PRICE_EXCLUSIVE)
-            const vat_amount = productsTotal.vat;               // VAT = sum(VAT_RATE * PRICE_EXCLUSIVE) for each product
-            const grand_total = sub_total + vat_amount;         // Tổng thanh toán = Tổng cộng + VAT
-
-            console.log('💰 Final Financial Summary:', {
-                sub_total: sub_total,
-                vat_amount: vat_amount,
-                grand_total: grand_total,
-                formatted: {
-                    sub_total: formatCurrency(sub_total),
-                    vat_amount: formatCurrency(vat_amount),
-                    grand_total: formatCurrency(grand_total)
-                }
-            });
+            const sub_total = productsTotal.subtotal;
+            const vat_amount = productsTotal.vat;
+            const grand_total = sub_total + vat_amount;
 
             // Payment schedule uses standard template (not dynamic calculation)
             // since specific payment terms are handled in template
