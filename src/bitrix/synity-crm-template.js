@@ -41,7 +41,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
-        /* SYNITY Design System - Optimized Layout */
+        /* SYNITY Design System - Full Height Optimized Layout */
         :root {
             --synity-primary: #0D9488;
             --synity-secondary: #2563EB;
@@ -64,58 +64,51 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             overflow: hidden;
         }
 
-        /* SYNITY App Container - Optimized for Bitrix Slider */
+        /* SYNITY App Container - Full Height without Header */
         .synity-app {
             height: 100vh;
             display: flex;
-            flex-direction: column;
             background: var(--synity-bg-primary);
-            min-height: 0;
+            overflow: hidden;
         }
 
-        /* SYNITY App Header */
-        .synity-app-header {
+        /* SYNITY Sidebar - Now with integrated header */
+        .synity-sidebar {
+            width: 380px;
+            background: var(--synity-bg-primary);
+            border-right: 1px solid var(--synity-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Sidebar Header - Compact */
+        .synity-sidebar-header {
             background: var(--synity-bg-primary);
             border-bottom: 1px solid var(--synity-border);
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: 1rem;
             flex-shrink: 0;
-            min-height: 60px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .synity-app-title {
+        .synity-sidebar-title {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             color: var(--synity-text-primary);
             font-size: 1rem;
             font-weight: 700;
-            margin: 0;
+            margin: 0 0 0.75rem 0;
         }
 
-        .synity-app-actions {
+        /* Action Buttons - Horizontal Row */
+        .synity-action-row {
             display: flex;
             gap: 0.5rem;
-            align-items: center;
+            flex-wrap: wrap;
         }
 
-        /* SYNITY Status Indicator */
-        .synity-status {
-            background: linear-gradient(135deg, var(--synity-primary), var(--synity-secondary));
-            color: white;
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        /* SYNITY Compact Buttons */
+        /* Compact Buttons */
         .synity-btn {
             padding: 0.5rem 0.75rem;
             border: none;
@@ -126,7 +119,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.375rem;
             text-decoration: none;
             white-space: nowrap;
         }
@@ -163,22 +156,19 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             font-size: 0.75rem;
         }
 
-        /* SYNITY App Body */
-        .synity-app-body {
+        /* CRM Status Badge - Compact */
+        .synity-status-badge {
+            background: linear-gradient(135deg, var(--synity-success), var(--synity-primary));
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 600;
             display: flex;
-            flex: 1;
-            min-height: 0;
-            background: var(--synity-bg-secondary);
-        }
-
-        /* SYNITY Sidebar */
-        .synity-sidebar {
-            width: 400px;
-            background: var(--synity-bg-primary);
-            border-right: 1px solid var(--synity-border);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            align-items: center;
+            gap: 0.25rem;
+            width: fit-content;
+            margin-top: 0.5rem;
         }
 
         .synity-sidebar-content {
@@ -187,7 +177,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             overflow-y: auto;
         }
 
-        /* SYNITY Main Content */
+        /* SYNITY Main Content - Full Height */
         .synity-main {
             flex: 1;
             background: var(--synity-bg-secondary);
@@ -202,7 +192,17 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             overflow: hidden;
         }
 
-        /* SYNITY Form Components */
+        /* SYNITY Preview Frame - Full Available Height */
+        .synity-preview {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--synity-border);
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* SYNITY Form Components - Compact */
         .synity-form-section {
             background: var(--synity-bg-primary);
             border: 1px solid var(--synity-border);
@@ -217,7 +217,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             font-weight: 700;
             margin: 0;
             padding: 1rem 1rem 0.75rem 1rem;
-            border-bottom: 2px solid var(--synity-border);
+            border-bottom: 1px solid var(--synity-border);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -240,7 +240,6 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
             width: 100%;
-            max-width: 100%;
             box-sizing: border-box;
         }
 
@@ -262,19 +261,12 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             background: var(--synity-bg-primary);
             color: var(--synity-text-primary);
             box-sizing: border-box;
-            max-width: 100%;
         }
 
         .synity-input:focus {
             outline: none;
             border-color: var(--synity-primary);
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
-        }
-
-        .synity-input:read-only {
-            background: var(--synity-bg-secondary);
-            color: var(--synity-text-secondary);
-            cursor: not-allowed;
         }
 
         .synity-select {
@@ -288,7 +280,6 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             cursor: pointer;
             transition: all 0.2s ease;
             box-sizing: border-box;
-            max-width: 100%;
         }
 
         .synity-select:focus {
@@ -297,17 +288,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
         }
 
-        /* SYNITY Preview Frame */
-        .synity-preview {
-            width: 100%;
-            height: 100%;
-            border: 1px solid var(--synity-border);
-            border-radius: 8px;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* SYNITY Compact Form Styling */
+        /* Compact Form Styling */
         .synity-compact-section {
             background: var(--synity-bg-primary);
             border: 1px solid var(--synity-border);
@@ -315,10 +296,6 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-            overflow: hidden;
         }
 
         .synity-compact-title {
@@ -331,28 +308,16 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             gap: 0.5rem;
         }
 
-        /* SYNITY CRM Data Display */
-        .synity-crm-indicator {
-            background: linear-gradient(135deg, var(--synity-primary), var(--synity-secondary));
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
+        /* Responsive */
+        @media (min-width: 1400px) {
+            .synity-sidebar {
+                width: 420px;
+            }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .synity-sidebar {
-                width: 300px;
-            }
-            
-            .synity-app-title {
-                font-size: 0.875rem;
+                width: 320px;
             }
             
             .synity-btn {
@@ -363,7 +328,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 
         /* SYNITY Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
@@ -372,36 +337,19 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 
         ::-webkit-scrollbar-thumb {
             background: var(--synity-border);
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--synity-text-secondary);
         }
 
-        /* Phase 2 Optimizations */
-        .synity-readonly-display {
-            background: var(--synity-bg-secondary);
-            border: 1px solid var(--synity-border);
-            border-radius: 6px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.875rem;
-            color: var(--synity-text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .synity-readonly-display i {
-            color: var(--synity-primary);
-        }
-
-        /* Phase 3: CRM Product Table Styles */
+        /* Hidden elements for data processing */
         .synity-products-table {
-            margin-top: 0.75rem;
-            overflow-x: auto;
+            display: none;
         }
 
+        /* CRM Product Table Styles */
         .synity-table {
             width: 100%;
             border-collapse: collapse;
@@ -411,7 +359,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 
         .synity-table th {
             background: var(--synity-bg-secondary);
-            padding: 0.5rem 0.375rem;
+            padding: 0.5rem;
             text-align: left;
             font-weight: 600;
             color: var(--synity-text-primary);
@@ -419,13 +367,9 @@ export function getSYNITYCRMTemplate(crmData = {}) {
         }
 
         .synity-table td {
-            padding: 0.5rem 0.375rem;
+            padding: 0.5rem;
             border-bottom: 1px solid var(--synity-border);
             color: var(--synity-text-secondary);
-        }
-
-        .synity-table tr:hover {
-            background: var(--synity-bg-secondary);
         }
 
         .synity-product-name {
@@ -446,153 +390,117 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             font-weight: 500;
             font-family: 'Consolas', monospace;
         }
-
-        /* Phase 4: Financial Summary Styles */
-        .synity-financial-summary {
-            margin-top: 0.75rem;
-        }
-
-        .synity-financial-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--synity-border);
-            font-size: 0.875rem;
-        }
-
-        .synity-financial-row:last-child {
-            border-bottom: none;
-            font-weight: 700;
-            color: var(--synity-text-primary);
-        }
-
-        .synity-amount {
-            font-weight: 700;
-            color: var(--synity-primary);
-            font-family: 'Consolas', monospace;
-        }
-
-        .synity-discount {
-            font-weight: 600;
-            color: var(--synity-danger);
-            font-family: 'Consolas', monospace;
-        }
-
-        .synity-tax {
-            font-weight: 600;
-            color: var(--synity-warning);
-            font-family: 'Consolas', monospace;
-        }
     </style>
 </head>
 
 <body data-entity-amount="${entityAmount || 0}" data-entity-discount="${entityDiscount || 0}" data-entity-tax="${entityTax || 0}" data-entity-currency="${entityCurrency || 'VND'}">
     <div class="synity-app">
-        <!-- SYNITY App Header -->
-        <header class="synity-app-header">
-            <h1 class="synity-app-title">
-                <i class="bi bi-file-earmark-text"></i>
-                SYNITY Quotation Generator
-            </h1>
-            <div class="synity-app-actions">
-                <span class="synity-status">
+        <!-- Left Sidebar with integrated header -->
+        <aside class="synity-sidebar">
+            <!-- Compact Header -->
+            <div class="synity-sidebar-header">
+                <h1 class="synity-sidebar-title">
+                    <i class="bi bi-file-earmark-text"></i>
+                    SYNITY Quotation Generator
+                </h1>
+                
+                <!-- Action buttons in horizontal row -->
+                <div class="synity-action-row">
+                    <button class="synity-btn synity-btn--primary" id="generate-btn">
+                        <i class="bi bi-play-fill"></i>
+                        Tạo
+                    </button>
+                    <button class="synity-btn synity-btn--secondary" id="export-btn">
+                        <i class="bi bi-download"></i>
+                        Xuất
+                    </button>
+                    <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                
+                <!-- CRM Status Badge -->
+                <div class="synity-status-badge">
                     <i class="bi bi-check-circle-fill"></i>
                     CRM Connected
-                </span>
-                <button class="synity-btn synity-btn--primary" id="generate-btn">
-                    <i class="bi bi-play-fill"></i>
-                    Tạo
-                </button>
-                <button class="synity-btn synity-btn--secondary" id="export-btn">
-                    <i class="bi bi-download"></i>
-                    Xuất
-                </button>
-                <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()">
-                    <i class="bi bi-x-lg"></i>
-                </button>
+                </div>
             </div>
-        </header>
 
-        <!-- SYNITY App Body -->
-        <div class="synity-app-body">
-            <!-- Compact Form Panel -->
-            <aside class="synity-sidebar" style="width: 320px;">
-                <div class="synity-sidebar-content">
-                    <!-- Essential Quotation Info -->
-                    <div class="synity-compact-section">
-                        <h3 class="synity-compact-title">
-                            <i class="bi bi-calendar3"></i>
-                            Thông Tin Báo Giá
-                        </h3>
-                        <div class="synity-form-row">
-                            <label class="synity-label">Số báo giá</label>
-                            <input type="text" class="synity-input" id="quotation_number">
+            <!-- Form Content -->
+            <div class="synity-sidebar-content">
+                <!-- Essential Quotation Info -->
+                <div class="synity-compact-section">
+                    <h3 class="synity-compact-title">
+                        <i class="bi bi-calendar3"></i>
+                        Thông Tin Báo Giá
+                    </h3>
+                    <div class="synity-form-row">
+                        <label class="synity-label">Số báo giá</label>
+                        <input type="text" class="synity-input" id="quotation_number">
+                    </div>
+                    <div class="synity-form-row synity-form-row--grid">
+                        <div>
+                            <label class="synity-label">Ngày tạo</label>
+                            <input type="date" class="synity-input" id="date_created">
                         </div>
-                        <div class="synity-form-row synity-form-row--grid">
-                            <div>
-                                <label class="synity-label">Ngày tạo</label>
-                                <input type="date" class="synity-input" id="date_created">
-                            </div>
-                            <div>
-                                <label class="synity-label">Hiệu lực đến</label>
-                                <input type="date" class="synity-input" id="closed_date">
-                            </div>
+                        <div>
+                            <label class="synity-label">Hiệu lực đến</label>
+                            <input type="date" class="synity-input" id="closed_date">
                         </div>
                     </div>
                 </div>
-            </aside>
+            </div>
+        </aside>
 
-            <!-- Main Content với Preview -->
-            <main class="synity-main">
-                <div class="synity-main-content">
-                    <iframe id="preview-frame" class="synity-preview"></iframe>
+        <!-- Right Main Content - Full Height Preview -->
+        <main class="synity-main">
+            <div class="synity-main-content">
+                <iframe id="preview-frame" class="synity-preview"></iframe>
+            </div>
+        </main>
+
+        <!-- Hidden CRM products data for JavaScript processing -->
+        ${bitrixProducts && bitrixProducts.length > 0 ? 
+            bitrixProducts.map(product => `
+                <div class="synity-products-table">
+                    <table class="synity-table">
+                        <tbody>
+                            <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" 
+                                data-discount-sum="${product.DISCOUNT_SUM || 0}"
+                                data-price="${product.PRICE || 0}"
+                                data-price-netto="${product.PRICE_NETTO || 0}"
+                                data-tax-rate="${product.TAX_RATE || 0}"
+                                data-tax-included="${product.TAX_INCLUDED || 'N'}">
+                                <td class="synity-product-name">${product.PRODUCT_NAME || 'Unknown Product'}</td>
+                                <td class="synity-product-qty">${product.QUANTITY || 1}</td>
+                                <td class="synity-product-price">${formatCurrency(product.PRICE || 0)}</td>
+                                <td class="synity-product-total">${formatCurrency(product.PRICE_NETTO || 0)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </main>
+            `).join('')
+        : ''}
 
-            <!-- Hidden CRM products data for JavaScript processing -->
-            ${bitrixProducts && bitrixProducts.length > 0 ? 
-                bitrixProducts.map(product => `
-                    <div class="synity-products-table" style="display:none;">
-                        <table class="synity-table">
-                            <tbody>
-                                <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" 
-                                    data-discount-sum="${product.DISCOUNT_SUM || 0}"
-                                    data-price="${product.PRICE || 0}"
-                                    data-price-netto="${product.PRICE_NETTO || 0}"
-                                    data-tax-rate="${product.TAX_RATE || 0}"
-                                    data-tax-included="${product.TAX_INCLUDED || 'N'}">
-                                    <td class="synity-product-name">${product.PRODUCT_NAME || 'Unknown Product'}</td>
-                                    <td class="synity-product-qty">${product.QUANTITY || 1}</td>
-                                    <td class="synity-product-price">${formatCurrency(product.PRICE || 0)}</td>
-                                    <td class="synity-product-total">${formatCurrency(product.PRICE_NETTO || 0)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                `).join('')
-            : ''}
-
-            <!-- Hidden fields with all CRM data -->
-            <input type="hidden" id="responsiblePersonName" value="${responsiblePersonName}">
-            <input type="hidden" id="responsiblePersonPhone" value="${responsiblePersonPhone}">
-            <input type="hidden" id="responsiblePersonEmail" value="${responsiblePersonEmail}">
-            <input type="hidden" id="clientCompanyName" value="${clientCompanyName}">
-            <input type="hidden" id="client_address" value="${client_address}">
-            <input type="hidden" id="client_tax_code" value="${client_tax_code}">
-            <input type="hidden" id="contact_name" value="${contact_name}">
-            <input type="hidden" id="contact_phone" value="${contact_phone}">
-            <input type="hidden" id="contact_email" value="${contact_email}">
-            <input type="hidden" id="bitrix_price_usd" value="249">
-            <input type="hidden" id="bitrix_months" value="12 tháng">
-            <input type="hidden" id="implementation_fee" value="392000000">
-            <input type="hidden" id="currency_conversion_fee_percent" value="3">
-            <input type="hidden" id="include_bitrix_license" value="true">
-            <input type="hidden" id="include_implementation_fee" value="true">
-            <input type="hidden" id="exchange_rate" value="26500">
-            <input type="hidden" id="discount_percent" value="10">
-            <input type="hidden" id="bitrix_version_select" value="Bitrix24 Professional (12-Month)">
-        </div>
+        <!-- Hidden fields with all CRM data -->
+        <input type="hidden" id="responsiblePersonName" value="${responsiblePersonName}">
+        <input type="hidden" id="responsiblePersonPhone" value="${responsiblePersonPhone}">
+        <input type="hidden" id="responsiblePersonEmail" value="${responsiblePersonEmail}">
+        <input type="hidden" id="clientCompanyName" value="${clientCompanyName}">
+        <input type="hidden" id="client_address" value="${client_address}">
+        <input type="hidden" id="client_tax_code" value="${client_tax_code}">
+        <input type="hidden" id="contact_name" value="${contact_name}">
+        <input type="hidden" id="contact_phone" value="${contact_phone}">
+        <input type="hidden" id="contact_email" value="${contact_email}">
+        <input type="hidden" id="bitrix_price_usd" value="249">
+        <input type="hidden" id="bitrix_months" value="12 tháng">
+        <input type="hidden" id="implementation_fee" value="392000000">
+        <input type="hidden" id="currency_conversion_fee_percent" value="3">
+        <input type="hidden" id="include_bitrix_license" value="true">
+        <input type="hidden" id="include_implementation_fee" value="true">
+        <input type="hidden" id="exchange_rate" value="26500">
+        <input type="hidden" id="discount_percent" value="10">
+        <input type="hidden" id="bitrix_version_select" value="Bitrix24 Professional (12-Month)">
     </div>
 
     <!-- SYNITY Quotation Template -->
@@ -601,26 +509,149 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     </template>
 
     <script>
+        // Enhanced logging for Cloudflare Workers debugging
+        function logToWorker(message, data = null) {
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                message: message,
+                data: data,
+                userAgent: navigator.userAgent,
+                viewport: {
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                }
+            };
+            console.log('🔧 WORKER LOG:', JSON.stringify(logEntry));
+        }
+
         // Initialize B24 and SYNITY integration
         BX24.init(function() {
-            console.log('🎯 SYNITY CRM Integration initialized');
+            logToWorker('SYNITY CRM Integration initialized - Full Height Layout', {
+                bx24Ready: true,
+                url: window.location.href
+            });
             
-            // Smart resize widget to expand for better UX in slider
-            setTimeout(function() {
-                // Get current scroll dimensions
-                const scrollSize = BX24.getScrollSize();
-                console.log('📏 Current scroll size:', scrollSize);
+            // Maximum height expansion to fill ui-page-slider-wrapper
+            function expandToMaximumHeight() {
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                const windowWidth = window.innerWidth || document.documentElement.clientWidth;
                 
-                // Calculate optimal dimensions for quotation generator
-                const targetWidth = Math.min(1400, Math.max(1200, scrollSize.scrollWidth + 100));
-                const targetHeight = Math.min(900, Math.max(800, scrollSize.scrollHeight + 50));
-                
-                console.log('📏 Resizing to:', targetWidth, 'x', targetHeight);
-                
-                BX24.resizeWindow(targetWidth, targetHeight, function() {
-                    console.log('✅ Widget resized successfully');
+                logToWorker('Attempting maximum height expansion', {
+                    windowWidth,
+                    windowHeight,
+                    documentHeight: document.documentElement.scrollHeight,
+                    bodyHeight: document.body.scrollHeight
                 });
-            }, 100); // Small delay to ensure DOM is ready
+                
+                // Use aggressive dimensions to fill entire slider space
+                const targetWidth = Math.min(2000, Math.max(1800, windowWidth));
+                const targetHeight = Math.min(1400, Math.max(1200, windowHeight));
+                
+                logToWorker('Maximum expansion dimensions', {
+                    targetWidth,
+                    targetHeight,
+                    calculationBase: { windowWidth, windowHeight }
+                });
+                
+                // Fit to content first
+                BX24.fitWindow(function() {
+                    const scrollSizeAfterFit = BX24.getScrollSize();
+                    logToWorker('fitWindow completed for maximum expansion', {
+                        scrollSize: scrollSizeAfterFit,
+                        viewportAfterFit: {
+                            width: window.innerWidth,
+                            height: window.innerHeight
+                        }
+                    });
+                    
+                    // Apply maximum resize
+                    BX24.resizeWindow(targetWidth, targetHeight, function() {
+                        logToWorker('Widget expanded to maximum size', {
+                            requestedSize: { width: targetWidth, height: targetHeight },
+                            actualViewport: {
+                                width: window.innerWidth,
+                                height: window.innerHeight
+                            },
+                            finalScrollSize: BX24.getScrollSize()
+                        });
+                        
+                        // Update app container to use exact viewport height
+                        const app = document.querySelector('.synity-app');
+                        if (app) {
+                            app.style.height = '100vh';
+                            app.style.maxHeight = '100vh';
+                            
+                            logToWorker('App container set to full viewport', {
+                                appHeight: '100vh',
+                                actualRect: app.getBoundingClientRect()
+                            });
+                        }
+                        
+                        // Ensure preview frame uses all available space
+                        const preview = document.querySelector('.synity-preview');
+                        if (preview) {
+                            preview.style.height = '100%';
+                            
+                            logToWorker('Preview frame set to full height', {
+                                previewHeight: '100%',
+                                previewRect: preview.getBoundingClientRect()
+                            });
+                        }
+                        
+                        // Log final layout measurements
+                        setTimeout(() => {
+                            logToWorker('Final maximum layout state', {
+                                viewport: {
+                                    width: window.innerWidth,
+                                    height: window.innerHeight
+                                },
+                                documentSize: {
+                                    width: document.documentElement.scrollWidth,
+                                    height: document.documentElement.scrollHeight
+                                },
+                                appRect: app ? app.getBoundingClientRect() : null,
+                                previewRect: preview ? preview.getBoundingClientRect() : null,
+                                sliderWrapper: document.querySelector('.ui-page-slider-wrapper') ? 
+                                    document.querySelector('.ui-page-slider-wrapper').getBoundingClientRect() : null
+                            });
+                        }, 200);
+                    });
+                });
+            }
+            
+            // Multiple expansion attempts with increasing aggressiveness
+            logToWorker('Starting maximum height expansion sequence');
+            
+            expandToMaximumHeight();
+            
+            setTimeout(() => {
+                logToWorker('Second maximum expansion attempt (500ms)');
+                expandToMaximumHeight();
+            }, 500);
+            
+            setTimeout(() => {
+                logToWorker('Third maximum expansion attempt (1500ms)');
+                expandToMaximumHeight();
+            }, 1500);
+            
+            // Try to detect and use slider wrapper dimensions
+            setTimeout(() => {
+                const sliderWrapper = document.querySelector('.ui-page-slider-wrapper');
+                if (sliderWrapper) {
+                    const sliderRect = sliderWrapper.getBoundingClientRect();
+                    logToWorker('Detected slider wrapper, attempting to match dimensions', {
+                        sliderRect: sliderRect,
+                        targetDimensions: {
+                            width: sliderRect.width,
+                            height: sliderRect.height
+                        }
+                    });
+                    
+                    BX24.resizeWindow(sliderRect.width, sliderRect.height, function() {
+                        logToWorker('Resized to match slider wrapper dimensions');
+                    });
+                }
+            }, 2000);
             
             initializeSYNITYQuotation();
         });
