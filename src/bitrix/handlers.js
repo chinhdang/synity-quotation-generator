@@ -490,7 +490,7 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
     });
     
     // If no entity ID in LIST_MENU, it might be a bulk action
-    if (!entityId && placement.includes('LIST_MENU')) {
+    if (!entityId && placement && placement.includes('LIST_MENU')) {
       console.log('⚠️ No entity ID provided - this might be a list view action without selection');
     }
 
@@ -584,7 +584,9 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
 
 // Helper function to determine entity type from placement
 function getEntityTypeFromPlacement(placement) {
-  // Enhanced mapping with more precision
+  // Enhanced mapping with more precision - handle null placement
+  if (!placement) return 'unknown';
+  
   if (placement.includes('SMART_INVOICE')) return 'invoice';
   if (placement.includes('LEAD')) return 'lead';
   if (placement.includes('DEAL')) return 'deal';
