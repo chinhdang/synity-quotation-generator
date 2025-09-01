@@ -26,6 +26,21 @@
 	],
 	"vars": {
 		"APP_NAME": "Bitrix24 Quotation Generator"
+	},
+	"env": {
+		"dev": {
+			"name": "bx-app-quotation-generator-dev",
+			"vars": {
+				"APP_NAME": "Bitrix24 Quotation Generator (DEV)",
+				"APP_ENV": "development"
+			},
+			"kv_namespaces": [
+				{
+					"binding": "BITRIX_KV",
+					"id": "f6a4d0e328454bf989e51003978b9c4d"
+				}
+			]
+		}
 	}
 	/**
 	 * Smart Placement
