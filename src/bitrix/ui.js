@@ -24,10 +24,10 @@ function analyzeBitrixProducts(bitrixProducts) {
 function getDevInfo() {
   const now = new Date();
   const devInfo = {
-    gitCommit: '7bec089',
-    commitMessage: 'feat: enhance CRM integration and add dev info panel',
+    gitCommit: '17d46b8',
+    commitMessage: 'fix: add dev info panel debug logging and auto environment detection',
     branch: 'feature/dev-prod-environments',
-    deployId: 'cb94c08e-9da8-412b-843c-0c12ecaa6e1c',
+    deployId: '187ea7de-116c-42e2-8bd9-66dc4696a260',
     timestamp: now.toLocaleString('vi-VN', {
       timeZone: 'Asia/Ho_Chi_Minh',
       year: 'numeric',
@@ -1140,8 +1140,24 @@ export function getAppUITemplate(crmData = {}) {
     </template>
 
     <script>
+        // Debug logging - App initialization
+        console.log('🚀 SYNITY APP INITIALIZING...');
+        console.log('🌍 Current URL:', window.location.href);
+        console.log('🔧 Environment detection:', window.location.hostname.includes('dev') ? 'DEVELOPMENT' : 'PRODUCTION');
+        
         // Store CRM data globally for direct template generation
         window.SYNITY_CRM_DATA = ${JSON.stringify(crmData)};
+        console.log('📊 CRM Data stored globally:', window.SYNITY_CRM_DATA);
+        
+        // Force trigger dev info logging
+        const devInfo = {
+            gitCommit: '17d46b8',
+            commitMessage: 'fix: add dev info panel debug logging and auto environment detection',
+            branch: 'feature/dev-prod-environments',
+            deployId: '187ea7de-116c-42e2-8bd9-66dc4696a260',
+            timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
+        };
+        console.log('🔍 DEV INFO FORCED LOG:', devInfo);
         
         // Load direct template generator
         ${getDirectTemplateGeneratorScript()}
