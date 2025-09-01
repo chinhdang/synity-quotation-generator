@@ -41,7 +41,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
-        /* SYNITY Design System - Full Height Optimized Layout */
+        /* SYNITY Design System - Maximum Height Layout */
         :root {
             --synity-primary: #0D9488;
             --synity-secondary: #2563EB;
@@ -64,31 +64,42 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             overflow: hidden;
         }
 
-        /* SYNITY App Container - Full Height without Header */
+        /* SYNITY App Container - Fill entire available space */
         .synity-app {
             height: 100vh;
+            max-height: 100vh;
             display: flex;
             background: var(--synity-bg-primary);
             overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
 
-        /* SYNITY Sidebar - Now with integrated header */
+        /* SYNITY Sidebar - Fixed height with flex layout */
         .synity-sidebar {
             width: 380px;
+            min-width: 380px;
             background: var(--synity-bg-primary);
             border-right: 1px solid var(--synity-border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 100vh;
+            max-height: 100vh;
         }
 
-        /* Sidebar Header - Compact */
+        /* Sidebar Header - Fixed height, no flex */
         .synity-sidebar-header {
             background: var(--synity-bg-primary);
             border-bottom: 1px solid var(--synity-border);
             padding: 1rem;
             flex-shrink: 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            height: auto;
+            min-height: fit-content;
         }
 
         .synity-sidebar-title {
@@ -101,62 +112,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             margin: 0 0 0.75rem 0;
         }
 
-        /* Action Buttons - Horizontal Row */
-        .synity-action-row {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        /* Compact Buttons */
-        .synity-btn {
-            padding: 0.5rem 0.75rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .synity-btn--primary {
-            background: var(--synity-primary);
-            color: white;
-        }
-
-        .synity-btn--primary:hover {
-            background: #0d8478;
-            transform: translateY(-1px);
-        }
-
-        .synity-btn--secondary {
-            background: var(--synity-secondary);
-            color: white;
-        }
-
-        .synity-btn--secondary:hover {
-            background: #1d4ed8;
-        }
-
-        .synity-btn--danger {
-            background: var(--synity-danger);
-            color: white;
-        }
-
-        .synity-btn--danger:hover {
-            background: #dc2626;
-        }
-
-        .synity-btn i {
-            font-size: 0.75rem;
-        }
-
-        /* CRM Status Badge - Compact */
+        /* CRM Status Badge */
         .synity-status-badge {
             background: linear-gradient(135deg, var(--synity-success), var(--synity-primary));
             color: white;
@@ -168,34 +124,45 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             align-items: center;
             gap: 0.25rem;
             width: fit-content;
-            margin-top: 0.5rem;
         }
 
+        /* Sidebar Content - Flexible with internal scroll AND sticky buttons */
         .synity-sidebar-content {
             flex: 1;
             padding: 1rem;
             overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--synity-border) transparent;
+            position: relative;
         }
 
-        /* SYNITY Main Content - Full Height */
+        /* SYNITY Main Content - Full Height with internal scroll */
         .synity-main {
             flex: 1;
             background: var(--synity-bg-secondary);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
         }
 
         .synity-main-content {
             flex: 1;
             padding: 1rem;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 0;
         }
 
         /* SYNITY Preview Frame - Full Available Height */
         .synity-preview {
             width: 100%;
             height: 100%;
+            min-height: 800px;
             border: 1px solid var(--synity-border);
             border-radius: 8px;
             background: white;
@@ -308,39 +275,137 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             gap: 0.5rem;
         }
 
-        /* Responsive */
+        /* Action Section - Sticky inside sidebar content */
+        .synity-action-section {
+            background: var(--synity-bg-primary);
+            border: 2px solid var(--synity-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0 1rem 0;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
+            position: sticky;
+            bottom: 1rem;
+            z-index: 10;
+        }
+
+        .synity-action-title {
+            color: var(--synity-primary);
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin: 0 0 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* Action Buttons - Vertical stack for better visibility */
+        .synity-action-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Enhanced Buttons */
+        .synity-btn {
+            padding: 0.875rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            white-space: nowrap;
+            justify-content: center;
+            min-height: 44px;
+            position: relative;
+        }
+
+        .synity-btn--primary {
+            background: var(--synity-primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+        }
+
+        .synity-btn--primary:hover {
+            background: #0d8478;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(13, 148, 136, 0.3);
+        }
+
+        .synity-btn--secondary {
+            background: var(--synity-secondary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .synity-btn--secondary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .synity-btn--danger {
+            background: var(--synity-danger);
+            color: white;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+
+        .synity-btn--danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .synity-btn i {
+            font-size: 1rem;
+        }
+
+        /* Responsive adjustments */
         @media (min-width: 1400px) {
             .synity-sidebar {
                 width: 420px;
+                min-width: 420px;
             }
         }
 
         @media (max-width: 768px) {
             .synity-sidebar {
                 width: 320px;
+                min-width: 320px;
             }
             
             .synity-btn {
-                padding: 0.375rem 0.5rem;
-                font-size: 0.6875rem;
+                padding: 0.75rem 0.875rem;
+                font-size: 0.8125rem;
+                min-height: 40px;
             }
         }
 
-        /* SYNITY Scrollbar */
-        ::-webkit-scrollbar {
+        /* SYNITY Scrollbar Styling */
+        .synity-sidebar-content::-webkit-scrollbar,
+        .synity-main-content::-webkit-scrollbar {
             width: 6px;
         }
 
-        ::-webkit-scrollbar-track {
+        .synity-sidebar-content::-webkit-scrollbar-track,
+        .synity-main-content::-webkit-scrollbar-track {
             background: var(--synity-bg-secondary);
         }
 
-        ::-webkit-scrollbar-thumb {
+        .synity-sidebar-content::-webkit-scrollbar-thumb,
+        .synity-main-content::-webkit-scrollbar-thumb {
             background: var(--synity-border);
             border-radius: 3px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
+        .synity-sidebar-content::-webkit-scrollbar-thumb:hover,
+        .synity-main-content::-webkit-scrollbar-thumb:hover {
             background: var(--synity-text-secondary);
         }
 
@@ -395,29 +460,14 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 
 <body data-entity-amount="${entityAmount || 0}" data-entity-discount="${entityDiscount || 0}" data-entity-tax="${entityTax || 0}" data-entity-currency="${entityCurrency || 'VND'}">
     <div class="synity-app">
-        <!-- Left Sidebar with integrated header -->
+        <!-- Left Sidebar with header and scrollable content including sticky action buttons -->
         <aside class="synity-sidebar">
-            <!-- Compact Header -->
+            <!-- Fixed Header -->
             <div class="synity-sidebar-header">
                 <h1 class="synity-sidebar-title">
                     <i class="bi bi-file-earmark-text"></i>
                     SYNITY Quotation Generator
                 </h1>
-                
-                <!-- Action buttons in horizontal row -->
-                <div class="synity-action-row">
-                    <button class="synity-btn synity-btn--primary" id="generate-btn">
-                        <i class="bi bi-play-fill"></i>
-                        Tạo
-                    </button>
-                    <button class="synity-btn synity-btn--secondary" id="export-btn">
-                        <i class="bi bi-download"></i>
-                        Xuất
-                    </button>
-                    <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
                 
                 <!-- CRM Status Badge -->
                 <div class="synity-status-badge">
@@ -426,7 +476,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                 </div>
             </div>
 
-            <!-- Form Content -->
+            <!-- Scrollable Content Area with sticky action buttons inside -->
             <div class="synity-sidebar-content">
                 <!-- Essential Quotation Info -->
                 <div class="synity-compact-section">
@@ -449,10 +499,32 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                         </div>
                     </div>
                 </div>
+
+                <!-- Action Buttons - Sticky at bottom of content area, always visible -->
+                <div class="synity-action-section">
+                    <h3 class="synity-action-title">
+                        <i class="bi bi-play-circle"></i>
+                        Thao Tác
+                    </h3>
+                    <div class="synity-action-row">
+                        <button class="synity-btn synity-btn--primary" id="generate-btn">
+                            <i class="bi bi-play-fill"></i>
+                            Tạo Báo Giá
+                        </button>
+                        <button class="synity-btn synity-btn--secondary" id="export-btn">
+                            <i class="bi bi-download"></i>
+                            Xuất File HTML
+                        </button>
+                        <button class="synity-btn synity-btn--danger" id="close-btn" onclick="BX24.closeApplication()">
+                            <i class="bi bi-x-lg"></i>
+                            Đóng Ứng Dụng
+                        </button>
+                    </div>
+                </div>
             </div>
         </aside>
 
-        <!-- Right Main Content - Full Height Preview -->
+        <!-- Right Main Content - Scrollable Preview -->
         <main class="synity-main">
             <div class="synity-main-content">
                 <iframe id="preview-frame" class="synity-preview"></iframe>
@@ -526,7 +598,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
 
         // Initialize B24 and SYNITY integration
         BX24.init(function() {
-            logToWorker('SYNITY CRM Integration initialized - Full Height Layout', {
+            logToWorker('SYNITY CRM Integration initialized - Sticky Action Buttons in Content', {
                 bx24Ready: true,
                 url: window.location.href
             });
@@ -575,32 +647,35 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                             finalScrollSize: BX24.getScrollSize()
                         });
                         
-                        // Update app container to use exact viewport height
+                        // Ensure app uses expanded viewport height
                         const app = document.querySelector('.synity-app');
                         if (app) {
-                            app.style.height = '100vh';
-                            app.style.maxHeight = '100vh';
+                            const viewportHeight = window.innerHeight;
+                            app.style.height = viewportHeight + 'px';
+                            app.style.maxHeight = viewportHeight + 'px';
                             
-                            logToWorker('App container set to full viewport', {
-                                appHeight: '100vh',
+                            logToWorker('App container adjusted to expanded viewport', {
+                                appHeight: viewportHeight + 'px',
                                 actualRect: app.getBoundingClientRect()
                             });
                         }
                         
-                        // Ensure preview frame uses all available space
-                        const preview = document.querySelector('.synity-preview');
-                        if (preview) {
-                            preview.style.height = '100%';
+                        // Ensure sidebar uses full expanded height
+                        const sidebar = document.querySelector('.synity-sidebar');
+                        if (sidebar) {
+                            const viewportHeight = window.innerHeight;
+                            sidebar.style.height = viewportHeight + 'px';
+                            sidebar.style.maxHeight = viewportHeight + 'px';
                             
-                            logToWorker('Preview frame set to full height', {
-                                previewHeight: '100%',
-                                previewRect: preview.getBoundingClientRect()
+                            logToWorker('Sidebar adjusted to expanded viewport', {
+                                sidebarHeight: viewportHeight + 'px',
+                                sidebarRect: sidebar.getBoundingClientRect()
                             });
                         }
                         
                         // Log final layout measurements
                         setTimeout(() => {
-                            logToWorker('Final maximum layout state', {
+                            logToWorker('Final expanded layout state with sticky buttons in content', {
                                 viewport: {
                                     width: window.innerWidth,
                                     height: window.innerHeight
@@ -610,9 +685,11 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                                     height: document.documentElement.scrollHeight
                                 },
                                 appRect: app ? app.getBoundingClientRect() : null,
-                                previewRect: preview ? preview.getBoundingClientRect() : null,
-                                sliderWrapper: document.querySelector('.ui-page-slider-wrapper') ? 
-                                    document.querySelector('.ui-page-slider-wrapper').getBoundingClientRect() : null
+                                sidebarRect: sidebar ? sidebar.getBoundingClientRect() : null,
+                                actionSectionRect: document.querySelector('.synity-action-section') ? 
+                                    document.querySelector('.synity-action-section').getBoundingClientRect() : null,
+                                actionsVisible: document.querySelector('.synity-action-section') ? 
+                                    document.querySelector('.synity-action-section').getBoundingClientRect().top < window.innerHeight : false
                             });
                         }, 200);
                     });
@@ -620,7 +697,7 @@ export function getSYNITYCRMTemplate(crmData = {}) {
             }
             
             // Multiple expansion attempts with increasing aggressiveness
-            logToWorker('Starting maximum height expansion sequence');
+            logToWorker('Starting maximum height expansion sequence with sticky buttons');
             
             expandToMaximumHeight();
             
