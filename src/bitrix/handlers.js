@@ -142,6 +142,15 @@ export async function installHandler({ req, env, ctx }) {
         'CRM_SMART_INVOICE_DETAIL_TOOLBAR'
       ];
       
+      // CRM Detail Tab placements (the main ones you need!)
+      const detailTabPlacements = [
+        'CRM_LEAD_DETAIL_TAB',
+        'CRM_DEAL_DETAIL_TAB', 
+        'CRM_CONTACT_DETAIL_TAB',
+        'CRM_COMPANY_DETAIL_TAB',
+        'CRM_SMART_INVOICE_DETAIL_TAB'
+      ];
+
       // Additional supported placements
       const activityPlacements = [
         'CRM_LEAD_ACTIVITY_TIMELINE_MENU',
@@ -164,6 +173,21 @@ export async function installHandler({ req, env, ctx }) {
         }
       }
 
+      // Bind CRM Detail Tab placements (main widgets!)
+      for (const placement of detailTabPlacements) {
+        try {
+          const result = await client.call('placement.bind', {
+            PLACEMENT: placement,
+            HANDLER: `${appUrl}/widget/quotation`,
+            TITLE: 'Báo Giá SYNITY',
+            DESCRIPTION: 'Tạo báo giá chuyên nghiệp từ thông tin CRM này'
+          });
+          console.log(`✅ Bound detail tab ${placement}:`, result);
+        } catch (bindError) {
+          console.error(`❌ Failed to bind detail tab ${placement}:`, bindError);
+        }
+      }
+
       // Bind activity timeline placements  
       for (const placement of activityPlacements) {
         try {
@@ -173,9 +197,9 @@ export async function installHandler({ req, env, ctx }) {
             TITLE: 'SYNITY Báo Giá',
             DESCRIPTION: 'Tạo báo giá từ thông tin CRM này'
           });
-          console.log(`✅ Bound ${placement}:`, result);
+          console.log(`✅ Bound activity ${placement}:`, result);
         } catch (bindError) {
-          console.error(`❌ Failed to bind ${placement}:`, bindError);
+          console.error(`❌ Failed to bind activity ${placement}:`, bindError);
         }
       }
 
