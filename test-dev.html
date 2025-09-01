@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Environment Tester</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #14B8A6;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-dev {
+            background: #14B8A6;
+            color: white;
+        }
+        .btn-dev:hover {
+            background: #0D9488;
+        }
+        .btn-prod {
+            background: #3B82F6;
+            color: white;
+        }
+        .btn-prod:hover {
+            background: #2563EB;
+        }
+        .url-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            color: #666;
+        }
+        .info {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info h3 {
+            margin: 0 0 10px 0;
+            color: #D97706;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #92400E;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Bitrix24 App Environment Tester</h1>
+        
+        <div class="info">
+            <h3>ℹ️ How to use:</h3>
+            <p>1. Enter your Bitrix24 domain and entity details</p>
+            <p>2. Click on Dev or Production button to open the app</p>
+            <p>3. Dev environment will show dev info panel</p>
+            <p>4. Production environment will be clean</p>
+        </div>
+
+        <div class="form-group">
+            <label for="domain">Bitrix24 Domain:</label>
+            <input type="text" id="domain" value="tamgiac.bitrix24.com" placeholder="yourcompany.bitrix24.com">
+        </div>
+
+        <div class="form-group">
+            <label for="placement">Placement:</label>
+            <select id="placement">
+                <option value="CRM_DEAL_DETAIL_TAB">Deal Detail Tab</option>
+                <option value="CRM_LEAD_DETAIL_TAB">Lead Detail Tab</option>
+                <option value="CRM_CONTACT_DETAIL_TAB">Contact Detail Tab</option>
+                <option value="CRM_COMPANY_DETAIL_TAB">Company Detail Tab</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="entityId">Entity ID (Deal/Lead/Contact ID):</label>
+            <input type="text" id="entityId" value="1868" placeholder="Enter entity ID">
+        </div>
+
+        <div class="form-group">
+            <label for="authId">Auth ID (optional - leave empty for test):</label>
+            <input type="text" id="authId" placeholder="Leave empty for test mode">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-dev" onclick="openEnvironment('dev')">
+                🛠️ Open DEV Environment
+            </button>
+            <button class="btn-prod" onclick="openEnvironment('prod')">
+                🚀 Open PRODUCTION
+            </button>
+        </div>
+
+        <div id="urlDisplay" class="url-display" style="display: none;">
+            <strong>URL:</strong> <span id="urlText"></span>
+        </div>
+    </div>
+
+    <script>
+        function openEnvironment(env) {
+            const domain = document.getElementById('domain').value;
+            const placement = document.getElementById('placement').value;
+            const entityId = document.getElementById('entityId').value;
+            const authId = document.getElementById('authId').value || 'test';
+            
+            const baseUrl = env === 'dev' 
+                ? 'https://bx-app-quotation-generator-dev.hicomta.workers.dev'
+                : 'https://bx-app-quotation-generator.hicomta.workers.dev';
+            
+            const placementOptions = encodeURIComponent(JSON.stringify({ ID: entityId }));
+            
+            const url = `${baseUrl}/widget/quotation?DOMAIN=${domain}&PROTOCOL=1&LANG=en&APP_SID=${authId}&PLACEMENT=${placement}&PLACEMENT_OPTIONS=${placementOptions}`;
+            
+            // Display URL
+            document.getElementById('urlText').textContent = url;
+            document.getElementById('urlDisplay').style.display = 'block';
+            
+            // Open in new window
+            window.open(url, '_blank', 'width=1200,height=800');
+        }
+        
+        // Allow Enter key to open dev environment
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                openEnvironment('dev');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -8,9 +8,24 @@ async function getLatestHTMLContent() {
 }
 
 // Helper function to get app URL
-function getAppUrl(domain, env) {
-  // Environment-aware URL
-  const isDevEnvironment = env?.APP_ENV === 'development';
+function getAppUrl(domain, env, requestUrl) {
+  // Environment-aware URL - check multiple sources
+  // 1. Check if APP_ENV is set to development
+  const isDevFromEnv = env?.APP_ENV === 'development';
+  
+  // 2. Check if request came to dev subdomain
+  const isDevFromUrl = requestUrl && requestUrl.includes('-dev.hicomta.workers.dev');
+  
+  // Use dev if either condition is true
+  const isDevEnvironment = isDevFromEnv || isDevFromUrl;
+  
+  console.log('URL Detection:', {
+    isDevFromEnv,
+    isDevFromUrl,
+    requestUrl,
+    finalDecision: isDevEnvironment ? 'DEV' : 'PROD'
+  });
+  
   return isDevEnvironment 
     ? `https://bx-app-quotation-generator-dev.hicomta.workers.dev`
     : `https://bx-app-quotation-generator.hicomta.workers.dev`;
@@ -109,9 +124,16 @@ export async function installHandler({ req, env, ctx }) {
     }
 
     console.log('Binding widget placements...');
+    console.log('Environment variables:', {
+      APP_ENV: env?.APP_ENV,
+      APP_NAME: env?.APP_NAME,
+      isDevEnvironment: env?.APP_ENV === 'development'
+    });
+    
     try {
-      const appUrl = getAppUrl(auth.domain, env);
+      const appUrl = getAppUrl(auth.domain, env, req.url);
       console.log('App URL for placements:', appUrl);
+      console.log('Will bind widgets to:', appUrl);
       
       // Clear existing placements first
       try {
@@ -988,7 +1010,7 @@ export async function debugPlacementsHandler({ req, env, ctx }) {
         
         <h2>Authentication Status</h2>
         <p>${authStatus}</p>
-        <p>App URL: <strong>${getAppUrl('debug', env)}</strong></p>
+        <p>App URL: <strong>${getAppUrl('debug', env, req.url)}</strong></p>
         <p>Total Placements Found: <strong>${placements.length}</strong></p>
         
         <h2>Current Placements</h2>
