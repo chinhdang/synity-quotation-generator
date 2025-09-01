@@ -622,7 +622,7 @@ export function getAppUITemplate(crmData = {}) {
             `).join('')
         : ''}
 
-        <!-- Hidden fields with all CRM data -->
+        <!-- Hidden fields with CRM data (only essential fields that can't be replaced with constants) -->
         <input type="hidden" id="responsiblePersonName" value="${responsiblePersonName}">
         <input type="hidden" id="responsiblePersonPhone" value="${responsiblePersonPhone}">
         <input type="hidden" id="responsiblePersonEmail" value="${responsiblePersonEmail}">
@@ -632,15 +632,7 @@ export function getAppUITemplate(crmData = {}) {
         <input type="hidden" id="contact_name" value="${contact_name}">
         <input type="hidden" id="contact_phone" value="${contact_phone}">
         <input type="hidden" id="contact_email" value="${contact_email}">
-        <input type="hidden" id="bitrix_price_usd" value="249">
-        <input type="hidden" id="bitrix_months" value="12 tháng">
-        <input type="hidden" id="implementation_fee" value="392000000">
-        <input type="hidden" id="currency_conversion_fee_percent" value="3">
-        <input type="hidden" id="include_bitrix_license" value="true">
-        <input type="hidden" id="include_implementation_fee" value="true">
-        <input type="hidden" id="exchange_rate" value="26500">
-        <input type="hidden" id="discount_percent" value="10">
-        <input type="hidden" id="bitrix_version_select" value="Bitrix24 Professional (12-Month)">
+        <!-- Configuration values moved to constants in quotation-logic.js -->
     </div>
 
     <!-- SYNITY Quotation Template -->
@@ -649,63 +641,24 @@ export function getAppUITemplate(crmData = {}) {
     </template>
 
     <script>
-        // Enhanced UX logging
-        function logToWorker(message, data = null) {
-            const logEntry = {
-                timestamp: new Date().toISOString(),
-                message: message,
-                data: data,
-                userAgent: navigator.userAgent,
-                viewport: {
-                    width: window.innerWidth,
-                    height: window.innerHeight
-                },
-                design_version: 'unified-cohesive-v2'
-            };
-            console.log('🎨 UNIFIED DESIGN LOG:', JSON.stringify(logEntry));
-        }
 
         // Initialize with Unified Design System
         BX24.init(function() {
-            logToWorker('SYNITY Unified Design System initialized', {
-                bx24Ready: true,
-                url: window.location.href,
-                designSystem: 'Unified Cohesive Experience',
-                uxPrinciple: '10-years-experience-applied'
-            });
             
             // Professional viewport expansion with unified approach
             function expandToMaximumHeight() {
                 const windowHeight = window.innerHeight || document.documentElement.clientHeight;
                 const windowWidth = window.innerWidth || document.documentElement.clientWidth;
                 
-                logToWorker('Unified design viewport expansion', {
-                    windowWidth,
-                    windowHeight,
-                    approach: 'cohesive-unified-design'
-                });
                 
                 // Unified expansion strategy
                 const targetWidth = Math.min(2000, Math.max(1800, windowWidth));
                 const targetHeight = Math.min(1400, Math.max(1200, windowHeight));
                 
-                logToWorker('Unified expansion dimensions', {
-                    targetWidth,
-                    targetHeight,
-                    designPrinciple: 'unified-cohesive-professional'
-                });
                 
                 // Unified fit and resize approach
                 BX24.fitWindow(function() {
                     BX24.resizeWindow(targetWidth, targetHeight, function() {
-                        logToWorker('Unified design widget expanded', {
-                            requestedSize: { width: targetWidth, height: targetHeight },
-                            actualViewport: {
-                                width: window.innerWidth,
-                                height: window.innerHeight
-                            },
-                            designSystemComplete: true
-                        });
                         
                         // Ensure unified app container
                         const app = document.querySelector('.synity-app');
@@ -717,21 +670,12 @@ export function getAppUITemplate(crmData = {}) {
                         
                         // Final unified layout verification
                         setTimeout(() => {
-                            logToWorker('Unified Design System Complete', {
-                                viewport: {
-                                    width: window.innerWidth,
-                                    height: window.innerHeight
-                                },
-                                unifiedDesignActive: true,
-                                cohesiveExperienceReady: true
-                            });
                         }, 200);
                     });
                 });
             }
             
             // Unified expansion sequence
-            logToWorker('Starting Unified Design expansion sequence');
             
             expandToMaximumHeight();
             
@@ -742,11 +686,6 @@ export function getAppUITemplate(crmData = {}) {
             const buttons = document.querySelectorAll('.synity-btn');
             buttons.forEach(button => {
                 button.addEventListener('click', function() {
-                    logToWorker('Unified button interaction', {
-                        buttonId: this.id,
-                        buttonClass: this.className,
-                        unifiedDesign: true
-                    });
                 });
             });
             

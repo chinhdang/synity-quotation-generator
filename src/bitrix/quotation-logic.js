@@ -4,20 +4,24 @@
 export function getQuotationLogicScript() {
   return `
     // Complete SYNITY Quotation Generator Logic
-    const BITRIX_PRICING_DATA = {
-        "Bitrix24 Professional (12-Month)": { price: 249, months: 12 },
-        "Bitrix24 Professional (3-Month)": { price: 249, months: 3 },
-        "Bitrix24 Standard (12-Month)": { price: 124, months: 12 },
-        "Bitrix24 Standard (3-Month)": { price: 124, months: 3 },
-        "Bitrix24 Enterprise (12-Month)": { price: 499, months: 12 },
-        "Bitrix24 Enterprise (3-Month)": { price: 499, months: 3 }
+
+    // Configuration constants (previously hardcoded in hidden fields)
+    const DEFAULT_CONFIG = {
+        IMPLEMENTATION_FEE: 392000000,
+        CURRENCY_CONVERSION_FEE_PERCENT: 3,
+        EXCHANGE_RATE: 26500,
+        DISCOUNT_PERCENT: 10,
+        DEFAULT_BITRIX_VERSION: "Bitrix24 Professional (12-Month)",
+        INCLUDE_BITRIX_LICENSE: true,
+        INCLUDE_IMPLEMENTATION_FEE: true
     };
 
     function initializeSYNITYQuotation() {
         console.log('🎯 Initializing SYNITY Quotation Generator...');
         
-        // Get all form inputs
+        // Get form inputs (only UI elements and CRM data fields)
         const inputs = {
+            // CRM data fields (from hidden inputs)
             responsiblePersonName: document.getElementById('responsiblePersonName'),
             responsiblePersonPhone: document.getElementById('responsiblePersonPhone'),
             responsiblePersonEmail: document.getElementById('responsiblePersonEmail'),
@@ -27,18 +31,11 @@ export function getQuotationLogicScript() {
             contact_name: document.getElementById('contact_name'),
             contact_phone: document.getElementById('contact_phone'),
             contact_email: document.getElementById('contact_email'),
+            // UI form elements (editable by user)
             quotation_number: document.getElementById('quotation_number'),
             date_created: document.getElementById('date_created'),
-            closed_date: document.getElementById('closed_date'),
-            exchange_rate: document.getElementById('exchange_rate'),
-            currency_conversion_fee_percent: document.getElementById('currency_conversion_fee_percent'),
-            discount_percent: document.getElementById('discount_percent'),
-            bitrix_version_select: document.getElementById('bitrix_version_select'),
-            bitrix_price_usd: document.getElementById('bitrix_price_usd'),
-            bitrix_months: document.getElementById('bitrix_months'),
-            implementation_fee: document.getElementById('implementation_fee'),
-            include_implementation_fee: document.getElementById('include_implementation_fee'),
-            include_bitrix_license: document.getElementById('include_bitrix_license')
+            closed_date: document.getElementById('closed_date')
+            // Configuration values now use constants from DEFAULT_CONFIG
         };
 
         // Initialize default values
@@ -95,55 +92,7 @@ export function getQuotationLogicScript() {
             return values;
         };
 
-        // Bitrix version change handler
-        const handleVersionChange = () => {
-            if (!inputs.bitrix_version_select) return;
-            
-            const selectedVersion = inputs.bitrix_version_select.value;
-            const pricing = BITRIX_PRICING_DATA[selectedVersion];
-            if (pricing) {
-                if (inputs.bitrix_price_usd) inputs.bitrix_price_usd.value = pricing.price;
-                if (inputs.bitrix_months) inputs.bitrix_months.value = \`\${pricing.months} tháng\`;
-            }
-        };
-
-        // Add version options to select
-        if (inputs.bitrix_version_select) {
-            // Clear existing options
-            inputs.bitrix_version_select.innerHTML = '';
-            
-            for (const version in BITRIX_PRICING_DATA) {
-                const option = document.createElement('option');
-                option.value = version;
-                option.textContent = version;
-                inputs.bitrix_version_select.appendChild(option);
-            }
-            
-            inputs.bitrix_version_select.value = "Bitrix24 Professional (12-Month)";
-            inputs.bitrix_version_select.addEventListener('change', handleVersionChange);
-            handleVersionChange(); // Initialize
-        }
-
-        // Toggle handlers
-        if (inputs.include_bitrix_license) {
-            inputs.include_bitrix_license.addEventListener('change', function() {
-                const container = document.getElementById('bitrix_license_container');
-                if (container) {
-                    container.style.opacity = this.checked ? '1' : '0.5';
-                    container.style.pointerEvents = this.checked ? 'auto' : 'none';
-                }
-            });
-        }
-
-        if (inputs.include_implementation_fee) {
-            inputs.include_implementation_fee.addEventListener('change', function() {
-                const container = document.getElementById('implementation_fee_container');
-                if (container) {
-                    container.style.opacity = this.checked ? '1' : '0.5';
-                    container.style.pointerEvents = this.checked ? 'auto' : 'none';
-                }
-            });
-        }
+        // Configuration is now handled by constants, no need for dynamic UI elements
 
         // CRM Product calculation functions - CORRECTED FORMULAS PER YOUR SPECIFICATION
         const calculateProductsTotal = (context = 'default') => {
@@ -252,25 +201,8 @@ export function getQuotationLogicScript() {
             const data = getFormValues();
             console.log('📊 Form data collected:', data);
 
-            // Calculate pricing
-            const exchange_rate = parseFloat(data.exchange_rate) || 26500;
-            const include_bitrix_license = data.include_bitrix_license || false;
-            const bitrix_price_usd = include_bitrix_license ? (parseFloat(data.bitrix_price_usd) || 0) : 0;
-            const selectedVersion = data.bitrix_version_select || "Bitrix24 Professional (12-Month)";
-            const bitrix_months = include_bitrix_license ? (BITRIX_PRICING_DATA[selectedVersion]?.months || 12) : 0;
-            const currency_conversion_fee_percent = parseFloat(data.currency_conversion_fee_percent) || 3;
-            const discount_percent = parseFloat(data.discount_percent) || 0;
-            const include_implementation_fee = data.include_implementation_fee || false;
-            const implementation_fee = include_implementation_fee ? (parseFloat(data.implementation_fee) || 0) : 0;
-
-            // Calculate costs
-            const bitrix_unit_price_vnd = bitrix_price_usd * exchange_rate;
-            const bitrix_total_price_vnd = bitrix_unit_price_vnd * bitrix_months;
-            const currency_conversion_fee = bitrix_total_price_vnd * (currency_conversion_fee_percent / 100);
-            const total_discount_amount = bitrix_total_price_vnd * (discount_percent / 100);
-
-            const total_license_fee_A = bitrix_total_price_vnd + currency_conversion_fee - total_discount_amount;
-            const total_implementation_fee_B = implementation_fee;
+            // Since we now get all product data directly from CRM, 
+            // we don't need manual Bitrix pricing calculations anymore
             
             // Calculate totals from CRM product sections using CORRECTED formulas
             const productsTotal = calculateProductsTotal('generateQuotation');
@@ -287,23 +219,11 @@ export function getQuotationLogicScript() {
                 tax: crm_entity_tax
             });
             
-            // Calculate final totals according to CORRECTED requirements
-            let sub_total, vat_amount, grand_total;
-            
-            if (productsTotal.subtotal > 0) {
-                console.log('🎯 Using calculateProductsTotal (CORRECTED formulas)');
-                // Use CRM product data with CORRECTED formulas
-                sub_total = productsTotal.subtotal;              // Tổng cộng = sum(PRICE_EXCLUSIVE)
-                vat_amount = productsTotal.vat;                  // VAT = sum(VAT_RATE * PRICE_EXCLUSIVE) for each product
-                grand_total = sub_total + vat_amount;            // Tổng thanh toán = Tổng cộng + VAT
-            } else {
-                console.log('🎯 Using Form calculation fallback');
-                // Fallback to calculated values from form inputs
-                const section_A_total = total_license_fee_A;
-                sub_total = section_A_total;
-                vat_amount = sub_total * 0.10;
-                grand_total = sub_total + vat_amount;
-            }
+            // Calculate final totals using CRM data only
+            console.log('🎯 Using CRM product data with CORRECTED formulas');
+            const sub_total = productsTotal.subtotal;           // Tổng cộng = sum(PRICE_EXCLUSIVE)
+            const vat_amount = productsTotal.vat;               // VAT = sum(VAT_RATE * PRICE_EXCLUSIVE) for each product
+            const grand_total = sub_total + vat_amount;         // Tổng thanh toán = Tổng cộng + VAT
 
             console.log('💰 Final Financial Summary:', {
                 sub_total: sub_total,
@@ -316,95 +236,47 @@ export function getQuotationLogicScript() {
                 }
             });
 
-            // Generate payment schedule (simplified - 2 payments: license first, then implementation)
-            let payment_schedule_table = '';
-            if (include_bitrix_license || include_implementation_fee) {
-                const post_tax_A = total_license_fee_A * 1.1;
-                const post_tax_B = total_implementation_fee_B * 1.1;
-
-                let scheduleRows = '';
-                if (include_bitrix_license && post_tax_A > 0) {
-                    scheduleRows += \`
-                        <tr class="bg-gray-50 border-b">
-                            <td class="p-3 font-semibold">Đợt 1</td>
-                            <td class="p-3">Thanh toán 100% Phí bản quyền (A)</td>
-                            <td class="p-3 text-right font-semibold">\${formatCurrency(post_tax_A)}</td>
-                        </tr>\`;
-                }
-                
-                if (include_implementation_fee && post_tax_B > 0) {
-                    const dotNumber = include_bitrix_license ? 2 : 1;
-                    scheduleRows += \`
-                        <tr class="border-b">
-                            <td class="p-3 font-semibold">Đợt \${dotNumber}</td>
-                            <td class="p-3">Thanh toán 100% Phí triển khai (B)</td>
-                            <td class="p-3 text-right font-semibold">\${formatCurrency(post_tax_B)}</td>
-                        </tr>\`;
-                }
-
-                payment_schedule_table = \`
-                    <table class="w-full text-sm text-left border rounded-lg">
-                        <thead class="bg-gray-200">
-                            <tr>
-                                <th class="p-3 font-semibold" style="color: var(--text-secondary);">ĐỢT</th>
-                                <th class="p-3 font-semibold" style="color: var(--text-secondary);">NỘI DUNG</th>
-                                <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">SỐ TIỀN (VNĐ)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            \${scheduleRows}
-                        </tbody>
-                    </table>
-                \`;
-            }
-
-            // Generate discount info
-            let discount_info = '';
-            if (include_bitrix_license && discount_percent > 0) {
-                discount_info = \`<p style="color: var(--text-secondary);">Ưu đãi từ SYNITY: <strong style="color: var(--accent-main);">Giảm \${discount_percent}%</strong> chi phí bản quyền Bitrix24 trong \${bitrix_months} tháng.</p>\`;
-            }
-
-            // Generate Bitrix section
-            let bitrix_section = '';
-            if (include_bitrix_license && bitrix_total_price_vnd > 0) {
-                bitrix_section = \`<tr class="bg-blue-50"><td class="p-3 font-bold text-blue-800" colspan="5">A. CHI PHÍ BẢN QUYỀN BITRIX24 - CLOUD</td></tr>
-                        <tr class="border-b" style="border-color: var(--border-subtle);">
-                            <td class="p-3 text-center">1</td>
-                            <td class="p-3">
-                                <p class="font-semibold">\${selectedVersion}</p>
-                                <p class="text-xs" style="color: var(--text-secondary);">Đơn vị tính: $\${bitrix_price_usd}/tháng</p>
-                            </td>
-                            <td class="p-3 text-right">\${formatCurrency(bitrix_unit_price_vnd)}</td>
-                            <td class="p-3 text-center">\${bitrix_months}</td>
-                            <td class="p-3 text-right font-semibold">\${formatCurrency(bitrix_total_price_vnd)}</td>
+            // Payment schedule uses standard template (not dynamic calculation)
+            // since specific payment terms are handled in template
+            const payment_schedule_table = \`
+                <table class="w-full text-sm text-left border rounded-lg">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">ĐỢT</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">THỜI ĐIỂM</th>
+                            <th class="p-3 font-semibold text-center" style="color: var(--text-secondary);">TỶ LỆ (%)</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">MÔ TẢ</th>
+                            <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">SỐ TIỀN (VNĐ)</th>
                         </tr>
-                        <tr class="bg-gray-50 border-b" style="border-color: var(--border-subtle);">
-                            <td class="p-3 text-center">2</td>
-                            <td class="p-3">
-                                <p class="font-semibold">Phí chuyển đổi ngoại tệ (\${currency_conversion_fee_percent}%)</p>
-                                <p class="text-xs" style="color: var(--text-secondary);">Tỷ giá USD dự kiến: \${formatCurrency(exchange_rate)} VNĐ</p>
-                            </td>
-                            <td class="p-3 text-right"></td>
-                            <td class="p-3 text-center">1</td>
-                            <td class="p-3 text-right font-semibold">\${formatCurrency(currency_conversion_fee)}</td>
-                        </tr>\`;
+                    </thead>
+                    <tbody>
+                        <tr class="bg-gray-50 border-b">
+                            <td class="p-3 font-semibold">1</td>
+                            <td class="p-3">Ký hợp đồng</td>
+                            <td class="p-3 text-center">30%</td>
+                            <td class="p-3">Thanh toán sau khi ký hợp đồng</td>
+                            <td class="p-3 text-right font-semibold">30% tổng giá trị</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-3 font-semibold">2</td>
+                            <td class="p-3">Triển khai 50%</td>
+                            <td class="p-3 text-center">40%</td>
+                            <td class="p-3">Hoàn thành 50% dự án</td>
+                            <td class="p-3 text-right font-semibold">40% tổng giá trị</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="p-3 font-semibold">3</td>
+                            <td class="p-3">Nghiệm thu</td>
+                            <td class="p-3 text-center">30%</td>
+                            <td class="p-3">Hoàn thành và bàn giao hệ thống</td>
+                            <td class="p-3 text-right font-semibold">30% tổng giá trị</td>
+                        </tr>
+                    </tbody>
+                </table>
+            \`;
 
-                // Add discount row if applicable
-                if (discount_percent > 0 && total_discount_amount > 0) {
-                    bitrix_section += \`<tr class="border-b" style="border-color: var(--border-subtle);">
-                                    <td class="p-3 text-center">3</td>
-                                    <td class="p-3">
-                                        <p class="font-semibold" style="color: var(--accent-main);">Ưu đãi SYNITY (\${discount_percent}%)</p>
-                                    </td>
-                                    <td class="p-3 text-right"></td>
-                                    <td class="p-3 text-center">1</td>
-                                    <td class="p-3 text-right font-semibold" style="color: var(--accent-main);">(\${formatCurrency(total_discount_amount)})</td>
-                                </tr>\`;
-                }
-            }
-
+            // Manual Bitrix section generation removed - products now come directly from CRM data
             // Section B completely removed - no implementation section
-            let implementation_section = '';
 
             // Classify and generate CRM Products sections - CORRECTED DISCOUNT CALCULATION
             let crm_license_section = '';
@@ -518,8 +390,7 @@ export function getQuotationLogicScript() {
                         \${discountRowHtml}
                     \`;
                     
-                    // Replace generic Bitrix section with CRM license products
-                    bitrix_section = '';
+                    // CRM license products are used instead of manual Bitrix section
                 }
                 
                 // Section B completely removed - no CRM implementation section generated
@@ -528,14 +399,12 @@ export function getQuotationLogicScript() {
             // Prepare template data with CORRECTED calculations
             const templateData = {
                 ...data,
-                bitrix_months: bitrix_months,
                 date_created: formatDate(data.date_created),
                 closed_date: formatDate(data.closed_date),
                 sub_total: formatCurrency(sub_total),      // Tổng cộng = sum(PRICE_EXCLUSIVE)
                 vat_amount: formatCurrency(vat_amount),    // VAT = sum(VAT_RATE * PRICE_EXCLUSIVE)
                 grand_total: formatCurrency(grand_total), // Tổng thanh toán = Tổng cộng + VAT
-                payment_schedule_table: payment_schedule_table,
-                discount_info: discount_info
+                payment_schedule_table: payment_schedule_table
             };
 
             // Get template and replace placeholders
@@ -555,8 +424,8 @@ export function getQuotationLogicScript() {
             }
 
             // Replace section placeholders with classified CRM sections
-            // Section A: License products from CRM or generic Bitrix section
-            finalHtml = finalHtml.replace('<!-- BITRIX_SECTION_PLACEHOLDER -->', crm_license_section || bitrix_section);
+            // Section A: License products from CRM data
+            finalHtml = finalHtml.replace('<!-- BITRIX_SECTION_PLACEHOLDER -->', crm_license_section);
             finalHtml = finalHtml.replace('<!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->', '');
             // Section B: Completely removed - no implementation section
             finalHtml = finalHtml.replace('<!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->', '');

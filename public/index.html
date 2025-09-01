@@ -1,754 +1,337 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bitrix24 Quotation Generator - B24UI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Bitrix24 App</title>
     <!-- Bitrix24 JS SDK -->
     <script src="//api.bitrix24.com/api/v1/"></script>
-    <!-- B24 Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        /* B24UI Design System - CSS Variables */
-        :root {
-            /* Primary Colors */
-            --b24-color-primary: #2066b0;
-            --b24-color-primary-hover: #004f69;
-            --b24-color-primary-active: #1a5490;
-            
-            /* Text Colors */
-            --b24-color-text-primary: #333333;
-            --b24-color-text-secondary: #525c69;
-            --b24-color-text-light: #6a737d;
-            
-            /* Background Colors */
-            --b24-color-bg-primary: #ffffff;
-            --b24-color-bg-secondary: #edeef0;
-            --b24-color-bg-soft: #f8fafb;
-            --b24-color-bg-card: #ffffff;
-            
-            /* Status Colors */
-            --b24-color-success: #9dcf00;
-            --b24-color-success-bg: #f1fbd0;
-            --b24-color-error: #ff5752;
-            --b24-color-error-bg: #ffe8e8;
-            --b24-color-warning: #ffa900;
-            --b24-color-warning-bg: #fff1d6;
-            --b24-color-info: #2fc6f6;
-            --b24-color-info-bg: #e5f9ff;
-            
-            /* Border Colors */
-            --b24-color-border: #d5d7db;
-            --b24-color-border-light: #e9ecef;
-            --b24-color-border-soft: #f1f3f4;
-            
-            /* Shadows */
-            --b24-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-            --b24-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-            --b24-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-            
-            /* Border Radius */
-            --b24-radius-sm: 4px;
-            --b24-radius-md: 8px;
-            --b24-radius-lg: 12px;
-            --b24-radius-xl: 16px;
-            
-            /* Spacing */
-            --b24-space-xs: 4px;
-            --b24-space-sm: 8px;
-            --b24-space-md: 12px;
-            --b24-space-lg: 16px;
-            --b24-space-xl: 20px;
-            --b24-space-2xl: 24px;
-            --b24-space-3xl: 32px;
-            
-            /* Typography */
-            --b24-font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            --b24-font-size-xs: 12px;
-            --b24-font-size-sm: 13px;
-            --b24-font-size-base: 14px;
-            --b24-font-size-lg: 16px;
-            --b24-font-size-xl: 18px;
-            --b24-font-size-2xl: 20px;
-            --b24-font-size-3xl: 24px;
-            
-            /* Line Heights */
-            --b24-line-height-sm: 1.2;
-            --b24-line-height-base: 1.4;
-            --b24-line-height-lg: 1.6;
-        }
-        
-        /* Reset & Base Styles */
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
         
         body {
-            font-family: var(--b24-font-family);
-            font-size: var(--b24-font-size-base);
-            line-height: var(--b24-line-height-base);
-            color: var(--b24-color-text-primary);
-            background: var(--b24-color-bg-soft);
-            margin: 0;
-            padding: var(--b24-space-lg);
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
         }
         
-        /* B24UI Layout System - Horizontal Optimized */
-        .b24-app {
-            max-width: 1400px;
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--b24-space-xl);
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .b24-header {
-            background: var(--b24-color-bg-card);
-            border: 1px solid var(--b24-color-border-light);
-            border-radius: var(--b24-radius-lg);
-            padding: var(--b24-space-xl) var(--b24-space-2xl);
-            box-shadow: var(--b24-shadow-sm);
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: var(--b24-space-xl);
+        h1 {
+            color: #2066a9;
+            margin-bottom: 20px;
+            font-size: 28px;
         }
         
-        .b24-header__title {
-            font-size: var(--b24-font-size-2xl);
-            font-weight: 600;
-            color: var(--b24-color-primary);
-            margin: 0;
+        .info-card {
+            background: #f0f7ff;
+            border-left: 4px solid #2066a9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .button-group {
             display: flex;
-            align-items: center;
-            gap: var(--b24-space-md);
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
         
-        .b24-header__status {
-            background: var(--b24-color-success-bg);
-            color: var(--b24-color-success);
-            padding: var(--b24-space-xs) var(--b24-space-md);
-            border-radius: var(--b24-radius-md);
-            font-size: var(--b24-font-size-sm);
-            font-weight: 500;
-            border: 1px solid rgba(157, 207, 0, 0.2);
-        }
-        
-        .b24-header__info {
-            font-size: var(--b24-font-size-sm);
-            color: var(--b24-color-text-secondary);
-            text-align: right;
-        }
-        
-        /* Horizontal Layout - Main Content */
-        .b24-main {
-            display: grid;
-            grid-template-columns: 2fr 3fr;
-            gap: var(--b24-space-xl);
-            align-items: start;
-        }
-        
-        /* Action Panel - Left Side */
-        .b24-actions {
-            background: var(--b24-color-bg-card);
-            border: 1px solid var(--b24-color-border-light);
-            border-radius: var(--b24-radius-lg);
-            padding: var(--b24-space-2xl);
-            box-shadow: var(--b24-shadow-sm);
-            height: fit-content;
-            position: sticky;
-            top: var(--b24-space-lg);
-        }
-        
-        .b24-actions__title {
-            font-size: var(--b24-font-size-lg);
-            font-weight: 600;
-            color: var(--b24-color-text-primary);
-            margin: 0 0 var(--b24-space-lg) 0;
-            display: flex;
-            align-items: center;
-            gap: var(--b24-space-sm);
-        }
-        
-        .b24-button-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--b24-space-md);
-        }
-        
-        /* B24UI Button Component */
-        .b24-btn {
-            font-family: var(--b24-font-family);
-            font-size: var(--b24-font-size-base);
-            font-weight: 500;
-            line-height: var(--b24-line-height-sm);
+        button {
+            background: #2066a9;
+            color: white;
             border: none;
-            border-radius: var(--b24-radius-md);
-            padding: var(--b24-space-md) var(--b24-space-lg);
+            padding: 12px 24px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: var(--b24-space-sm);
-            text-decoration: none;
-            outline: none;
-            position: relative;
-            overflow: hidden;
+            font-size: 14px;
+            transition: background 0.3s;
         }
         
-        .b24-btn--primary {
-            background: var(--b24-color-primary);
-            color: #ffffff;
-            box-shadow: var(--b24-shadow-sm);
+        button:hover {
+            background: #1a5490;
         }
         
-        .b24-btn--primary:hover {
-            background: var(--b24-color-primary-hover);
-            box-shadow: var(--b24-shadow-md);
-            transform: translateY(-1px);
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         
-        .b24-btn--primary:active {
-            background: var(--b24-color-primary-active);
-            transform: translateY(0);
-            box-shadow: var(--b24-shadow-sm);
-        }
-        
-        .b24-btn--primary:focus {
-            box-shadow: 0 0 0 3px rgba(32, 102, 176, 0.2);
-        }
-        
-        .b24-btn i {
-            font-size: var(--b24-font-size-lg);
-        }
-        
-        /* Output Panel - Right Side */
-        .b24-output-panel {
-            display: grid;
-            gap: var(--b24-space-lg);
-        }
-        
-        .b24-card {
-            background: var(--b24-color-bg-card);
-            border: 1px solid var(--b24-color-border-light);
-            border-radius: var(--b24-radius-lg);
-            box-shadow: var(--b24-shadow-sm);
-            overflow: hidden;
-        }
-        
-        .b24-card__header {
-            padding: var(--b24-space-lg) var(--b24-space-xl);
-            border-bottom: 1px solid var(--b24-color-border-light);
-            background: var(--b24-color-bg-soft);
-        }
-        
-        .b24-card__title {
-            font-size: var(--b24-font-size-lg);
-            font-weight: 600;
-            color: var(--b24-color-text-primary);
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: var(--b24-space-sm);
-        }
-        
-        .b24-card__content {
-            padding: var(--b24-space-xl);
-        }
-        
-        /* Console Output */
-        .b24-console {
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: var(--b24-font-size-sm);
-            line-height: var(--b24-line-height-lg);
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: var(--b24-space-lg);
-            border-radius: var(--b24-radius-md);
-            max-height: 400px;
-            overflow-y: auto;
+        .output {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            min-height: 50px;
             white-space: pre-wrap;
-            word-break: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
         }
         
-        .b24-console:empty::before {
-            content: "Waiting for actions... ";
-            color: #6a737d;
-            font-style: italic;
-        }
-        
-        /* Console Message Colors */
-        .console-success { color: #4ade80; }
-        .console-error { color: #f87171; }
-        .console-info { color: #60a5fa; }
-        .console-warning { color: #facc15; }
-        
-        /* User Info Panel */
-        .b24-user-info {
-            background: linear-gradient(135deg, var(--b24-color-info-bg), var(--b24-color-success-bg));
-            border: 1px solid var(--b24-color-border-light);
-            border-radius: var(--b24-radius-lg);
-            padding: var(--b24-space-xl);
-            box-shadow: var(--b24-shadow-sm);
-        }
-        
-        .b24-user-info__grid {
+        .user-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--b24-space-lg);
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            margin: 15px 0;
         }
         
-        .b24-user-info__item {
-            display: flex;
-            align-items: center;
-            gap: var(--b24-space-sm);
-            font-size: var(--b24-font-size-sm);
+        .user-info label {
+            font-weight: bold;
+            color: #666;
         }
         
-        .b24-user-info__label {
-            font-weight: 600;
-            color: var(--b24-color-text-primary);
-        }
-        
-        .b24-user-info__value {
-            color: var(--b24-color-text-secondary);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .b24-main {
-                grid-template-columns: 1fr;
-            }
-            
-            .b24-header {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: var(--b24-space-md);
-            }
-            
-            .b24-button-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: var(--b24-space-md);
-            }
-            
-            .b24-header {
-                padding: var(--b24-space-lg);
-            }
-            
-            .b24-actions,
-            .b24-card__content {
-                padding: var(--b24-space-lg);
-            }
-            
-            .b24-button-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Animation System */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-        
-        .animate-pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        /* Loading States */
-        .b24-btn--loading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-        
-        .b24-btn--loading::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            margin: auto;
-            border: 2px solid transparent;
-            border-top-color: currentColor;
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2066a9;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-left: 10px;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            color: #2e7d32;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <!-- B24UI App Container -->
-    <div class="b24-app">
-        <!-- Header Section -->
-        <header class="b24-header">
-            <h1 class="b24-header__title">
-                <i class="bi bi-laptop"></i>
-                Bitrix24 Quotation Generator
-            </h1>
-            <div class="b24-header__status" id="status">
-                <i class="bi bi-circle-fill animate-pulse" style="font-size: 8px; margin-right: 4px;"></i>
-                Initializing...
-            </div>
-            <div class="b24-header__info">
-                <div>Cloudflare Worker</div>
-                <div style="font-size: 11px; opacity: 0.7;">B24UI Design System</div>
-            </div>
-        </header>
+    <div class="container">
+        <h1>🚀 Hello World - Bitrix24 App</h1>
+        
+        <div class="info-card">
+            <p>Đây là ứng dụng Bitrix24 local được xây dựng với Cloudflare Worker</p>
+            <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                Status: <span id="status" style="color: #2e7d32;">Đang khởi tạo...</span>
+            </p>
+        </div>
 
-        <!-- Main Content - Horizontal Layout -->
-        <main class="b24-main">
-            <!-- Left Panel - Actions -->
-            <aside class="b24-actions">
-                <h2 class="b24-actions__title">
-                    <i class="bi bi-grid-3x3-gap"></i>
-                    Available Actions
-                </h2>
-                <div class="b24-button-grid">
-                    <button id="btnGetUser" class="b24-btn b24-btn--primary" type="button">
-                        <i class="bi bi-person-circle"></i>
-                        Get User Information
-                    </button>
-                    <button id="btnGetMessage" class="b24-btn b24-btn--primary" type="button">
-                        <i class="bi bi-chat-dots"></i>
-                        Fetch Worker Message
-                    </button>
-                    <button id="btnGetUUID" class="b24-btn b24-btn--primary" type="button">
-                        <i class="bi bi-dice-5"></i>
-                        Generate Random UUID
-                    </button>
-                    <button id="btnGetDepartment" class="b24-btn b24-btn--primary" type="button">
-                        <i class="bi bi-building"></i>
-                        Load Departments
-                    </button>
-                    <button id="btnGetTasks" class="b24-btn b24-btn--primary" type="button">
-                        <i class="bi bi-list-check"></i>
-                        Fetch Task List
-                    </button>
-                    <button id="btnCallWorkerAPI" class="b24-btn b24-btn--primary" type="button">
-                        <i class="bi bi-arrow-repeat"></i>
-                        Call Worker API
-                    </button>
-                </div>
-            </aside>
+        <div class="button-group">
+            <button id="btnGetUser" type="button">👤 Lấy thông tin người dùng</button>
+            <button id="btnGetMessage" type="button">💬 Lấy message từ Worker</button>
+            <button id="btnGetUUID" type="button">🎲 Tạo UUID ngẫu nhiên</button>
+            <button id="btnGetDepartment" type="button">🏢 Lấy thông tin phòng ban</button>
+            <button id="btnGetTasks" type="button">📋 Lấy danh sách task</button>
+            <button id="btnCallWorkerAPI" type="button">🔄 Gọi API Worker với Bitrix data</button>
+        </div>
 
-            <!-- Right Panel - Output & User Info -->
-            <section class="b24-output-panel">
-                <!-- Console Output -->
-                <div class="b24-card">
-                    <div class="b24-card__header">
-                        <h3 class="b24-card__title">
-                            <i class="bi bi-terminal"></i>
-                            Console Output
-                        </h3>
-                    </div>
-                    <div class="b24-card__content">
-                        <div id="output" class="b24-console"></div>
-                    </div>
-                </div>
+        <div id="output" class="output">
+            Kết quả sẽ hiển thị ở đây...
+        </div>
 
-                <!-- User Information -->
-                <div id="userInfoSection" class="b24-user-info animate-fade-in" style="display: none;">
-                    <div class="b24-user-info__grid" id="userInfoContent">
-                        <!-- User info will be populated dynamically -->
-                    </div>
-                </div>
-            </section>
-        </main>
+        <div id="userInfoSection" style="display: none;">
+            <h3 style="margin: 20px 0 10px; color: #2066a9;">Thông tin người dùng:</h3>
+            <div class="user-info" id="userInfoContent"></div>
+        </div>
     </div>
 
     <script>
-        // B24UI Enhanced JavaScript with UX Improvements
-        console.log('🚀 B24UI APP LOADED - Current Time:', new Date().toISOString());
-        console.log('🔍 User Agent:', navigator.userAgent);
-        console.log('🌐 Location:', window.location.href);
-        console.log('🎨 B24UI Design System Activated');
-        
-        // Enhanced UI Controller
-        class B24UIController {
-            constructor() {
-                this.output = document.getElementById('output');
-                this.status = document.getElementById('status');
-                this.userSection = document.getElementById('userInfoSection');
-                this.userContent = document.getElementById('userInfoContent');
-                this.loadingButtons = new Set();
-                this.init();
-            }
+        let currentUser = null;
+        let authData = null;
+
+        // Khởi tạo Bitrix24 SDK
+        BX24.init(function() {
+            console.log('Bitrix24 SDK initialized');
+            updateStatus('Sẵn sàng', '#2e7d32');
             
-            init() {
-                // Add initial animation
-                document.querySelector('.b24-app').style.opacity = '0';
-                setTimeout(() => {
-                    document.querySelector('.b24-app').style.transition = 'opacity 0.5s ease';
-                    document.querySelector('.b24-app').style.opacity = '1';
-                }, 100);
-            }
+            // Lấy auth data
+            authData = BX24.getAuth();
+            console.log('Auth data:', authData);
             
-            updateStatus(text, type = 'success') {
-                const iconMap = {
-                    loading: 'bi bi-arrow-clockwise',
-                    success: 'bi bi-check-circle-fill',
-                    error: 'bi bi-exclamation-triangle-fill',
-                    info: 'bi bi-info-circle-fill'
-                };
-                
-                const colorMap = {
-                    loading: 'var(--b24-color-info)',
-                    success: 'var(--b24-color-success)',
-                    error: 'var(--b24-color-error)',
-                    info: 'var(--b24-color-primary)'
-                };
-                
-                this.status.innerHTML = `
-                    <i class="${iconMap[type] || iconMap.info}" 
-                       style="font-size: 8px; margin-right: 4px; color: ${colorMap[type]}"></i>
-                    ${text}
-                `;
-                this.status.style.borderColor = colorMap[type];
-            }
-            
-            log(message, type = 'info', details = '') {
-                const timestamp = new Date().toLocaleTimeString();
-                const typeMap = {
-                    error: { icon: '❌', class: 'console-error' },
-                    success: { icon: '✅', class: 'console-success' },
-                    info: { icon: 'ℹ️', class: 'console-info' },
-                    warning: { icon: '⚠️', class: 'console-warning' }
-                };
-                
-                const config = typeMap[type] || typeMap.info;
-                const detailsText = details ? `\n  └─ ${details}` : '';
-                
-                this.output.innerHTML += `<span class="${config.class}">
-[${timestamp}] ${config.icon} ${message}${detailsText}
-</span>`;
-                this.output.scrollTop = this.output.scrollHeight;
-                
-                // Auto-scroll animation
-                this.output.style.scrollBehavior = 'smooth';
-            }
-            
-            setButtonLoading(buttonId, loading = true) {
-                const button = document.getElementById(buttonId);
-                if (loading) {
-                    this.loadingButtons.add(buttonId);
-                    button.classList.add('b24-btn--loading');
-                    button.disabled = true;
-                } else {
-                    this.loadingButtons.delete(buttonId);
-                    button.classList.remove('b24-btn--loading');
-                    button.disabled = false;
-                }
-            }
-            
-            showUserInfo(userData) {
-                const userItems = [
-                    { icon: 'bi bi-person-fill', label: 'Full Name', value: `${userData.NAME} ${userData.LAST_NAME}` },
-                    { icon: 'bi bi-envelope-fill', label: 'Email', value: userData.EMAIL },
-                    { icon: 'bi bi-hash', label: 'User ID', value: userData.ID },
-                    { icon: 'bi bi-telephone-fill', label: 'Phone', value: userData.WORK_PHONE || 'Not provided' },
-                    { icon: 'bi bi-briefcase-fill', label: 'Position', value: userData.WORK_POSITION || 'Not specified' },
-                    { icon: 'bi bi-calendar-fill', label: 'Last Login', value: new Date().toLocaleDateString() }
-                ];
-                
-                this.userContent.innerHTML = userItems.map(item => `
-                    <div class="b24-user-info__item">
-                        <i class="${item.icon}" style="color: var(--b24-color-primary);"></i>
-                        <span class="b24-user-info__label">${item.label}:</span>
-                        <span class="b24-user-info__value">${item.value}</span>
-                    </div>
-                `).join('');
-                
-                this.userSection.style.display = 'block';
-                this.userSection.classList.add('animate-fade-in');
-            }
-            
-            async executeWithLoading(buttonId, asyncFunc, actionName) {
-                this.setButtonLoading(buttonId, true);
-                this.updateStatus(`${actionName}...`, 'loading');
-                this.log(`🔄 ${actionName}...`, 'info');
-                
-                try {
-                    await asyncFunc();
-                    this.updateStatus('Ready', 'success');
-                } catch (error) {
-                    this.log(`❌ Error in ${actionName}: ${error.message}`, 'error');
-                    this.updateStatus('Error occurred', 'error');
-                } finally {
-                    this.setButtonLoading(buttonId, false);
-                }
+            // Tự động lấy thông tin user khi load
+            getCurrentUser();
+        });
+
+        function updateStatus(text, color = '#666') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = text;
+            statusEl.style.color = color;
+        }
+
+        function showOutput(content, isError = false) {
+            const output = document.getElementById('output');
+            if (isError) {
+                output.innerHTML = `<div class="error">${content}</div>`;
+            } else {
+                output.textContent = typeof content === 'object' ? 
+                    JSON.stringify(content, null, 2) : content;
             }
         }
-        
-        // Initialize B24UI Controller
-        const ui = new B24UIController();
 
-        // Initialize Bitrix24 SDK with B24UI enhancements
-        BX24.init(function(){
-            console.log('✅ Bitrix24 SDK Ready!');
-            const bx24Info = {
-                isAdmin: BX24.isAdmin(),
-                domain: BX24.getDomain(),
-                lang: BX24.getLang()
-            };
-            console.log('📱 BX24 Info:', bx24Info);
+        function showLoading() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<span class="loading"></span> Đang xử lý...';
+        }
+
+        // Lấy thông tin người dùng hiện tại
+        function getCurrentUser() {
+            showLoading();
+            BX24.callMethod(
+                'user.current',
+                {},
+                function(result) {
+                    if (result.error()) {
+                        showOutput('Lỗi: ' + result.error(), true);
+                    } else {
+                        currentUser = result.data();
+                        displayUserInfo(currentUser);
+                        showOutput('Thông tin người dùng đã được tải');
+                    }
+                }
+            );
+        }
+
+        function displayUserInfo(user) {
+            const section = document.getElementById('userInfoSection');
+            const content = document.getElementById('userInfoContent');
             
-            // Update status with B24UI
-            ui.updateStatus('Connected to Bitrix24', 'success');
-            ui.log('🚀 Bitrix24 SDK initialized successfully', 'success', 'B24UI Design System Active');
-            ui.log(`🌐 Domain: ${bx24Info.domain}`, 'info', `Language: ${bx24Info.lang} | Admin: ${bx24Info.isAdmin ? 'Yes' : 'No'}`);
+            content.innerHTML = `
+                <label>ID:</label><span>${user.ID}</span>
+                <label>Họ tên:</label><span>${user.NAME} ${user.LAST_NAME}</span>
+                <label>Email:</label><span>${user.EMAIL}</span>
+                <label>Chức vụ:</label><span>${user.WORK_POSITION || 'N/A'}</span>
+                <label>Phòng ban:</label><span>${user.UF_DEPARTMENT ? user.UF_DEPARTMENT.join(', ') : 'N/A'}</span>
+            `;
+            
+            section.style.display = 'block';
+        }
 
-            // Button 1: Get User Information
-            document.getElementById('btnGetUser').addEventListener('click', () => {
-                ui.executeWithLoading('btnGetUser', () => {
-                    return new Promise((resolve, reject) => {
-                        BX24.callMethod('user.current', {}, function(result) {
-                            if(result.error()) {
-                                ui.log('Failed to fetch user information', 'error', result.error());
-                                reject(new Error(result.error()));
-                            } else {
-                                const user = result.data();
-                                ui.log('User information retrieved successfully', 'success', 
-                                      `${user.NAME} ${user.LAST_NAME} (${user.EMAIL})`);
-                                ui.showUserInfo(user);
-                                resolve();
-                            }
-                        });
-                    });
-                }, 'Fetching User Information');
-            });
+        // Event Listeners
+        document.getElementById('btnGetUser').addEventListener('click', getCurrentUser);
 
-            // Button 2: Get Worker Message
-            document.getElementById('btnGetMessage').addEventListener('click', () => {
-                ui.executeWithLoading('btnGetMessage', async () => {
-                    const response = await fetch('/api/message');
-                    const data = await response.json();
-                    ui.log('Worker message retrieved', 'success', data.message);
-                    ui.log('Message timestamp', 'info', data.timestamp);
-                }, 'Fetching Worker Message');
-            });
-
-            // Button 3: Generate UUID
-            document.getElementById('btnGetUUID').addEventListener('click', () => {
-                ui.executeWithLoading('btnGetUUID', async () => {
-                    const response = await fetch('/api/random');
-                    const data = await response.json();
-                    ui.log('Random UUID generated', 'success', data.uuid);
-                    ui.log('Generation timestamp', 'info', data.timestamp);
-                    ui.log('Random number', 'info', `Additional random: ${data.random || 'N/A'}`);
-                }, 'Generating Random UUID');
-            });
-
-            // Button 4: Get Department Information
-            document.getElementById('btnGetDepartment').addEventListener('click', () => {
-                ui.executeWithLoading('btnGetDepartment', () => {
-                    return new Promise((resolve, reject) => {
-                        BX24.callMethod('department.get', {}, function(result) {
-                            if(result.error()) {
-                                ui.log('Failed to load departments', 'error', result.error());
-                                reject(new Error(result.error()));
-                            } else {
-                                const departments = result.data();
-                                ui.log(`Departments loaded successfully`, 'success', `Found ${departments.length} departments`);
-                                departments.slice(0, 10).forEach((dept, index) => {
-                                    ui.log(`Department ${index + 1}`, 'info', `${dept.NAME} (ID: ${dept.ID})`);
-                                });
-                                if (departments.length > 10) {
-                                    ui.log(`... and ${departments.length - 10} more departments`, 'info');
-                                }
-                                resolve();
-                            }
-                        });
-                    });
-                }, 'Loading Department Information');
-            });
-
-            // Button 5: Get Task List
-            document.getElementById('btnGetTasks').addEventListener('click', () => {
-                ui.executeWithLoading('btnGetTasks', () => {
-                    return new Promise((resolve, reject) => {
-                        BX24.callMethod('tasks.task.list', {
-                            filter: { REAL_STATUS: [1, 2, 3] },
-                            select: ['ID', 'TITLE', 'STATUS', 'CREATED_DATE'],
-                            order: { CREATED_DATE: 'desc' }
-                        }, function(result) {
-                            if(result.error()) {
-                                ui.log('Failed to load tasks', 'error', result.error());
-                                reject(new Error(result.error()));
-                            } else {
-                                const tasks = result.data().tasks || [];
-                                ui.log(`Tasks retrieved successfully`, 'success', `Found ${tasks.length} active tasks`);
-                                tasks.slice(0, 5).forEach((task, index) => {
-                                    ui.log(`Task ${index + 1}`, 'info', `${task.title} (Status: ${task.status})`);
-                                });
-                                if (tasks.length > 5) {
-                                    ui.log(`... and ${tasks.length - 5} more tasks`, 'info');
-                                }
-                                resolve();
-                            }
-                        });
-                    });
-                }, 'Fetching Task List');
-            });
-
-            // Button 6: Call Worker API with Bitrix Data
-            document.getElementById('btnCallWorkerAPI').addEventListener('click', () => {
-                ui.executeWithLoading('btnCallWorkerAPI', () => {
-                    return new Promise((resolve, reject) => {
-                        BX24.callMethod('user.current', {}, async function(result) {
-                            if(result.error()) {
-                                ui.log('Failed to get user for API call', 'error', result.error());
-                                reject(new Error(result.error()));
-                                return;
-                            }
-                            
-                            const user = result.data();
-                            
-                            try {
-                                const response = await fetch('/api/quote', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        user: {
-                                            id: user.ID,
-                                            name: `${user.NAME} ${user.LAST_NAME}`,
-                                            email: user.EMAIL
-                                        },
-                                        domain: BX24.getDomain(),
-                                        timestamp: new Date().toISOString()
-                                    })
-                                });
-                                
-                                const data = await response.json();
-                                ui.log('Worker API called successfully', 'success', data.message || 'API Response received');
-                                ui.log('Processing performance', 'info', `Processing time: ${data.duration || 'N/A'}ms`);
-                                resolve();
-                            } catch (error) {
-                                ui.log('Worker API call failed', 'error', error.message);
-                                reject(error);
-                            }
-                        });
-                    });
-                }, 'Calling Worker API with Bitrix Data');
-            });
+        // Lấy message từ Worker
+        document.getElementById('btnGetMessage').addEventListener('click', async () => {
+            showLoading();
+            try {
+                const response = await fetch('/api/message');
+                const data = await response.json();
+                showOutput(data.message);
+                updateStatus('Message đã tải', '#2e7d32');
+            } catch (error) {
+                showOutput('Lỗi: ' + error.message, true);
+            }
         });
+
+        // Tạo UUID ngẫu nhiên
+        document.getElementById('btnGetUUID').addEventListener('click', async () => {
+            showLoading();
+            try {
+                const response = await fetch('/api/random');
+                const data = await response.json();
+                showOutput(`UUID: ${data.uuid}\nTạo lúc: ${data.timestamp}`);
+                updateStatus('UUID đã tạo', '#2e7d32');
+            } catch (error) {
+                showOutput('Lỗi: ' + error.message, true);
+            }
+        });
+
+        // Lấy thông tin phòng ban
+        document.getElementById('btnGetDepartment').addEventListener('click', () => {
+            showLoading();
+            BX24.callMethod(
+                'department.get',
+                {},
+                function(result) {
+                    if (result.error()) {
+                        showOutput('Lỗi: ' + result.error(), true);
+                    } else {
+                        showOutput(result.data());
+                        updateStatus(`Tìm thấy ${result.data().length} phòng ban`, '#2e7d32');
+                    }
+                }
+            );
+        });
+
+        // Lấy danh sách task
+        document.getElementById('btnGetTasks').addEventListener('click', () => {
+            showLoading();
+            BX24.callMethod(
+                'tasks.task.list',
+                {
+                    filter: { RESPONSIBLE_ID: currentUser ? currentUser.ID : null },
+                    select: ['ID', 'TITLE', 'STATUS', 'CREATED_DATE']
+                },
+                function(result) {
+                    if (result.error()) {
+                        showOutput('Lỗi: ' + result.error(), true);
+                    } else {
+                        const tasks = result.data().tasks;
+                        if (tasks && tasks.length > 0) {
+                            showOutput(tasks);
+                            updateStatus(`Tìm thấy ${tasks.length} task`, '#2e7d32');
+                        } else {
+                            showOutput('Không có task nào');
+                            updateStatus('Không tìm thấy task', '#ff9800');
+                        }
+                    }
+                }
+            );
+        });
+
+        // Gọi API Worker với Bitrix data
+        document.getElementById('btnCallWorkerAPI').addEventListener('click', async () => {
+            if (!currentUser) {
+                showOutput('Vui lòng lấy thông tin người dùng trước', true);
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/api/process-bitrix-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: currentUser,
+                        auth: authData,
+                        domain: BX24.getDomain(),
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                const data = await response.json();
+                showOutput(data);
+                updateStatus('API Worker đã xử lý', '#2e7d32');
+            } catch (error) {
+                showOutput('Lỗi: ' + error.message, true);
+            }
+        });
+
+        // Resize frame khi cần
+        BX24.fitWindow();
     </script>
 </body>
 </html>
