@@ -22,6 +22,15 @@ export function getSYNITYCRMTemplate(crmData = {}) {
     entityCurrency = 'VND'
   } = crmData;
 
+  // DEBUG: Log received CRM data
+  console.log('🔍 getSYNITYCRMTemplate received crmData:', {
+    bitrixProducts: bitrixProducts,
+    productCount: bitrixProducts?.length || 0,
+    entityAmount: entityAmount,
+    entityDiscount: entityDiscount,
+    entityTax: entityTax
+  });
+
   // Helper function for currency formatting
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0));
@@ -562,16 +571,24 @@ export function getSYNITYCRMTemplate(crmData = {}) {
                 <div class="synity-products-table">
                     <table>
                         <tbody>
-                            <tr data-discount-rate="${product.DISCOUNT_RATE || 0}" 
-                                data-discount-sum="${product.DISCOUNT_SUM || 0}"
+                            <tr data-product-id="${product.ID || 0}"
+                                data-product-name="${product.PRODUCT_NAME || product.NAME || 'Unknown Product'}"
+                                data-quantity="${product.QUANTITY || 1}"
                                 data-price="${product.PRICE || 0}"
-                                data-price-netto="${product.PRICE_NETTO || 0}"
+                                data-price-exclusive="${product.PRICE_EXCLUSIVE || product.PRICE || 0}"
+                                data-price-netto="${product.PRICE_NETTO || product.PRICE || 0}"
+                                data-discount-rate="${product.DISCOUNT_RATE || 0}" 
+                                data-discount-sum="${product.DISCOUNT_SUM || 0}"
+                                data-discount-type="${product.DISCOUNT_TYPE_ID || 1}"
                                 data-tax-rate="${product.TAX_RATE || 0}"
-                                data-tax-included="${product.TAX_INCLUDED || 'N'}">
-                                <td>${product.PRODUCT_NAME || 'Unknown Product'}</td>
-                                <td>${product.QUANTITY || 1}</td>
-                                <td>${formatCurrency(product.PRICE || 0)}</td>
-                                <td>${formatCurrency(product.PRICE_NETTO || 0)}</td>
+                                data-tax-included="${product.TAX_INCLUDED || 'N'}"
+                                data-row-sum="${((product.PRICE_EXCLUSIVE || product.PRICE || 0) * (product.QUANTITY || 1)) - (product.DISCOUNT_SUM || 0)}">
+                                <td class="synity-product-name">${product.PRODUCT_NAME || product.NAME || 'Unknown Product'}</td>
+                                <td class="synity-product-quantity">${product.QUANTITY || 1}</td>
+                                <td class="synity-product-price">${formatCurrency(product.PRICE_NETTO || product.PRICE || 0)}</td>
+                                <td class="synity-product-discount">${product.DISCOUNT_RATE || 0}%</td>
+                                <td class="synity-product-discount-sum">${formatCurrency(product.DISCOUNT_SUM || 0)}</td>
+                                <td class="synity-product-total">${formatCurrency(((product.PRICE_EXCLUSIVE || product.PRICE || 0) * (product.QUANTITY || 1)) - (product.DISCOUNT_SUM || 0))}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -736,98 +753,28 @@ function getQuotationTemplate() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Báo giá - \${clientCompanyName}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Unified Design System - Professional Color Palette */
-        :root {
-            /* Primary Palette - 10-step system */
-            --primary-50: #F0FDFA;
-            --primary-100: #CCFBF1;
-            --primary-200: #99F6E4;
-            --primary-300: #5EEAD4;
-            --primary-400: #2DD4BF;
-            --primary-500: #14B8A6;
-            --primary-600: #0D9488;
-            --primary-700: #0F766E;
-            --primary-800: #115E59;
-            --primary-900: #134E4A;
-            
-            /* Neutral Palette */
-            --neutral-50: #FAFAFA;
-            --neutral-100: #F5F5F5;
-            --neutral-200: #E5E5E5;
-            --neutral-300: #D4D4D4;
-            --neutral-400: #A3A3A3;
-            --neutral-500: #737373;
-            --neutral-600: #525252;
-            --neutral-700: #404040;
-            --neutral-800: #262626;
-            --neutral-900: #171717;
-            
-            /* Perfect 8px Spacing Grid - Optimized for Print */
-            --space-xs: 4px;
-            --space-sm: 6px;    /* Reduced from 8px */
-            --space-md: 12px;   /* Reduced from 16px */
-            --space-lg: 18px;   /* Reduced from 24px */
-            --space-xl: 24px;   /* Reduced from 32px */
-            --space-2xl: 32px;  /* Reduced from 48px */
-            --space-3xl: 48px;  /* Reduced from 64px */
-            
-            /* Professional Elevation System */
-            --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --elevation-2: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-            --elevation-3: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
-            --elevation-4: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-            
-            /* Typography Scale */
-            --text-xs: 12px;
-            --text-sm: 14px;
-            --text-base: 16px;
-            --text-lg: 18px;
-            --text-xl: 20px;
-            --text-2xl: 24px;
-            --text-3xl: 32px;
-            --text-4xl: 40px;
-            
-            /* Border Radius */
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #F3F4F6; }
+        @media print { 
+            body { background-color: #FFFFFF; } 
+            .print-container { 
+                box-shadow: none !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                border: none !important;
+            } 
         }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--primary-50) 0%, var(--neutral-50) 100%);
-            margin: 0;
-            padding: var(--space-md);  /* Reduced padding */
-            color: var(--neutral-800);
-            line-height: 1.5;  /* Reduced line height */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Unified Quotation Document Container */
-        .synity-quotation-document {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--elevation-4);
-            overflow: hidden;
-            position: relative;
-        }
+        :root { --bg-main: #FFFFFF; --bg-secondary: #F9FAFB; --border-subtle: #E5E7EB; --accent-main: #0D9488; --accent-secondary: #2563EB; --text-main: #1F2937; --text-secondary: #6B7280; }
+        .highlight-accent { color: var(--accent-main); }
 
         /* Professional Header with Gradient */
         .quotation-header {
-            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
-            padding: var(--space-xl) var(--space-xl) var(--space-lg);  /* Reduced padding */
+            background: linear-gradient(135deg, var(--accent-main) 0%, #0F766E 100%);
+            padding: 2rem 2rem 1.5rem;
             color: white;
             position: relative;
             overflow: hidden;
@@ -852,18 +799,18 @@ function getQuotationTemplate() {
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
-            gap: var(--space-lg);
+            gap: 1.5rem;
         }
 
         .company-info h1 {
-            font-size: var(--text-2xl);
+            font-size: 1.5rem;
             font-weight: 800;
-            margin: 0 0 var(--space-sm);
+            margin: 0 0 0.5rem;
             letter-spacing: -0.02em;
         }
 
         .company-info p {
-            font-size: var(--text-sm);
+            font-size: 0.875rem;
             margin: 0;
             opacity: 0.9;
             line-height: 1.4;
@@ -871,9 +818,9 @@ function getQuotationTemplate() {
 
         .company-logo {
             background: rgba(255,255,255,0.15);
-            border-radius: var(--radius-md);
-            padding: var(--space-md) var(--space-lg);
-            font-size: var(--text-lg);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1.125rem;
             font-weight: 700;
             letter-spacing: 0.1em;
             backdrop-filter: blur(10px);
@@ -882,448 +829,24 @@ function getQuotationTemplate() {
         /* Unified Document Title */
         .quotation-title {
             background: white;
-            padding: var(--space-xl) var(--space-xl) var(--space-lg);  /* Reduced padding */
+            padding: 2rem 2rem 1.5rem;
             text-align: center;
-            border-bottom: 1px solid var(--neutral-200);
+            border-bottom: 1px solid #E5E7EB;
         }
 
         .quotation-title h2 {
-            font-size: var(--text-3xl);  /* Reduced from 4xl */
+            font-size: 2rem;
             font-weight: 800;
-            color: var(--primary-600);
-            margin: 0 0 var(--space-sm);
+            color: var(--accent-main);
+            margin: 0 0 0.5rem;
             letter-spacing: -0.03em;
         }
 
         .quotation-title p {
-            font-size: var(--text-base);  /* Reduced from lg */
-            color: var(--neutral-600);
+            font-size: 1rem;
+            color: var(--text-secondary);
             margin: 0;
             font-weight: 500;
-        }
-
-        /* Unified Content Container */
-        .quotation-content {
-            padding: var(--space-xl);  /* Reduced from 2xl */
-        }
-
-        /* Client Information Cards */
-        .client-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--space-md);  /* Reduced gap */
-            margin-bottom: var(--space-xl);  /* Reduced margin */
-        }
-
-        .info-card {
-            background: var(--neutral-50);
-            border: 1px solid var(--neutral-200);
-            border-radius: var(--radius-lg);
-            padding: var(--space-lg);  /* Reduced padding */
-            position: relative;
-        }
-
-        .info-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-400) 100%);
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: var(--space-xs) var(--space-md);  /* Reduced gaps */
-            align-items: center;
-        }
-
-        .info-label {
-            font-size: var(--text-sm);
-            font-weight: 600;
-            color: var(--neutral-600);
-        }
-
-        .info-value {
-            font-size: var(--text-sm);
-            color: var(--neutral-800);
-            font-weight: 500;
-            text-align: right;
-            word-break: break-word;
-        }
-
-        .info-divider {
-            grid-column: 1 / -1;
-            height: 1px;
-            background: var(--neutral-200);
-            margin: var(--space-sm) 0;  /* Reduced margin */
-        }
-
-        /* Introduction Section */
-        .quotation-intro {
-            background: var(--primary-50);
-            border: 1px solid var(--primary-200);
-            border-radius: var(--radius-lg);
-            padding: var(--space-lg);  /* Reduced padding */
-            margin-bottom: var(--space-xl);  /* Reduced margin */
-            position: relative;
-        }
-
-        .quotation-intro::before {
-            content: '';
-            position: absolute;
-            top: var(--space-sm);
-            left: var(--space-sm);
-            width: 4px;
-            height: calc(100% - var(--space-md));
-            background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-400) 100%);
-            border-radius: 2px;
-        }
-
-        .quotation-intro p {
-            margin: 0;
-            padding-left: var(--space-lg);
-            font-size: var(--text-base);
-            line-height: 1.5;  /* Reduced line height */
-            color: var(--neutral-700);
-        }
-
-        .quotation-intro .highlight {
-            font-weight: 600;
-            color: var(--primary-700);
-        }
-
-        /* Professional Product Table - Compact Version */
-        .products-section {
-            margin-bottom: var(--space-xl);  /* Reduced margin */
-        }
-
-        .products-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border: 1px solid var(--neutral-200);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--elevation-1);
-        }
-
-        .products-table thead {
-            background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-200) 100%);
-        }
-
-        .products-table th {
-            padding: var(--space-md) var(--space-sm);  /* Reduced padding */
-            font-size: var(--text-sm);
-            font-weight: 700;
-            color: var(--neutral-700);
-            text-align: left;
-            border-bottom: 2px solid var(--primary-500);
-        }
-
-        .products-table th:last-child,
-        .products-table th:nth-child(3),
-        .products-table th:nth-child(4) {
-            text-align: right;
-        }
-
-        .products-table th:nth-child(4) {
-            text-align: center;
-        }
-
-        .products-table td {
-            padding: var(--space-sm) var(--space-sm);  /* Significantly reduced padding */
-            font-size: var(--text-sm);
-            color: var(--neutral-800);
-            border-bottom: 1px solid var(--neutral-200);
-            vertical-align: top;
-            line-height: 1.4;  /* Compact line height */
-        }
-
-        .products-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .products-table tr:nth-child(even) {
-            background: var(--neutral-50);
-        }
-
-        .products-table tr:hover {
-            background: var(--primary-50);
-            transition: background-color 0.2s ease;
-        }
-
-        .products-table .text-right {
-            text-align: right;
-        }
-
-        .products-table .text-center {
-            text-align: center;
-        }
-
-        /* Professional Total Summary */
-        .total-summary {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: var(--space-xl);  /* Reduced margin */
-        }
-
-        .total-card {
-            background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
-            border: 2px solid var(--primary-200);
-            border-radius: var(--radius-lg);
-            padding: var(--space-lg);  /* Reduced padding */
-            min-width: 400px;
-            box-shadow: var(--elevation-2);
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--space-xs) 0;  /* Reduced padding */
-        }
-
-        .total-row.subtotal {
-            border-bottom: 1px solid var(--primary-200);
-            margin-bottom: var(--space-xs);  /* Reduced margin */
-        }
-
-        .total-row.grand-total {
-            border-top: 2px solid var(--primary-600);
-            padding-top: var(--space-sm);  /* Reduced padding */
-            margin-top: var(--space-sm);   /* Reduced margin */
-        }
-
-        .total-label {
-            font-size: var(--text-sm);
-            color: var(--neutral-600);
-            font-weight: 500;
-        }
-
-        .total-value {
-            font-size: var(--text-sm);
-            color: var(--neutral-800);
-            font-weight: 600;
-        }
-
-        .grand-total .total-label {
-            font-size: var(--text-lg);
-            font-weight: 700;
-            color: var(--neutral-800);
-        }
-
-        .grand-total .total-value {
-            font-size: var(--text-xl);
-            font-weight: 800;
-            color: var(--primary-600);
-        }
-
-        /* Compact Section Dividers */
-        .section-divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, var(--neutral-300) 50%, transparent 100%);
-            margin: var(--space-lg) 0;  /* Reduced margin significantly */
-        }
-
-        .content-section {
-            margin-bottom: var(--space-lg);  /* Reduced margin */
-        }
-
-        .section-title {
-            font-size: var(--text-lg);  /* Reduced from xl */
-            font-weight: 700;
-            color: var(--neutral-800);
-            margin: 0 0 var(--space-md);  /* Reduced margin */
-            position: relative;
-            padding-left: var(--space-lg);
-        }
-
-        .section-title::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 20px;
-            background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-600) 100%);
-            border-radius: 2px;
-        }
-
-        /* Payment Schedule Table - NEW */
-        .payment-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border: 1px solid var(--neutral-200);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--elevation-1);
-            margin-bottom: var(--space-md);
-        }
-
-        .payment-table thead {
-            background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%);
-        }
-
-        .payment-table th {
-            padding: var(--space-md) var(--space-sm);
-            font-size: var(--text-sm);
-            font-weight: 700;
-            color: var(--primary-700);
-            text-align: left;
-            border-bottom: 2px solid var(--primary-400);
-        }
-
-        .payment-table th:nth-child(2),
-        .payment-table th:nth-child(3),
-        .payment-table th:nth-child(4) {
-            text-align: center;
-        }
-
-        .payment-table th:last-child {
-            text-align: right;
-        }
-
-        .payment-table td {
-            padding: var(--space-sm) var(--space-sm);
-            font-size: var(--text-sm);
-            color: var(--neutral-800);
-            border-bottom: 1px solid var(--neutral-200);
-            vertical-align: top;
-            line-height: 1.4;
-        }
-
-        .payment-table td:nth-child(2),
-        .payment-table td:nth-child(3),
-        .payment-table td:nth-child(4) {
-            text-align: center;
-        }
-
-        .payment-table td:last-child {
-            text-align: right;
-            font-weight: 600;
-        }
-
-        .payment-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .payment-table tr:nth-child(even) {
-            background: var(--primary-50);
-        }
-
-        .payment-table tr:hover {
-            background: var(--primary-100);
-            transition: background-color 0.2s ease;
-        }
-
-        .benefit-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .benefit-list li {
-            padding: var(--space-xs) 0 var(--space-xs) var(--space-lg);  /* Reduced padding */
-            position: relative;
-            font-size: var(--text-sm);
-            color: var(--neutral-700);
-            line-height: 1.4;  /* Reduced line height */
-        }
-
-        .benefit-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            top: var(--space-xs);
-            width: var(--space-md);
-            height: var(--space-md);
-            background: var(--primary-500);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        /* Professional Footer */
-        .quotation-footer {
-            background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-50) 100%);
-            padding: var(--space-lg);  /* Reduced padding */
-            text-align: center;
-            border-top: 1px solid var(--neutral-200);
-        }
-
-        .footer-thanks {
-            font-size: var(--text-base);  /* Reduced font size */
-            font-weight: 600;
-            color: var(--neutral-800);
-            margin: 0 0 var(--space-sm);  /* Reduced margin */
-        }
-
-        .footer-subtitle {
-            font-size: var(--text-sm);
-            color: var(--neutral-600);
-            margin: 0 0 var(--space-lg);  /* Reduced margin */
-        }
-
-        .contact-actions {
-            display: flex;
-            justify-content: center;
-            gap: var(--space-md);  /* Reduced gap */
-            flex-wrap: wrap;
-            margin-bottom: var(--space-lg);  /* Reduced margin */
-        }
-
-        .contact-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-md);  /* Reduced padding */
-            font-size: var(--text-sm);
-            font-weight: 600;
-            text-decoration: none;
-            border-radius: var(--radius-md);
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-
-        .contact-btn--primary {
-            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-            color: white;
-            box-shadow: var(--elevation-2);
-        }
-
-        .contact-btn--primary:hover {
-            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
-            box-shadow: var(--elevation-3);
-            transform: translateY(-1px);
-        }
-
-        .contact-btn--secondary {
-            background: white;
-            color: var(--primary-600);
-            border-color: var(--primary-300);
-        }
-
-        .contact-btn--secondary:hover {
-            background: var(--primary-50);
-            border-color: var(--primary-400);
-            transform: translateY(-1px);
-        }
-
-        .footer-company {
-            font-size: var(--text-sm);
-            color: var(--neutral-500);
-            font-weight: 500;
-            margin: 0;
         }
 
         /* Print Optimizations */
@@ -1333,7 +856,7 @@ function getQuotationTemplate() {
                 padding: 0;
             }
             
-            .synity-quotation-document {
+            .print-container {
                 box-shadow: none;
                 max-width: none;
             }
@@ -1345,70 +868,13 @@ function getQuotationTemplate() {
             .quotation-header::before {
                 display: none;
             }
-
-            /* Even more compact spacing for print */
-            .section-divider {
-                margin: var(--space-sm) 0;
-            }
-
-            .content-section {
-                margin-bottom: var(--space-md);
-            }
-
-            .quotation-content {
-                padding: var(--space-lg);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: var(--space-sm);
-            }
-
-            .quotation-content {
-                padding: var(--space-md);
-            }
-
-            .client-info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .total-card {
-                min-width: auto;
-                width: 100%;
-            }
-
-            .contact-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .contact-btn {
-                width: 200px;
-                justify-content: center;
-            }
-
-            .products-table {
-                font-size: var(--text-xs);
-            }
-
-            .products-table th,
-            .products-table td {
-                padding: var(--space-xs) var(--space-xs);
-            }
         }
     </style>
 </head>
-<body>
-    <div class="synity-quotation-document">
+<body class="p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto my-8 bg-white shadow-lg rounded-lg print-container">
         <!-- Professional Header -->
-        <header class="quotation-header">
+        <header class="quotation-header rounded-t-lg">
             <div class="header-content">
                 <div class="company-info">
                     <h1>SYNITY Co, Ltd</h1>
@@ -1426,71 +892,66 @@ function getQuotationTemplate() {
         </section>
 
         <!-- Main Content -->
-        <div class="quotation-content">
+        <div class="p-8 sm:p-12">
             <!-- Client Information Grid -->
-            <section class="client-info-grid">
-                <div class="info-card">
-                    <div class="info-grid">
-                        <span class="info-label">Gửi đến:</span>
-                        <span class="info-value">\${clientCompanyName}</span>
-                        <span class="info-label">Địa chỉ:</span>
-                        <span class="info-value">\${client_address}</span>
-                        <span class="info-label">MST:</span>
-                        <span class="info-value">\${client_tax_code}</span>
-                        
-                        <div class="info-divider"></div>
-                        
-                        <span class="info-label">Người liên hệ:</span>
-                        <span class="info-value">\${contact_name}</span>
-                        <span class="info-label">Phone:</span>
-                        <span class="info-value">\${contact_phone}</span>
-                        <span class="info-label">Email:</span>
-                        <span class="info-value">\${contact_email}</span>
+            <section class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm mb-10">
+                <div class="bg-gray-50 p-4 rounded-lg" style="background-color: var(--bg-secondary); border: 1px solid var(--border-subtle);">
+                    <div class="grid grid-cols-2 gap-y-1">
+                        <p class="font-bold" style="color: var(--text-secondary);">Gửi đến:</p>
+                        <p class="font-semibold text-right" style="color: var(--text-main);">\${clientCompanyName}</p>
+                        <p class="font-bold" style="color: var(--text-secondary);">Địa chỉ:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${client_address}</p>
+                        <p class="font-bold" style="color: var(--text-secondary);">MST:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${client_tax_code}</p>
+                    </div>
+                    <hr class="my-2">
+                    <div class="grid grid-cols-2 gap-y-1">
+                        <p class="font-bold" style="color: var(--text-secondary);">Người liên hệ:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${contact_name}</p>
+                        <p class="font-bold" style="color: var(--text-secondary);">Phone:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${contact_phone}</p>
+                        <p class="font-bold" style="color: var(--text-secondary);">Email:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${contact_email}</p>
                     </div>
                 </div>
-
-                <div class="info-card">
-                    <div class="info-grid">
-                        <span class="info-label">Số báo giá:</span>
-                        <span class="info-value">\${quotation_number}</span>
-                        <span class="info-label">Ngày tạo:</span>
-                        <span class="info-value">\${date_created}</span>
-                        <span class="info-label">Hiệu lực đến:</span>
-                        <span class="info-value">\${closed_date}</span>
-                        
-                        <div class="info-divider"></div>
-                        
-                        <span class="info-label">Phụ trách:</span>
-                        <span class="info-value">\${responsiblePersonName}</span>
-                        <span class="info-label">Phone:</span>
-                        <span class="info-value">\${responsiblePersonPhone}</span>
-                        <span class="info-label">Email:</span>
-                        <span class="info-value">\${responsiblePersonEmail}</span>
+                <div class="bg-gray-50 p-4 rounded-lg" style="background-color: var(--bg-secondary); border: 1px solid var(--border-subtle);">
+                    <div class="grid grid-cols-2 gap-y-1">
+                        <p class="font-semibold self-center" style="color: var(--text-secondary);">Số báo giá:</p>
+                        <p class="font-bold text-right break-words" style="color: var(--text-main);">\${quotation_number}</p>
+                        <p class="font-semibold" style="color: var(--text-secondary);">Ngày tạo:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${date_created}</p>
+                        <p class="font-semibold" style="color: var(--text-secondary);">Hiệu lực đến:</p>
+                        <p class="text-right" style="color: var(--text-main);">\${closed_date}</p>
+                    </div>
+                     <div class="border-t mt-3 pt-3 grid grid-cols-2" style="border-color: var(--border-subtle);">
+                        <div><p class="font-semibold" style="color: var(--text-secondary);">Phụ trách:</p></div>
+                         <div class="text-right">
+                            <p class="font-bold" style="color: var(--text-main);">\${responsiblePersonName}</p>
+                            <p style="color: var(--text-main);">\${responsiblePersonPhone}</p>
+                            <p style="color: var(--text-main);">\${responsiblePersonEmail}</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Introduction -->
-            <section class="quotation-intro">
-                <p>
-                    SYNITY kính gửi <span class="highlight">Quý \${clientCompanyName}</span> bảng báo giá chi tiết cho 
-                    <span class="highlight">HỆ SINH THÁI GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN SYNITY</span> như sau:
-                </p>
-            </section>
+            <p class="mb-8" style="color: var(--text-main);">
+                SYNITY kính gửi <span class="font-bold">Quý \${clientCompanyName}</span> bảng báo giá chi tiết cho HỆ SINH THÁI GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN SYNITY như sau:
+            </p>
 
-            <!-- Products Table -->
-            <section class="products-section">
-                <table class="products-table">
-                    <thead>
+            <!-- Products Table - Original Tailwind Style -->
+            <section class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-200">
                         <tr>
-                            <th>STT</th>
-                            <th>HẠNG MỤC TRIỂN KHAI</th>
-                            <th class="text-right">ĐƠN GIÁ</th>
-                            <th class="text-center">SỐ LƯỢNG</th>
-                            <th class="text-right">THÀNH TIỀN (VNĐ)</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">STT</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">HẠNG MỤC TRIỂN KHAI</th>
+                            <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">ĐƠN GIÁ</th>
+                            <th class="p-3 font-semibold text-center" style="color: var(--text-secondary);">SỐ LƯỢNG</th>
+                            <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">THÀNH TIỀN (VNĐ)</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="color: var(--text-main);">
                         <!-- BITRIX_SECTION_PLACEHOLDER -->
                         <!-- BITRIX_DISCOUNT_ROW_PLACEHOLDER -->
                         <!-- IMPLEMENTATION_SECTION_PLACEHOLDER -->
@@ -1500,108 +961,100 @@ function getQuotationTemplate() {
             </section>
 
             <!-- Total Summary -->
-            <section class="total-summary">
-                <div class="total-card">
-                    <div class="total-row subtotal">
-                        <span class="total-label">Tổng cộng (A+B):</span>
-                        <span class="total-value">\${sub_total}</span>
-                    </div>
-                    <div class="total-row subtotal">
-                        <span class="total-label">VAT (10%):</span>
-                        <span class="total-value">\${vat_amount}</span>
-                    </div>
-                    <div class="total-row grand-total">
-                        <span class="total-label">TỔNG THANH TOÁN:</span>
-                        <span class="total-value">\${grand_total} VNĐ</span>
+            <section class="mt-8 flex justify-end">
+                <div class="w-full sm:w-2/5 lg:w-2/5 bg-teal-50 p-4 rounded-lg border-l-4" style="border-color: var(--accent-main);">
+                    <div class="text-sm">
+                        <div class="flex justify-between py-2">
+                            <span style="color: var(--text-secondary);">Tổng cộng (A+B):</span>
+                            <span class="font-semibold" style="color: var(--text-main);">\${sub_total}</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span style="color: var(--text-secondary);">VAT (10%):</span>
+                            <span class="font-semibold" style="color: var(--text-main);">\${vat_amount}</span>
+                        </div>
+                        <div class="flex justify-between py-3 mt-2 border-t-2" style="border-color: var(--text-main);">
+                            <span class="text-base font-bold" style="color: var(--text-main);">TỔNG THANH TOÁN:</span>
+                            <span class="text-base font-bold" style="color: var(--accent-main);">\${grand_total} VNĐ</span>
+                        </div>
                     </div>
                 </div>
             </section>
-
-            <div class="section-divider"></div>
-
-            <!-- Payment Schedule Table - NEW IMPLEMENTATION -->
-            <section class="content-section">
-                <h3 class="section-title">TIẾN ĐỘ THANH TOÁN</h3>
-                <table class="payment-table">
-                    <thead>
+            
+            <!-- Payment Schedule - Tailwind Style -->
+            <section class="mt-12 pt-8 border-t text-sm space-y-4" style="border-color: var(--border-subtle);">
+                <h4 class="font-bold text-lg" style="color: var(--text-main);">TIẾN ĐỘ THANH TOÁN</h4>
+                <table class="w-full text-sm text-left border rounded-lg">
+                    <thead class="bg-gray-200">
                         <tr>
-                            <th>ĐỢT</th>
-                            <th>THỜI ĐIỂM</th>
-                            <th>TỶ LỆ (%)</th>
-                            <th>MÔ TẢ</th>
-                            <th>SỐ TIỀN (VNĐ)</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">ĐỢT</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">THỜI ĐIỂM</th>
+                            <th class="p-3 font-semibold text-center" style="color: var(--text-secondary);">TỶ LỆ (%)</th>
+                            <th class="p-3 font-semibold" style="color: var(--text-secondary);">MÔ TẢ</th>
+                            <th class="p-3 font-semibold text-right" style="color: var(--text-secondary);">SỐ TIỀN (VNĐ)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Ký hợp đồng</td>
-                            <td>30%</td>
-                            <td>Thanh toán sau khi ký hợp đồng</td>
-                            <td class="highlight-amount">30% tổng giá trị</td>
+                        <tr class="bg-gray-50 border-b">
+                            <td class="p-3 font-semibold">1</td>
+                            <td class="p-3">Ký hợp đồng</td>
+                            <td class="p-3 text-center">30%</td>
+                            <td class="p-3">Thanh toán sau khi ký hợp đồng</td>
+                            <td class="p-3 text-right font-semibold">30% tổng giá trị</td>
                         </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Triển khai 50%</td>
-                            <td>40%</td>
-                            <td>Hoàn thành 50% dự án</td>
-                            <td class="highlight-amount">40% tổng giá trị</td>
+                        <tr class="border-b">
+                            <td class="p-3 font-semibold">2</td>
+                            <td class="p-3">Triển khai 50%</td>
+                            <td class="p-3 text-center">40%</td>
+                            <td class="p-3">Hoàn thành 50% dự án</td>
+                            <td class="p-3 text-right font-semibold">40% tổng giá trị</td>
                         </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Nghiệm thu</td>
-                            <td>30%</td>
-                            <td>Hoàn thành và bàn giao hệ thống</td>
-                            <td class="highlight-amount">30% tổng giá trị</td>
+                        <tr class="bg-gray-50">
+                            <td class="p-3 font-semibold">3</td>
+                            <td class="p-3">Nghiệm thu</td>
+                            <td class="p-3 text-center">30%</td>
+                            <td class="p-3">Hoàn thành và bàn giao hệ thống</td>
+                            <td class="p-3 text-right font-semibold">30% tổng giá trị</td>
                         </tr>
                     </tbody>
                 </table>
-                <p style="font-size: var(--text-xs); color: var(--neutral-500); font-style: italic; margin-top: var(--space-sm);">
+                <p class="mt-2 text-sm italic text-gray-500">
                     * Thời hạn thanh toán chi tiết cho từng đợt sẽ được quy định cụ thể trong hợp đồng.
                 </p>
             </section>
 
-            <div class="section-divider"></div>
-
             <!-- Benefits & Support -->
-            <section class="content-section">
-                <h3 class="section-title">ưu ĐÃI VÀ KHUYẾN MÃI</h3>
-                \${discount_info}
+            <section class="mt-8 pt-8 border-t text-sm space-y-6" style="border-color: var(--border-subtle);">
+                <div>
+                    <h4 class="font-bold mb-2" style="color: var(--text-main);">ƯU ĐÃI VÀ KHUYẾN MÃI</h4>
+                    \${discount_info}
+                </div>
+                <div>
+                    <h4 class="font-bold mb-2" style="color: var(--text-main);">CHÍNH SÁCH BẢO HÀNH VÀ HỖ TRỢ</h4>
+                    <ul class="list-disc list-inside space-y-1" style="color: var(--text-secondary);">
+                        <li>Hỗ trợ và hướng dẫn sử dụng qua livechat, điện thoại, và gặp mặt trực tiếp.</li>
+                        <li>Cam kết giải đáp các vấn đề, sự cố trong suốt quá trình sử dụng.</li>
+                        <li>Cung cấp tài liệu hướng dẫn đầy đủ cho đội ngũ của Quý Công ty.</li>
+                    </ul>
+                </div>
             </section>
 
-            <section class="content-section">
-                <h3 class="section-title">CHÍNH SÁCH BẢO HÀNH VÀ HỖ TRỢ</h3>
-                <ul class="benefit-list">
-                    <li>Hỗ trợ và hướng dẫn sử dụng qua livechat, điện thoại, và gặp mặt trực tiếp.</li>
-                    <li>Cam kết giải đáp các vấn đề, sự cố trong suốt quá trình sử dụng.</li>
-                    <li>Cung cấp tài liệu hướng dẫn đầy đủ cho đội ngũ của Quý Công ty.</li>
-                </ul>
-            </section>
+            <!-- Professional Footer -->
+            <footer class="mt-12 pt-8 text-center text-xs border-t" style="border-color: var(--border-subtle); color: var(--text-secondary);">
+                <p class="font-semibold" style="color: var(--text-main);">Cảm ơn sự quan tâm của Quý Công ty.</p>
+                <p>Nếu có bất kỳ câu hỏi nào, xin vui lòng liên hệ với chúng tôi qua:</p>
+                <div class="flex justify-center items-center space-x-4 mt-4">
+                    <a href="mailto:\${responsiblePersonEmail}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                        Gửi Email
+                    </a>
+                    <a href="tel:\${responsiblePersonPhone}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                        Gọi điện
+                    </a>
+                </div>
+                <p class="mt-4">SYNITY Co, Ltd</p>
+            </footer>
         </div>
-
-        <!-- Professional Footer -->
-        <footer class="quotation-footer">
-            <p class="footer-thanks">Cảm ơn sự quan tâm của Quý Công ty.</p>
-            <p class="footer-subtitle">Nếu có bất kỳ câu hỏi nào, xin vui lòng liên hệ với chúng tôi qua:</p>
-            
-            <div class="contact-actions">
-                <a href="mailto:\${responsiblePersonEmail}" class="contact-btn contact-btn--primary">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                    </svg>
-                    Gửi Email
-                </a>
-                <a href="tel:\${responsiblePersonPhone}" class="contact-btn contact-btn--secondary">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
-                    </svg>
-                    Gọi điện
-                </a>
-            </div>
-            
-            <p class="footer-company">SYNITY Co, Ltd</p>
-        </footer>
     </div>
 </body>
 </html>`;
@@ -1752,39 +1205,68 @@ function getSYNITYQuotationScript() {
             });
         }
 
-        // CRM Product calculation functions using Bitrix24 fields
-        const calculateProductsTotal = () => {
+        // CRM Product calculation functions - CORRECTED FORMULAS PER YOUR SPECIFICATION
+        const calculateProductsTotal = (context = 'default') => {
             const productRowsForCalc = document.querySelectorAll('.synity-products-table tbody tr');
-            let totalPriceNetto = 0;
-            let totalDiscountSum = 0;
-            let totalTax = 0;
+            console.log('[' + context + '] Found ' + productRowsForCalc.length + ' product rows in DOM');
             
-            productRowsForCalc.forEach(row => {
-                // Use PRICE_NETTO from data attributes (more accurate than parsing display text)
+            let totalProductAmount = 0;      // Sum of (PRICE_NETTO * QUANTITY) for products
+            let totalVat = 0;               // Sum of VAT calculations
+            let totalDiscountSum = 0;       // Sum of (DISCOUNT_SUM * QUANTITY) for display
+            
+            productRowsForCalc.forEach((row, index) => {
+                // Get data from Bitrix24 product row attributes
                 const priceNetto = parseFloat(row.getAttribute('data-price-netto')) || 0;
+                const quantity = parseFloat(row.getAttribute('data-quantity')) || 1;
                 const discountSum = parseFloat(row.getAttribute('data-discount-sum')) || 0;
-                const price = parseFloat(row.getAttribute('data-price')) || 0;
                 const taxRate = parseFloat(row.getAttribute('data-tax-rate')) || 0;
+                const productName = row.getAttribute('data-product-name') || 'Unknown';
                 
-                // Calculate tax: TAX = PRICE + PRICE * TAX_RATE(%)
-                const tax = price + (price * (taxRate / 100));
+                // CORRECTED FORMULAS PER YOUR SPECIFICATION:
+                const productsAmount = priceNetto * quantity;                      // THÀNH TIỀN = PRICE_NETTO * QUANTITY
+                const totalDiscountForProduct = discountSum * quantity;           // TỔNG DISCOUNT = DISCOUNT_SUM * QUANTITY
+                const priceExclusive = priceNetto - discountSum;                  // PRICE_EXCLUSIVE = PRICE_NETTO - DISCOUNT_SUM
+                const exclusiveAmount = priceExclusive * quantity;                // PRICE_EXCLUSIVE * QUANTITY
+                const vatAmount = (exclusiveAmount * (taxRate / 100));           // VAT = PRICE_EXCLUSIVE * QUANTITY * VAT_RATE
                 
-                totalPriceNetto += priceNetto;
-                totalDiscountSum += discountSum;
-                totalTax += tax;
+                console.log('[' + context + '] Product ' + (index + 1) + ': ' + productName, {
+                    priceNetto: priceNetto,
+                    quantity: quantity,
+                    discountSum: discountSum,
+                    taxRate: taxRate,
+                    productsAmount: productsAmount,
+                    totalDiscountForProduct: totalDiscountForProduct,
+                    priceExclusive: priceExclusive,
+                    exclusiveAmount: exclusiveAmount,
+                    vatAmount: vatAmount,
+                    hasDiscount: discountSum > 0
+                });
+                
+                // Accumulate totals
+                totalProductAmount += productsAmount;           // Sum of (PRICE_NETTO * QUANTITY)
+                totalDiscountSum += totalDiscountForProduct;    // Sum of (DISCOUNT_SUM * QUANTITY) for display
+                totalVat += vatAmount;                          // Sum of VAT calculations
             });
             
-            return {
-                priceNetto: totalPriceNetto,
-                discountSum: totalDiscountSum,
-                tax: totalTax,
-                subtotal: totalPriceNetto - totalDiscountSum, // Tổng cộng = sum of PRICE_NETTO - sum of DISCOUNT_SUM
-                grandTotal: (totalPriceNetto - totalDiscountSum) + totalTax // TỔNG THANH TOÁN = Tổng cộng + TAX
+            // FINAL CALCULATIONS PER YOUR SPECIFICATION:
+            const subtotal = totalProductAmount - totalDiscountSum; // TỔNG CỘNG = sum(PRICE_NETTO * QUANTITY) - sum(DISCOUNT_SUM * QUANTITY)
+                                                                      // This equals sum(PRICE_EXCLUSIVE * QUANTITY) from CRM source
+            const grandTotal = subtotal + totalVat;                 // TỔNG THANH TOÁN = TỔNG CỘNG + VAT
+            
+            const result = {
+                productAmount: totalProductAmount,               // Sum of (PRICE_NETTO * QUANTITY)
+                discountSum: totalDiscountSum,                  // Sum of (DISCOUNT_SUM * QUANTITY) for display
+                vat: totalVat,                                  // Sum of VAT calculations
+                subtotal: subtotal,                             // TỔNG CỘNG = Products - Discount = sum(PRICE_EXCLUSIVE * QUANTITY)
+                grandTotal: grandTotal                          // TỔNG THANH TOÁN = TỔNG CỘNG + VAT
             };
+            
+            console.log('[' + context + '] calculateProductsTotal result:', result);
+            return result;
         };
 
         const updateFinancialSummary = () => {
-            const productsTotal = calculateProductsTotal();
+            const productsTotal = calculateProductsTotal('updateFinancialSummary');
             
             // Get CRM data from data attributes on the body element  
             const entityAmount = parseFloat(document.body.getAttribute('data-entity-amount')) || 0;
@@ -1811,7 +1293,7 @@ function getSYNITYQuotationScript() {
             }
             
             if (taxElement) {
-                const displayTax = productsTotal.tax > 0 ? productsTotal.tax : entityTax;
+                const displayTax = productsTotal.vat > 0 ? productsTotal.vat : entityTax;
                 if (displayTax > 0) {
                     taxElement.textContent = formatCurrency(displayTax) + ' ' + entityCurrency;
                 }
@@ -1823,7 +1305,7 @@ function getSYNITYQuotationScript() {
             updateFinancialSummary();
         }, 100);
 
-        // Generate quotation function
+        // Generate quotation function - CORRECTED CALCULATIONS
         window.generateQuotation = function() {
             console.log('🚀 Starting quotation generation...');
             
@@ -1850,61 +1332,49 @@ function getSYNITYQuotationScript() {
             const total_license_fee_A = bitrix_total_price_vnd + currency_conversion_fee - total_discount_amount;
             const total_implementation_fee_B = implementation_fee;
             
-            // Calculate totals from CRM product sections
-            let crm_license_total = 0;
-            let crm_implementation_total = 0;
-            let crm_discount_total = 0;
-            
-            // Get totals using correct Bitrix24 calculation method
-            const productRowsForTotal = document.querySelectorAll('.synity-products-table tbody tr');
-            productRowsForTotal.forEach(row => {
-                const productName = row.querySelector('.synity-product-name')?.textContent || '';
-                
-                // Use PRICE_NETTO and proper Bitrix24 fields
-                const priceNetto = parseFloat(row.getAttribute('data-price-netto')) || 0;
-                const discountSum = parseFloat(row.getAttribute('data-discount-sum') || '0');
-                const price = parseFloat(row.getAttribute('data-price')) || 0;
-                const taxRate = parseFloat(row.getAttribute('data-tax-rate')) || 0;
-                
-                // Calculate tax: TAX = PRICE + PRICE * TAX_RATE(%)
-                const tax = price + (price * (taxRate / 100));
-                
-                // Classify product and add to appropriate total
-                const isLicense = ['bitrix24', 'license', 'subscription', 'bản quyền', 'phần mềm', 'chuyển đổi ngoại tệ', 'conversion']
-                    .some(keyword => productName.toLowerCase().includes(keyword.toLowerCase()));
-                const isImplementation = ['triển khai', 'implementation', 'đồng hành', 'training', 'hỗ trợ', 'tư vấn', 'setup']
-                    .some(keyword => productName.toLowerCase().includes(keyword.toLowerCase()));
-                
-                if (isLicense || !isImplementation) {
-                    crm_license_total += priceNetto; // Use PRICE_NETTO instead of calculated total
-                } else if (isImplementation) {
-                    crm_implementation_total += priceNetto; // Use PRICE_NETTO instead of calculated total
-                }
-                
-                // Add discount amount
-                crm_discount_total += discountSum;
-            });
+            // Calculate totals from CRM product sections using CORRECTED formulas
+            const productsTotal = calculateProductsTotal('generateQuotation');
+            console.log('📊 Products Total Calculated:', productsTotal);
             
             // Use CRM entity data for financial calculations
             const crm_entity_amount = parseFloat(document.body.getAttribute('data-entity-amount')) || 0;
             const crm_entity_discount = parseFloat(document.body.getAttribute('data-entity-discount')) || 0;
             const crm_entity_tax = parseFloat(document.body.getAttribute('data-entity-tax')) || 0;
             
-            // If CRM data exists, use it directly; otherwise fallback to calculated values
+            console.log('📋 CRM Entity Data:', {
+                amount: crm_entity_amount,
+                discount: crm_entity_discount,
+                tax: crm_entity_tax
+            });
+            
+            // Calculate final totals according to CORRECTED requirements
             let sub_total, vat_amount, grand_total;
             
-            if (crm_entity_amount > 0) {
-                // Use CRM entity financial data
-                sub_total = crm_entity_amount - crm_entity_discount;
-                vat_amount = crm_entity_tax;
-                grand_total = crm_entity_amount + crm_entity_tax;
+            if (productsTotal.subtotal > 0) {
+                console.log('🎯 Using calculateProductsTotal (CORRECTED formulas)');
+                // Use CRM product data with CORRECTED formulas
+                sub_total = productsTotal.subtotal;              // Tổng cộng = sum(PRICE_EXCLUSIVE)
+                vat_amount = productsTotal.vat;                  // VAT = sum(VAT_RATE * PRICE_EXCLUSIVE) for each product
+                grand_total = sub_total + vat_amount;            // Tổng thanh toán = Tổng cộng + VAT
             } else {
-                // Fallback to calculated values from form inputs (Section A only, no Section B)
-                const section_A_total = crm_license_total > 0 ? (crm_license_total - crm_discount_total) : total_license_fee_A;
-                sub_total = section_A_total; // No Section B
+                console.log('🎯 Using Form calculation fallback');
+                // Fallback to calculated values from form inputs
+                const section_A_total = total_license_fee_A;
+                sub_total = section_A_total;
                 vat_amount = sub_total * 0.10;
                 grand_total = sub_total + vat_amount;
             }
+
+            console.log('💰 Final Financial Summary:', {
+                sub_total: sub_total,
+                vat_amount: vat_amount,
+                grand_total: grand_total,
+                formatted: {
+                    sub_total: formatCurrency(sub_total),
+                    vat_amount: formatCurrency(vat_amount),
+                    grand_total: formatCurrency(grand_total)
+                }
+            });
 
             // Generate payment schedule (simplified - 2 payments: license first, then implementation)
             let payment_schedule_table = '';
@@ -1996,7 +1466,7 @@ function getSYNITYQuotationScript() {
             // Section B completely removed - no implementation section
             let implementation_section = '';
 
-            // Classify and generate CRM Products sections
+            // Classify and generate CRM Products sections - CORRECTED DISCOUNT CALCULATION
             let crm_license_section = '';
             let crm_implementation_section = '';
             const productRowsForSection = document.querySelectorAll('.synity-products-table tbody tr');
@@ -2004,7 +1474,7 @@ function getSYNITYQuotationScript() {
             if (productRowsForSection.length > 0) {
                 let licenseProducts = [];
                 let implementationProducts = [];
-                let totalDiscount = 0;
+                let totalDiscount = 0;         // This will be sum of all DISCOUNT_SUM
                 let discountRate = 0;
                 
                 // Helper function to classify products
@@ -2022,22 +1492,25 @@ function getSYNITYQuotationScript() {
                     );
                 };
                 
-                // Classify products into categories
+                // Classify products into categories and calculate CORRECT discount total
                 productRowsForSection.forEach(row => {
                     const productName = row.querySelector('.synity-product-name')?.textContent || 'Unknown Product';
-                    const qty = row.querySelector('.synity-product-qty')?.textContent || '1';
+                    const qty = row.querySelector('.synity-product-quantity')?.textContent || '1';
                     const priceText = row.querySelector('.synity-product-price')?.textContent || '0';
                     
-                    // Use PRICE_NETTO for the total column (THÀNH TIỀN)
+                    // CORRECTED: THÀNH TIỀN sản phẩm = PRICE_NETTO * QUANTITY (không trừ discount)
                     const priceNetto = parseFloat(row.getAttribute('data-price-netto')) || 0;
-                    const totalText = formatCurrency(priceNetto);
+                    const quantity = parseFloat(row.getAttribute('data-quantity')) || 1;
+                    const discountSum = parseFloat(row.getAttribute('data-discount-sum')) || 0;
+                    const totalAmount = priceNetto * quantity;  // THÀNH TIỀN = PRICE_NETTO * QUANTITY
+                    const totalText = formatCurrency(totalAmount);
                     
-                    // Extract discount info from data attributes if available
+                    // Extract discount info from data attributes 
                     const discountRateAttr = row.getAttribute('data-discount-rate');
                     const discountSumAttr = row.getAttribute('data-discount-sum');
                     
                     if (discountRateAttr) discountRate = Math.max(discountRate, parseFloat(discountRateAttr));
-                    if (discountSumAttr) totalDiscount += parseFloat(discountSumAttr);
+                    if (discountSumAttr) totalDiscount += parseFloat(discountSumAttr) * quantity;  // CORRECT: DISCOUNT_SUM * QUANTITY
                     
                     const product = {
                         name: productName,
@@ -2077,11 +1550,11 @@ function getSYNITYQuotationScript() {
                         itemNumber++;
                     });
                     
-                    // Add discount row if available
+                    // Add discount row with CORRECTED amount = sum(DISCOUNT_SUM * QUANTITY)
                     let discountRowHtml = '';
-                    if (totalDiscount > 0 || discountRate > 0) {
+                    if (productsTotal.discountSum > 0 || discountRate > 0) {
                         const discountText = discountRate > 0 ? \`\${discountRate}%\` : '';
-                        const discountAmount = totalDiscount > 0 ? formatCurrency(totalDiscount) : '';
+                        const discountAmount = formatCurrency(productsTotal.discountSum);  // Use productsTotal.discountSum (CORRECTED)
                         
                         discountRowHtml = \`
                             <tr class="border-b" style="border-color: var(--border-subtle);">
@@ -2112,15 +1585,15 @@ function getSYNITYQuotationScript() {
                 // Section B completely removed - no CRM implementation section generated
             }
 
-            // Prepare template data
+            // Prepare template data with CORRECTED calculations
             const templateData = {
                 ...data,
                 bitrix_months: bitrix_months,
                 date_created: formatDate(data.date_created),
                 closed_date: formatDate(data.closed_date),
-                sub_total: formatCurrency(sub_total),
-                vat_amount: formatCurrency(vat_amount),
-                grand_total: formatCurrency(grand_total),
+                sub_total: formatCurrency(sub_total),      // Tổng cộng = sum(PRICE_EXCLUSIVE)
+                vat_amount: formatCurrency(vat_amount),    // VAT = sum(VAT_RATE * PRICE_EXCLUSIVE)
+                grand_total: formatCurrency(grand_total), // Tổng thanh toán = Tổng cộng + VAT
                 payment_schedule_table: payment_schedule_table,
                 discount_info: discount_info
             };
