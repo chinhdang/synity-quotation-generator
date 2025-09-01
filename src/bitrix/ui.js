@@ -232,14 +232,13 @@ function getDirectTemplateGeneratorScript() {
 }
 
 export function getAppUITemplate(crmData = {}) {
-  // Environment detection based on URL - automatically detect dev environment
-  const isDevelopment = typeof window !== 'undefined' && window.location?.hostname?.includes('dev') ||
-                        typeof globalThis !== 'undefined' && globalThis.location?.hostname?.includes('dev') ||
-                        crmData.environment === 'development';
+  // Simple environment detection - just check for development in URL or crmData
+  // This will be evaluated client-side in the browser
+  const environment = 'development'; // Force development for now to debug
   
-  // Safely extract CRM data with fallbacks
+  // Safely extract CRM data with fallbacks  
   const {
-    environment = isDevelopment ? 'development' : 'production',
+    // environment = environment, // Use forced environment
     appName = 'Bitrix24 Quotation Generator',
     responsiblePersonName = 'Chinh Đặng',
     responsiblePersonPhone = '0947100700', 
@@ -271,7 +270,7 @@ export function getAppUITemplate(crmData = {}) {
   
   console.log('🌍 ENVIRONMENT DEBUG:', {
     detected: environment,
-    isDev: isDevelopment,
+    forcedDevelopment: true,
     willShowDevPanel: environment === 'development'
   });
 
@@ -1151,10 +1150,10 @@ export function getAppUITemplate(crmData = {}) {
         
         // Force trigger dev info logging
         const devInfo = {
-            gitCommit: '17d46b8',
-            commitMessage: 'fix: add dev info panel debug logging and auto environment detection',
+            gitCommit: 'd699823',
+            commitMessage: 'fix: force debug logging and update dev info to latest commit',
             branch: 'feature/dev-prod-environments',
-            deployId: '187ea7de-116c-42e2-8bd9-66dc4696a260',
+            deployId: 'f9df0c79-d2c1-40cc-a891-f72d2cc78220',
             timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
         };
         console.log('🔍 DEV INFO FORCED LOG:', devInfo);

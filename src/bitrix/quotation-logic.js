@@ -434,7 +434,7 @@ export function getQuotationLogicScript() {
             for (const key in templateData) {
                 const regex = new RegExp('\\\\$\\\\{' + key + '\\\\}', 'g');
                 finalHtml = finalHtml.replace(regex, templateData[key] || '');
-                console.log('🔄 Replaced ' + key + ': ' + (templateData[key] || 'empty'));
+                // Removed verbose template replacement logging to clean up console
             }
 
             // Replace section placeholders with classified CRM sections
