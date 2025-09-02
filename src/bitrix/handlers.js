@@ -132,8 +132,12 @@ export async function installHandler({ req, env, ctx }) {
     
     try {
       const appUrl = getAppUrl(auth.domain, env, req.url);
+      const isDev = appUrl.includes('-dev.hicomta.workers.dev');
+      const titlePrefix = isDev ? '[DEV] ' : '';
+      
       console.log('App URL for placements:', appUrl);
       console.log('Will bind widgets to:', appUrl);
+      console.log('Title prefix:', titlePrefix);
       
       // Clear existing placements first
       try {
@@ -186,7 +190,7 @@ export async function installHandler({ req, env, ctx }) {
           const result = await client.call('placement.bind', {
             PLACEMENT: placement,
             HANDLER: `${appUrl}/widget/quotation`,
-            TITLE: 'Tạo Báo Giá SYNITY',
+            TITLE: `${titlePrefix}SYNITY Báo Giá`,
             DESCRIPTION: 'Tạo báo giá chuyên nghiệp với SYNITY Quotation Generator'
           });
           console.log(`✅ Bound ${placement}:`, result);
@@ -201,7 +205,7 @@ export async function installHandler({ req, env, ctx }) {
           const result = await client.call('placement.bind', {
             PLACEMENT: placement,
             HANDLER: `${appUrl}/widget/quotation`,
-            TITLE: 'Báo Giá SYNITY',
+            TITLE: `${titlePrefix}SYNITY Báo Giá`,
             DESCRIPTION: 'Tạo báo giá chuyên nghiệp từ thông tin CRM này'
           });
           console.log(`✅ Bound detail tab ${placement}:`, result);
@@ -216,7 +220,7 @@ export async function installHandler({ req, env, ctx }) {
           const result = await client.call('placement.bind', {
             PLACEMENT: placement,
             HANDLER: `${appUrl}/widget/quotation`,
-            TITLE: 'SYNITY Báo Giá',
+            TITLE: `${titlePrefix}SYNITY Báo Giá`,
             DESCRIPTION: 'Tạo báo giá từ thông tin CRM này'
           });
           console.log(`✅ Bound activity ${placement}:`, result);
@@ -574,7 +578,7 @@ export async function widgetQuotationHandler({ req, env, ctx }) {
     // Generate SYNITY quotation interface with pre-filled CRM data
     let synityCRMHtml;
     try {
-      synityCRMHtml = await generateSYNITYCRMInterface(crmData, env);
+      synityCRMHtml = await generateSYNITYCRMInterface(crmData, env, req.url);
       console.log('✅ Generated SYNITY CRM interface successfully');
     } catch (error) {
       console.error('❌ Failed to generate SYNITY CRM interface:', error);
@@ -918,13 +922,25 @@ async function fetchProductRowsLegacy(client, entityType, entityId) {
 }
 
 // Function to generate SYNITY CRM interface
-async function generateSYNITYCRMInterface(crmData, env) {
+async function generateSYNITYCRMInterface(crmData, env, requestUrl) {
+  // Detect environment from multiple sources
+  const isDevEnv = env?.APP_ENV === 'development';
+  const isDevUrl = requestUrl && requestUrl.includes('-dev.hicomta.workers.dev');
+  const environment = (isDevEnv || isDevUrl) ? 'development' : 'production';
+  
   // Add environment info to crmData
   const dataWithEnv = {
     ...crmData,
-    environment: env?.APP_ENV || 'production',
+    environment: environment,
     appName: env?.APP_NAME || 'Bitrix24 Quotation Generator'
   };
+  
+  console.log('🌍 Environment for template:', {
+    isDevEnv,
+    isDevUrl,
+    finalEnvironment: environment
+  });
+  
   return getSYNITYCRMTemplate(dataWithEnv);
 }
 
