@@ -21,9 +21,13 @@ function analyzeBitrixProducts(bitrixProducts) {
 }
 
 export function getAppUITemplate(crmData = {}) {
+  // Environment detection - check for dev worker URL or explicit dev environment
+  const isDevEnvironment = crmData.environment === 'development' || 
+                           (typeof globalThis !== 'undefined' && globalThis.APP_ENV === 'development');
+  
   // Safely extract CRM data with fallbacks
   const {
-    environment = 'production',
+    environment = isDevEnvironment ? 'development' : 'production',
     appName = 'Bitrix24 Quotation Generator',
     responsiblePersonName = 'Chinh Đặng',
     responsiblePersonPhone = '0947100700', 
@@ -508,6 +512,121 @@ export function getAppUITemplate(crmData = {}) {
             outline: 2px solid var(--primary-500);
             outline-offset: 2px;
         }
+
+        /* Development Environment Info Panel - Only for Dev */
+        .dev-info-panel {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            font-size: 0.8rem;
+            box-shadow: var(--elevation-2);
+        }
+
+        .dev-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid #475569;
+        }
+
+        .dev-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dev-pulse {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dev-info-toggle {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: var(--space-xs);
+            border-radius: var(--radius-sm);
+            transition: color 0.2s ease;
+        }
+
+        .dev-info-toggle:hover {
+            color: #e2e8f0;
+        }
+
+        .dev-info-content {
+            padding: var(--space-md);
+            display: none;
+        }
+
+        .dev-info-content.expanded {
+            display: block;
+        }
+
+        .dev-info-item {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: var(--space-sm);
+            align-items: start;
+            margin-bottom: var(--space-sm);
+        }
+
+        .dev-info-label {
+            color: #64748b;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dev-info-value {
+            color: #e2e8f0;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .dev-commit-hash {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.7rem;
+            margin-right: var(--space-xs);
+        }
+
+        .dev-branch {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+        }
+
+        .dev-env-badge {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
     </style>
 </head>
 
@@ -515,10 +634,44 @@ export function getAppUITemplate(crmData = {}) {
     <div class="synity-app">
         <!-- Unified Sidebar - Single Cohesive Experience -->
         <aside class="synity-sidebar">
-            <!-- Development Environment Badge -->
+            <!-- Development Environment Info Panel -->
             ${environment === 'development' ? `
-            <div style="background: #ff6b35; color: white; padding: 8px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 1000; border-radius: 0;">
-                ⚠️ DEV ENVIRONMENT - Testing Only
+            <div class="dev-info-panel">
+                <div class="dev-info-header">
+                    <div class="dev-status-indicator">
+                        <div class="dev-pulse"></div>
+                        Development
+                    </div>
+                    <button class="dev-info-toggle" onclick="toggleDevInfo()">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="dev-info-content" id="dev-info-content">
+                    <div class="dev-info-item">
+                        <div class="dev-info-label">Git Commit</div>
+                        <div class="dev-info-value">
+                            <span class="dev-commit-hash">29060cc</span>
+                            <span class="dev-commit-msg">standardize widget titles</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dev-info-item">
+                        <div class="dev-info-label">Branch</div>
+                        <div class="dev-info-value dev-branch">feature/dev-prod-environments</div>
+                    </div>
+                    
+                    <div class="dev-info-item">
+                        <div class="dev-info-label">Deploy ID</div>
+                        <div class="dev-info-value dev-deploy-id">63073132-3c98</div>
+                    </div>
+                    
+                    <div class="dev-info-item">
+                        <div class="dev-info-label">Environment</div>
+                        <div class="dev-info-value">
+                            <span class="dev-env-badge">DEVELOPMENT</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             ` : ''}
             
@@ -641,6 +794,20 @@ export function getAppUITemplate(crmData = {}) {
     </template>
 
     <script>
+        // Development info panel toggle function
+        function toggleDevInfo() {
+            const content = document.getElementById('dev-info-content');
+            const button = document.querySelector('.dev-info-toggle');
+            const isExpanded = content.classList.contains('expanded');
+            
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                button.innerHTML = '<i class="bi bi-chevron-down"></i>';
+            } else {
+                content.classList.add('expanded');
+                button.innerHTML = '<i class="bi bi-chevron-up"></i>';
+            }
+        }
 
         // Initialize with Unified Design System
         BX24.init(function() {
