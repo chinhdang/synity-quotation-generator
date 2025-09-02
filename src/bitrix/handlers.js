@@ -1184,29 +1184,48 @@ export async function uninstallHandler({ req, env, ctx }) {
     // Clear placements if client is available
     if (client) {
       try {
-        console.log('Clearing all placement bindings...');
-        await client.call('placement.unbind');
+        console.log('🧹 Clearing all placement bindings...');
+        console.log('📍 Client auth info:', { domain: client.auth?.domain, hasToken: !!client.auth?.access_token });
+        
+        const placementResult = await client.call('placement.unbind');
+        console.log('📍 Placement.unbind result:', placementResult);
+        
         placementsCleared = true;
         uninstallStatus = 'Placements cleared';
         console.log('✅ All placements unbound successfully');
       } catch (error) {
         console.error('❌ Failed to clear placements:', error);
+        console.error('❌ Placement error details:', error.stack || error);
         uninstallStatus = `Failed to clear placements: ${error.message}`;
       }
 
       // Clear KV storage
       try {
-        console.log('Clearing KV storage...');
+        console.log('🗂️ Clearing KV storage...');
         const authDomain = client.auth?.domain || domain;
+        console.log('🔑 Storage domain:', authDomain);
+        
         if (authDomain) {
-          await env.BITRIX_KV.delete(`auth_${authDomain}`);
-          await env.BITRIX_KV.delete(`settings_${authDomain}`);
+          const authKey = `auth_${authDomain}`;
+          const settingsKey = `settings_${authDomain}`;
+          
+          console.log('🗑️ Deleting keys:', { authKey, settingsKey });
+          
+          await env.BITRIX_KV.delete(authKey);
+          await env.BITRIX_KV.delete(settingsKey);
+          
           storageCleared = true;
-          console.log('✅ KV storage cleared');
+          console.log('✅ KV storage cleared successfully');
+        } else {
+          console.log('⚠️ No domain found for KV storage cleanup');
         }
       } catch (error) {
         console.error('❌ Failed to clear KV storage:', error);
+        console.error('❌ Storage error details:', error.stack || error);
       }
+    } else {
+      console.log('❌ No client available for uninstall operations');
+      uninstallStatus = 'No authentication - cannot clear placements';
     }
 
     // Detect environment
