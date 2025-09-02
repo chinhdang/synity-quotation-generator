@@ -592,13 +592,29 @@ export function getB24UITemplate() {
             console.log('🔧 Checking widget placements...');
             
             if (typeof BX24 !== 'undefined') {
-                BX24.getAuth(function(auth) {
-                    // Open debug page with auth
-                    const debugUrl = '/debug/placements?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
-                    window.open(debugUrl, '_blank');
-                });
+                console.log('🔑 BX24 SDK available, getting auth for placements...');
+                
+                // Set timeout for BX24.getAuth
+                let authTimeout = setTimeout(() => {
+                    console.log('⏰ BX24.getAuth timeout, opening without auth');
+                    window.open('/debug/placements', '_blank');
+                }, 2000); // 2 second timeout
+                
+                try {
+                    BX24.getAuth(function(auth) {
+                        clearTimeout(authTimeout);
+                        console.log('🔐 Auth received for placements');
+                        const debugUrl = '/debug/placements?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                        console.log('🔗 Opening:', debugUrl);
+                        window.open(debugUrl, '_blank');
+                    });
+                } catch (error) {
+                    clearTimeout(authTimeout);
+                    console.error('❌ BX24.getAuth failed:', error);
+                    window.open('/debug/placements', '_blank');
+                }
             } else {
-                // Fallback - open without auth
+                console.log('⚠️ BX24 SDK not available, opening without auth');
                 window.open('/debug/placements', '_blank');
             }
         }
@@ -608,13 +624,29 @@ export function getB24UITemplate() {
             console.log('📋 Opening widget list...');
             
             if (typeof BX24 !== 'undefined') {
-                BX24.getAuth(function(auth) {
-                    // Open widget list page with auth
-                    const widgetListUrl = '/debug/widget-list?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
-                    window.open(widgetListUrl, '_blank');
-                });
+                console.log('🔑 BX24 SDK available, getting auth for widget list...');
+                
+                // Set timeout for BX24.getAuth
+                let authTimeout = setTimeout(() => {
+                    console.log('⏰ BX24.getAuth timeout, opening without auth');
+                    window.open('/debug/widget-list', '_blank');
+                }, 2000); // 2 second timeout
+                
+                try {
+                    BX24.getAuth(function(auth) {
+                        clearTimeout(authTimeout);
+                        console.log('🔐 Auth received for widget list');
+                        const widgetListUrl = '/debug/widget-list?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                        console.log('🔗 Opening:', widgetListUrl);
+                        window.open(widgetListUrl, '_blank');
+                    });
+                } catch (error) {
+                    clearTimeout(authTimeout);
+                    console.error('❌ BX24.getAuth failed:', error);
+                    window.open('/debug/widget-list', '_blank');
+                }
             } else {
-                // Fallback - open without auth
+                console.log('⚠️ BX24 SDK not available, opening without auth');
                 window.open('/debug/widget-list', '_blank');
             }
         }
