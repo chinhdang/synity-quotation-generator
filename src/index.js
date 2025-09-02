@@ -80,7 +80,7 @@ export default {
         }
 
         // 2.7. Handle App Uninstallation
-        if (url.pathname === '/uninstall' && request.method === 'POST') {
+        if (url.pathname === '/uninstall') {
             return uninstallHandler({ req: request, env, ctx });
         }
 
