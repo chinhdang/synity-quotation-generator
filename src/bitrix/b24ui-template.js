@@ -527,6 +527,10 @@ export function getB24UITemplate() {
                         <i class="bi bi-bug"></i>
                         Check Widget Placements
                     </button>
+                    <button id="btnWidgetList" class="b24-btn b24-btn--warning" type="button" onclick="showWidgetList()">
+                        <i class="bi bi-list-ul"></i>
+                        Widget List
+                    </button>
                     <button id="btnUninstall" class="b24-btn b24-btn--danger" type="button" onclick="uninstallApp()">
                         <i class="bi bi-trash"></i>
                         Uninstall App
@@ -596,6 +600,22 @@ export function getB24UITemplate() {
             } else {
                 // Fallback - open without auth
                 window.open('/debug/placements', '_blank');
+            }
+        }
+        
+        // Function to show widget list
+        function showWidgetList() {
+            console.log('📋 Opening widget list...');
+            
+            if (typeof BX24 !== 'undefined') {
+                BX24.getAuth(function(auth) {
+                    // Open widget list page with auth
+                    const widgetListUrl = '/debug/widget-list?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                    window.open(widgetListUrl, '_blank');
+                });
+            } else {
+                // Fallback - open without auth
+                window.open('/debug/widget-list', '_blank');
             }
         }
         

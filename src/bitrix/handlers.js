@@ -1133,6 +1133,260 @@ export async function debugPlacementsHandler({ req, env, ctx }) {
 }
 
 /**
+ * Lists all widget placements created by the app
+ * @param {object} context - An object containing { req, env, ctx }
+ */
+export async function widgetListHandler({ req, env, ctx }) {
+  try {
+    console.log('='.repeat(50));
+    console.log('WIDGET LIST REQUEST');
+    console.log('='.repeat(50));
+
+    const url = new URL(req.url);
+    const authId = url.searchParams.get('AUTH_ID');
+    const domain = url.searchParams.get('DOMAIN');
+
+    // Get auth from stored settings or URL params
+    let client = null;
+    let authStatus = 'No authentication';
+
+    if (authId && domain) {
+      try {
+        const auth = {
+          access_token: authId,
+          domain: domain,
+          client_endpoint: `https://${domain}/rest/`
+        };
+        client = new Bitrix24Client(auth, env);
+        authStatus = `✅ Authenticated with domain: ${domain}`;
+        console.log('Using provided auth from URL params');
+      } catch (error) {
+        console.error('Failed to create client with URL auth:', error);
+        authStatus = `⚠️ Failed to use URL auth: ${error.message}`;
+      }
+    } else {
+      try {
+        client = await Bitrix24Client.createFromStoredSettings(env);
+        authStatus = '✅ Using stored authentication';
+        console.log('Using stored auth settings');
+      } catch (error) {
+        console.error('No valid auth available:', error);
+        authStatus = `❌ No authentication available. ${error.message}`;
+      }
+    }
+
+    let widgetData = {
+      availablePlacements: [],
+      boundPlacements: [],
+      error: null
+    };
+
+    if (client) {
+      try {
+        // Get available placements (placement.list)
+        console.log('📋 Getting available placements...');
+        const availableResult = await client.call('placement.list');
+        widgetData.availablePlacements = availableResult.result || [];
+        console.log(`✅ Found ${widgetData.availablePlacements.length} available placements`);
+
+        // Get bound placements (placement.get)
+        console.log('🔗 Getting bound placements...');
+        const boundResult = await client.call('placement.get');
+        widgetData.boundPlacements = boundResult.result || [];
+        console.log(`✅ Found ${widgetData.boundPlacements.length} bound placements`);
+
+      } catch (error) {
+        console.error('❌ Failed to get widget data:', error);
+        widgetData.error = error.message;
+      }
+    }
+
+    // Detect environment
+    const isDevEnv = env?.APP_ENV === 'development';
+    const isDevUrl = req.url && req.url.includes('-dev.hicomta.workers.dev');
+    const isDev = isDevEnv || isDevUrl;
+    const envName = isDev ? 'Development' : 'Production';
+    const envIcon = isDev ? '🚧' : '🚀';
+
+    // Generate widget list HTML
+    const widgetHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Widget List - ${envName} - SYNITY</title>
+        <script src="//api.bitrix24.com/api/v1/"></script>
+        <style>
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+          }
+          .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+          }
+          .env-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: ${isDev ? '#FEF3C7' : '#DBEAFE'};
+            color: ${isDev ? '#D97706' : '#1D4ED8'};
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+          }
+          .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 500;
+          }
+          .status-success {
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #10B981;
+          }
+          .status-error {
+            background: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #EF4444;
+          }
+          .widget-section {
+            margin: 30px 0;
+          }
+          .widget-section h2 {
+            color: #374151;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 10px;
+          }
+          .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+          }
+          .widget-item {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+          }
+          .widget-item.bound {
+            background: #ECFDF5;
+            border-color: #10B981;
+          }
+          .widget-meta {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #6B7280;
+            font-family: system-ui;
+          }
+          .count {
+            font-weight: 600;
+            color: #059669;
+          }
+          button {
+            background: #6366F1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 10px 5px;
+          }
+          button:hover {
+            background: #4F46E5;
+          }
+          .btn-refresh {
+            background: #059669;
+          }
+          .btn-refresh:hover {
+            background: #047857;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>${envIcon} Widget Placements</h1>
+          <div class="env-badge">${envName} Environment</div>
+          
+          <div class="status ${client ? 'status-success' : 'status-error'}">
+            ${authStatus}
+          </div>
+
+          ${widgetData.error ? `
+          <div class="status status-error">
+            ❌ Error: ${widgetData.error}
+          </div>
+          ` : ''}
+
+          <div class="widget-section">
+            <h2>📋 Available Placements <span class="count">(${widgetData.availablePlacements.length})</span></h2>
+            <div class="widget-grid">
+              ${widgetData.availablePlacements.map(placement => `
+                <div class="widget-item">
+                  ${placement}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="widget-section">
+            <h2>🔗 Bound Placements <span class="count">(${widgetData.boundPlacements.length})</span></h2>
+            ${widgetData.boundPlacements.length > 0 ? `
+            <div class="widget-grid">
+              ${widgetData.boundPlacements.map(binding => `
+                <div class="widget-item bound">
+                  <strong>${binding.PLACEMENT || 'Unknown'}</strong>
+                  ${binding.TITLE ? `<div class="widget-meta">Title: ${binding.TITLE}</div>` : ''}
+                  ${binding.HANDLER ? `<div class="widget-meta">Handler: ${binding.HANDLER}</div>` : ''}
+                </div>
+              `).join('')}
+            </div>
+            ` : '<p>No widgets currently bound to this app.</p>'}
+          </div>
+
+          <button onclick="window.location.reload()" class="btn-refresh">🔄 Refresh</button>
+          <button onclick="window.close()">Close</button>
+        </div>
+      </body>
+      </html>
+    `;
+
+    console.log('='.repeat(50));
+    console.log('WIDGET LIST COMPLETED');
+    console.log(`Available placements: ${widgetData.availablePlacements.length}`);
+    console.log(`Bound placements: ${widgetData.boundPlacements.length}`);
+    console.log('='.repeat(50));
+
+    return new Response(widgetHtml, {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+  } catch (error) {
+    console.error('Widget list handler failed:', error);
+    return new Response(`Widget list failed: ${error.message}`, { status: 500 });
+  }
+}
+
+/**
  * Handles app uninstallation requests
  * @param {object} context - An object containing { req, env, ctx }
  */

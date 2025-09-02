@@ -10,7 +10,7 @@
 
 // Cloudflare Worker cho Bitrix24 App
 
-import { installHandler, indexHandler, widgetQuotationHandler, debugPlacementsHandler, uninstallHandler } from './bitrix/handlers.js';
+import { installHandler, indexHandler, widgetQuotationHandler, debugPlacementsHandler, uninstallHandler, widgetListHandler } from './bitrix/handlers.js';
 import { healthCheck, quickHealthCheck } from './bitrix/health.js';
 
 export default {
@@ -87,6 +87,11 @@ export default {
         // 2.8. Debug Placements Endpoint
         if (url.pathname === '/debug/placements' && request.method === 'GET') {
             return debugPlacementsHandler({ req: request, env, ctx });
+        }
+
+        // 2.9. Widget List Endpoint
+        if (url.pathname === '/debug/widget-list' && request.method === 'GET') {
+            return widgetListHandler({ req: request, env, ctx });
         }
 
         // 3. Handle API Routes
