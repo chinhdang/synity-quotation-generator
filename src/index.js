@@ -10,7 +10,7 @@
 
 // Cloudflare Worker cho Bitrix24 App
 
-import { installHandler, indexHandler, widgetQuotationHandler, debugPlacementsHandler } from './bitrix/handlers.js';
+import { installHandler, indexHandler, widgetQuotationHandler, debugPlacementsHandler, uninstallHandler } from './bitrix/handlers.js';
 import { healthCheck, quickHealthCheck } from './bitrix/health.js';
 
 export default {
@@ -79,7 +79,12 @@ export default {
             return indexHandler({ req: request, env, ctx });
         }
 
-        // 2.7. Debug Placements Endpoint
+        // 2.7. Handle App Uninstallation
+        if (url.pathname === '/uninstall' && request.method === 'POST') {
+            return uninstallHandler({ req: request, env, ctx });
+        }
+
+        // 2.8. Debug Placements Endpoint
         if (url.pathname === '/debug/placements' && request.method === 'GET') {
             return debugPlacementsHandler({ req: request, env, ctx });
         }

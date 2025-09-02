@@ -221,6 +221,30 @@ export function getB24UITemplate() {
             box-shadow: 0 0 0 3px rgba(32, 102, 176, 0.2);
         }
         
+        .b24-btn--warning {
+            background: var(--b24-color-warning);
+            color: #ffffff;
+            box-shadow: var(--b24-shadow-sm);
+        }
+        
+        .b24-btn--warning:hover {
+            background: #e09900;
+            box-shadow: var(--b24-shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        .b24-btn--danger {
+            background: var(--b24-color-error);
+            color: #ffffff;
+            box-shadow: var(--b24-shadow-sm);
+        }
+        
+        .b24-btn--danger:hover {
+            background: #e04542;
+            box-shadow: var(--b24-shadow-md);
+            transform: translateY(-1px);
+        }
+        
         .b24-btn i {
             font-size: var(--b24-font-size-lg);
         }
@@ -315,6 +339,57 @@ export function getB24UITemplate() {
         
         .b24-user-info__value {
             color: var(--b24-color-text-secondary);
+        }
+        
+        /* Dev Info Panel */
+        .b24-dev-info {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .b24-dev-info__grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--b24-space-lg);
+        }
+        
+        .b24-dev-info__item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--b24-space-sm) var(--b24-space-md);
+            background: var(--b24-color-bg-soft);
+            border: 1px solid var(--b24-color-border-light);
+            border-radius: var(--b24-radius-md);
+            font-size: var(--b24-font-size-sm);
+        }
+        
+        .b24-dev-info__label {
+            font-weight: 600;
+            color: var(--b24-color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--b24-space-xs);
+        }
+        
+        .b24-dev-info__value {
+            color: var(--b24-color-text-secondary);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: var(--b24-font-size-xs);
+            background: var(--b24-color-bg-primary);
+            padding: var(--b24-space-xs) var(--b24-space-sm);
+            border-radius: var(--b24-radius-sm);
+            border: 1px solid var(--b24-color-border);
+        }
+        
+        .b24-dev-info__badge {
+            display: inline-block;
+            padding: var(--b24-space-xs) var(--b24-space-sm);
+            background: var(--b24-color-warning-bg);
+            color: var(--b24-color-warning);
+            border-radius: var(--b24-radius-md);
+            font-size: var(--b24-font-size-xs);
+            font-weight: 600;
+            border: 1px solid rgba(255, 169, 0, 0.3);
         }
         
         /* Responsive Design */
@@ -452,6 +527,10 @@ export function getB24UITemplate() {
                         <i class="bi bi-bug"></i>
                         Check Widget Placements
                     </button>
+                    <button id="btnUninstall" class="b24-btn b24-btn--danger" type="button" onclick="uninstallApp()">
+                        <i class="bi bi-trash"></i>
+                        Uninstall App
+                    </button>
                 </div>
             </aside>
 
@@ -467,6 +546,23 @@ export function getB24UITemplate() {
                     </div>
                     <div class="b24-card__content">
                         <div id="output" class="b24-console"></div>
+                    </div>
+                </div>
+
+                <!-- Dev Panel Info (Development Only) -->
+                <div id="devInfoSection" class="b24-dev-info" style="display: none;">
+                    <div class="b24-card">
+                        <div class="b24-card__header">
+                            <h3 class="b24-card__title">
+                                <i class="bi bi-code-slash"></i>
+                                Development Environment
+                            </h3>
+                        </div>
+                        <div class="b24-card__content">
+                            <div id="devInfoContent" class="b24-dev-info__grid">
+                                <!-- Dev info will be populated dynamically -->
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -503,6 +599,24 @@ export function getB24UITemplate() {
             }
         }
         
+        // Function to uninstall app
+        function uninstallApp() {
+            console.log('🗑️ Starting app uninstall...');
+            
+            if (confirm('⚠️ Are you sure you want to uninstall this app?\\n\\nThis will:\\n• Remove all widget placements\\n• Clear app data\\n• Cannot be undone\\n\\nContinue with uninstall?')) {
+                if (typeof BX24 !== 'undefined') {
+                    BX24.getAuth(function(auth) {
+                        // Open uninstall page with auth
+                        const uninstallUrl = '/uninstall?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                        window.location.href = uninstallUrl;
+                    });
+                } else {
+                    // Fallback - open without auth
+                    window.location.href = '/uninstall';
+                }
+            }
+        }
+        
         // Enhanced UI Controller
         class B24UIController {
             constructor() {
@@ -510,6 +624,8 @@ export function getB24UITemplate() {
                 this.status = document.getElementById('status');
                 this.userSection = document.getElementById('userInfoSection');
                 this.userContent = document.getElementById('userInfoContent');
+                this.devInfoSection = document.getElementById('devInfoSection');
+                this.devInfoContent = document.getElementById('devInfoContent');
                 this.loadingButtons = new Set();
                 this.init();
             }
@@ -521,6 +637,9 @@ export function getB24UITemplate() {
                     document.querySelector('.b24-app').style.transition = 'opacity 0.5s ease';
                     document.querySelector('.b24-app').style.opacity = '1';
                 }, 100);
+                
+                // Show dev info panel if in development environment
+                this.checkAndShowDevInfo();
             }
             
             updateStatus(text, type = 'success') {
@@ -600,6 +719,93 @@ export function getB24UITemplate() {
                 
                 this.userSection.style.display = 'block';
                 this.userSection.classList.add('animate-fade-in');
+            }
+            
+            checkAndShowDevInfo() {
+                // Detect if running in development environment
+                const currentUrl = window.location.href;
+                const isDev = currentUrl.includes('dev-') || 
+                             currentUrl.includes('.dev.') || 
+                             currentUrl.includes('development') ||
+                             currentUrl.includes('localhost') ||
+                             currentUrl.includes('127.0.0.1') ||
+                             window.location.hostname.includes('dev');
+                
+                if (isDev) {
+                    this.showDevInfo();
+                }
+            }
+            
+            showDevInfo() {
+                // Get development environment information
+                const devInfo = this.getDevEnvironmentInfo();
+                
+                const devItems = [
+                    { 
+                        icon: 'bi bi-git', 
+                        label: 'Git Version', 
+                        value: devInfo.gitVersion || 'Unknown'
+                    },
+                    { 
+                        icon: 'bi bi-cloud-arrow-up', 
+                        label: 'Deploy ID', 
+                        value: devInfo.deployId || 'N/A'
+                    },
+                    { 
+                        icon: 'bi bi-info-circle', 
+                        label: 'Description', 
+                        value: devInfo.description || 'Development Build'
+                    },
+                    { 
+                        icon: 'bi bi-globe', 
+                        label: 'Environment', 
+                        value: \`<span class="b24-dev-info__badge">🚧 DEVELOPMENT</span>\`
+                    },
+                    { 
+                        icon: 'bi bi-clock', 
+                        label: 'Build Time', 
+                        value: devInfo.buildTime || new Date().toISOString()
+                    },
+                    { 
+                        icon: 'bi bi-server', 
+                        label: 'Worker Host', 
+                        value: window.location.hostname
+                    }
+                ];
+                
+                this.devInfoContent.innerHTML = devItems.map(item => \`
+                    <div class="b24-dev-info__item">
+                        <div class="b24-dev-info__label">
+                            <i class="\${item.icon}"></i>
+                            \${item.label}
+                        </div>
+                        <div class="b24-dev-info__value">\${item.value}</div>
+                    </div>
+                \`).join('');
+                
+                this.devInfoSection.style.display = 'block';
+                this.devInfoSection.classList.add('animate-fade-in');
+                
+                this.log('🚧 Development environment detected - Dev panel activated', 'info');
+            }
+            
+            getDevEnvironmentInfo() {
+                // Try to extract development info from various sources
+                const urlParams = new URLSearchParams(window.location.search);
+                const hostname = window.location.hostname;
+                
+                return {
+                    gitVersion: urlParams.get('version') || 
+                               sessionStorage.getItem('git-version') || 
+                               'feature/dev-prod-environments',
+                    deployId: urlParams.get('deploy-id') || 
+                             sessionStorage.getItem('deploy-id') || 
+                             \`dev-\${Date.now().toString(36)}\`,
+                    description: urlParams.get('description') || 
+                                'Enhanced Bitrix24 CRM Integration with Dev/Prod Environments',
+                    buildTime: new Date().toISOString(),
+                    environment: hostname.includes('dev') ? 'Development' : 'Local Development'
+                };
             }
             
             async executeWithLoading(buttonId, asyncFunc, actionName) {

@@ -133,7 +133,7 @@ export async function installHandler({ req, env, ctx }) {
     try {
       const appUrl = getAppUrl(auth.domain, env, req.url);
       const isDev = appUrl.includes('-dev.hicomta.workers.dev');
-      const titlePrefix = isDev ? '[DEV] ' : '';
+      const titlePrefix = isDev ? '🚧 [DEV] ' : '';
       
       console.log('App URL for placements:', appUrl);
       console.log('Will bind widgets to:', appUrl);
@@ -1129,5 +1129,286 @@ export async function debugPlacementsHandler({ req, env, ctx }) {
   } catch (error) {
     console.error('Debug placements handler failed:', error);
     return new Response(`Debug failed: ${error.message}`, { status: 500 });
+  }
+}
+
+/**
+ * Handles app uninstallation requests
+ * @param {object} context - An object containing { req, env, ctx }
+ */
+export async function uninstallHandler({ req, env, ctx }) {
+  try {
+    console.log('='.repeat(50));
+    console.log('APP UNINSTALL REQUEST');
+    console.log('='.repeat(50));
+
+    const url = new URL(req.url);
+    const authId = url.searchParams.get('AUTH_ID');
+    const domain = url.searchParams.get('DOMAIN');
+
+    // Get auth from stored settings if not provided
+    let client = null;
+    let authStatus = 'No authentication';
+
+    if (authId && domain) {
+      // Use provided auth
+      try {
+        const auth = {
+          access_token: authId,
+          domain: domain,
+          client_endpoint: `https://${domain}/rest/`
+        };
+        client = new Bitrix24Client(auth, env);
+        authStatus = `✅ Authenticated with domain: ${domain}`;
+        console.log('Using provided auth from URL params');
+      } catch (error) {
+        console.error('Failed to create client with URL auth:', error);
+        authStatus = `⚠️ Failed to use URL auth: ${error.message}`;
+      }
+    } else {
+      // Try stored settings
+      try {
+        client = await Bitrix24Client.createFromStoredSettings(env);
+        authStatus = '✅ Using stored authentication';
+        console.log('Using stored auth settings');
+      } catch (error) {
+        console.error('No valid auth available:', error);
+        authStatus = `❌ No authentication available. ${error.message}`;
+      }
+    }
+
+    let uninstallStatus = 'Not started';
+    let placementsCleared = false;
+    let storageCleared = false;
+
+    // Clear placements if client is available
+    if (client) {
+      try {
+        console.log('Clearing all placement bindings...');
+        await client.call('placement.unbind');
+        placementsCleared = true;
+        uninstallStatus = 'Placements cleared';
+        console.log('✅ All placements unbound successfully');
+      } catch (error) {
+        console.error('❌ Failed to clear placements:', error);
+        uninstallStatus = `Failed to clear placements: ${error.message}`;
+      }
+
+      // Clear KV storage
+      try {
+        console.log('Clearing KV storage...');
+        const authDomain = client.auth?.domain || domain;
+        if (authDomain) {
+          await env.BITRIX_KV.delete(`auth_${authDomain}`);
+          await env.BITRIX_KV.delete(`settings_${authDomain}`);
+          storageCleared = true;
+          console.log('✅ KV storage cleared');
+        }
+      } catch (error) {
+        console.error('❌ Failed to clear KV storage:', error);
+      }
+    }
+
+    // Detect environment
+    const isDevEnv = env?.APP_ENV === 'development';
+    const isDevUrl = req.url && req.url.includes('-dev.hicomta.workers.dev');
+    const isDev = isDevEnv || isDevUrl;
+    const envName = isDev ? 'Development' : 'Production';
+    const envIcon = isDev ? '🚧' : '🚀';
+
+    // Generate uninstall confirmation HTML
+    const uninstallHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>App Uninstalled - SYNITY</title>
+        <script src="//api.bitrix24.com/api/v1/"></script>
+        <style>
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+          }
+          .status-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+          }
+          h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+          }
+          .env-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: ${isDev ? '#FEF3C7' : '#DBEAFE'};
+            color: ${isDev ? '#D97706' : '#1D4ED8'};
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+          }
+          .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+          }
+          .status-success {
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #10B981;
+          }
+          .status-error {
+            background: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #EF4444;
+          }
+          .status-warning {
+            background: #FFFBEB;
+            color: #92400E;
+            border: 1px solid #F59E0B;
+          }
+          .details {
+            text-align: left;
+            margin: 20px 0;
+            padding: 15px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            font-size: 14px;
+          }
+          .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 4px 0;
+            border-bottom: 1px solid #E5E7EB;
+          }
+          button {
+            background: #6366F1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+          }
+          button:hover {
+            background: #4F46E5;
+            transform: translateY(-2px);
+          }
+          .btn-secondary {
+            background: #6B7280;
+          }
+          .btn-secondary:hover {
+            background: #4B5563;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="status-icon">${placementsCleared && storageCleared ? '✅' : '❌'}</div>
+          <h1>${envIcon} App Uninstalled</h1>
+          <div class="env-badge">${envName} Environment</div>
+          
+          <div class="status ${placementsCleared && storageCleared ? 'status-success' : 
+                            placementsCleared || storageCleared ? 'status-warning' : 'status-error'}">
+            ${placementsCleared && storageCleared ? 
+              '✅ App successfully uninstalled from Bitrix24' :
+              placementsCleared || storageCleared ?
+              '⚠️ App partially uninstalled' :
+              '❌ Uninstall failed'}
+          </div>
+
+          <div class="details">
+            <div class="detail-item">
+              <span>Authentication</span>
+              <span>${client ? '✅ Connected' : '❌ Failed'}</span>
+            </div>
+            <div class="detail-item">
+              <span>Widget Placements</span>
+              <span>${placementsCleared ? '✅ Cleared' : '❌ Not cleared'}</span>
+            </div>
+            <div class="detail-item">
+              <span>App Data</span>
+              <span>${storageCleared ? '✅ Cleared' : '❌ Not cleared'}</span>
+            </div>
+            <div class="detail-item">
+              <span>Environment</span>
+              <span>${envName}</span>
+            </div>
+          </div>
+
+          <p style="color: #6B7280; font-size: 14px;">
+            ${placementsCleared && storageCleared ? 
+              'The app has been completely removed from your Bitrix24. You can safely close this window.' :
+              'Some uninstall steps may have failed. You may need to manually remove the app from Bitrix24 settings.'}
+          </p>
+
+          <button onclick="closeWindow()">Close Window</button>
+          ${!placementsCleared || !storageCleared ? 
+            '<button class="btn-secondary" onclick="retryUninstall()">Retry Uninstall</button>' : ''}
+        </div>
+
+        <script>
+          function closeWindow() {
+            if (typeof BX24 !== 'undefined') {
+              BX24.init(function(){
+                console.log('Closing app window...');
+                window.close();
+              });
+            } else {
+              window.close();
+            }
+          }
+
+          function retryUninstall() {
+            window.location.reload();
+          }
+
+          // Auto-close after 5 seconds if successful
+          ${placementsCleared && storageCleared ? `
+          setTimeout(function() {
+            closeWindow();
+          }, 5000);
+          ` : ''}
+        </script>
+      </body>
+      </html>
+    `;
+
+    console.log('='.repeat(50));
+    console.log('UNINSTALL COMPLETED');
+    console.log('Placements cleared:', placementsCleared);
+    console.log('Storage cleared:', storageCleared);
+    console.log('='.repeat(50));
+
+    return new Response(uninstallHtml, {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+  } catch (error) {
+    console.error('Uninstall handler failed:', error);
+    return new Response(`Uninstall failed: ${error.message}`, { status: 500 });
   }
 }

@@ -648,10 +648,10 @@ export function getAppUITemplate(crmData = {}) {
                 </div>
                 <div class="dev-info-content" id="dev-info-content">
                     <div class="dev-info-item">
-                        <div class="dev-info-label">Git Commit</div>
+                        <div class="dev-info-label">Version</div>
                         <div class="dev-info-value">
-                            <span class="dev-commit-hash">29060cc</span>
-                            <span class="dev-commit-msg">standardize widget titles</span>
+                            <span class="dev-commit-hash">v2.1.3</span>
+                            <span class="dev-commit-msg">🚧 Add DEV emoji prefix to widget titles</span>
                         </div>
                     </div>
                     
@@ -661,8 +661,15 @@ export function getAppUITemplate(crmData = {}) {
                     </div>
                     
                     <div class="dev-info-item">
-                        <div class="dev-info-label">Deploy ID</div>
-                        <div class="dev-info-value dev-deploy-id">63073132-3c98</div>
+                        <div class="dev-info-label">Last Update</div>
+                        <div class="dev-info-value">${new Date().toLocaleString('vi-VN', {
+                            timeZone: 'Asia/Ho_Chi_Minh',
+                            year: 'numeric',
+                            month: '2-digit', 
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}</div>
                     </div>
                     
                     <div class="dev-info-item">
