@@ -604,16 +604,30 @@ export function getB24UITemplate() {
             console.log('🗑️ Starting app uninstall...');
             
             if (confirm('⚠️ Are you sure you want to uninstall this app?\\n\\nThis will:\\n• Remove all widget placements\\n• Clear app data\\n• Cannot be undone\\n\\nContinue with uninstall?')) {
+                console.log('✅ User confirmed uninstall');
+                
                 if (typeof BX24 !== 'undefined') {
-                    BX24.getAuth(function(auth) {
-                        // Open uninstall page with auth
-                        const uninstallUrl = '/uninstall?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
-                        window.location.href = uninstallUrl;
-                    });
+                    console.log('🔑 BX24 SDK available, getting auth...');
+                    try {
+                        BX24.getAuth(function(auth) {
+                            console.log('🔐 Auth received:', auth);
+                            const uninstallUrl = '/uninstall?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                            console.log('🔗 Redirecting to:', uninstallUrl);
+                            window.location.href = uninstallUrl;
+                        });
+                    } catch (error) {
+                        console.error('❌ BX24 getAuth failed:', error);
+                        // Fallback - open without auth
+                        console.log('🔄 Fallback: redirecting without auth');
+                        window.location.href = '/uninstall';
+                    }
                 } else {
+                    console.log('⚠️ BX24 SDK not available, using fallback');
                     // Fallback - open without auth
                     window.location.href = '/uninstall';
                 }
+            } else {
+                console.log('❌ User cancelled uninstall');
             }
         }
         
