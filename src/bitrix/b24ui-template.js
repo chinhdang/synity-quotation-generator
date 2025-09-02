@@ -611,7 +611,8 @@ export function getB24UITemplate() {
                     
                     // Set timeout for BX24.getAuth in case it hangs
                     let authTimeout = setTimeout(() => {
-                        console.log('⏰ BX24.getAuth timeout, using fallback');
+                        console.log('⏰ BX24.getAuth timeout, using fallback without auth params');
+                        console.log('🔗 Fallback redirect to: /uninstall');
                         window.location.href = '/uninstall';
                     }, 3000); // 3 second timeout
                     
