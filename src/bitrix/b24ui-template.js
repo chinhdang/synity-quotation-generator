@@ -608,14 +608,28 @@ export function getB24UITemplate() {
                 
                 if (typeof BX24 !== 'undefined') {
                     console.log('🔑 BX24 SDK available, getting auth...');
+                    
+                    // Set timeout for BX24.getAuth in case it hangs
+                    let authTimeout = setTimeout(() => {
+                        console.log('⏰ BX24.getAuth timeout, using fallback');
+                        window.location.href = '/uninstall';
+                    }, 3000); // 3 second timeout
+                    
                     try {
                         BX24.getAuth(function(auth) {
+                            clearTimeout(authTimeout);
                             console.log('🔐 Auth received:', auth);
-                            const uninstallUrl = '/uninstall?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
-                            console.log('🔗 Redirecting to:', uninstallUrl);
-                            window.location.href = uninstallUrl;
+                            if (auth && auth.access_token && auth.domain) {
+                                const uninstallUrl = '/uninstall?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
+                                console.log('🔗 Redirecting to:', uninstallUrl);
+                                window.location.href = uninstallUrl;
+                            } else {
+                                console.log('⚠️ Invalid auth received, using fallback');
+                                window.location.href = '/uninstall';
+                            }
                         });
                     } catch (error) {
+                        clearTimeout(authTimeout);
                         console.error('❌ BX24 getAuth failed:', error);
                         // Fallback - open without auth
                         console.log('🔄 Fallback: redirecting without auth');
