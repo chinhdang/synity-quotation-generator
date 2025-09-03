@@ -200,6 +200,17 @@ export async function installHandler({ req, env, ctx }) {
         }
       }
 
+      // Register OnAppUninstall event handler for proper cleanup
+      try {
+        const uninstallResult = await client.call('event.bind', {
+          EVENT: 'OnAppUninstall',
+          HANDLER: `${appUrl}/uninstall`
+        });
+        console.log('✅ Registered OnAppUninstall handler:', uninstallResult);
+      } catch (eventError) {
+        console.error('❌ Failed to register OnAppUninstall handler:', eventError);
+      }
+
       console.log('Widget placements binding completed');
     } catch (error) {
       console.error('Failed to bind widget placements:', error);
@@ -1366,10 +1377,35 @@ export async function uninstallHandler({ req, env, ctx }) {
     console.log('='.repeat(50));
     console.log('APP UNINSTALL REQUEST');
     console.log('='.repeat(50));
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
 
     const url = new URL(req.url);
-    const authId = url.searchParams.get('AUTH_ID');
-    const domain = url.searchParams.get('DOMAIN');
+    let authId = url.searchParams.get('AUTH_ID');
+    let domain = url.searchParams.get('DOMAIN');
+
+    // Handle POST request from OnAppUninstall event
+    if (req.method === 'POST') {
+      try {
+        const postData = await req.formData();
+        authId = authId || postData.get('auth[access_token]') || postData.get('AUTH_ID');
+        domain = domain || postData.get('auth[domain]') || postData.get('DOMAIN');
+        
+        console.log('📬 OnAppUninstall event received');
+        console.log('POST auth data:', { domain, hasToken: !!authId });
+        
+        // For OnAppUninstall event, just return success quickly
+        // The actual cleanup happens via the Bitrix24 system
+        if (authId && domain) {
+          return new Response('OK', { 
+            status: 200,
+            headers: { 'Content-Type': 'text/plain' }
+          });
+        }
+      } catch (e) {
+        console.log('Could not parse POST data:', e.message);
+      }
+    }
 
     // Get auth from stored settings if not provided
     let client = null;
