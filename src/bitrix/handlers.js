@@ -153,39 +153,25 @@ export async function installHandler({ req, env, ctx }) {
         console.log('No existing placements to unbind or error:', unbindError.message);
       }
       
-      // Use placements that are actually supported (based on log)
-      // These are the toolbar placements that were successful before
-      const toolbarPlacements = [
+      // Keep only LIST and DETAIL placements for specified entities
+      // LIST_TOOLBAR placements for LEAD, DEAL, SMART_INVOICE, QUOTE
+      const listPlacements = [
         'CRM_LEAD_LIST_TOOLBAR',
         'CRM_DEAL_LIST_TOOLBAR',
-        'CRM_CONTACT_LIST_TOOLBAR',
-        'CRM_COMPANY_LIST_TOOLBAR',
         'CRM_SMART_INVOICE_LIST_TOOLBAR',
-        'CRM_LEAD_DETAIL_TOOLBAR',
-        'CRM_DEAL_DETAIL_TOOLBAR',
-        'CRM_CONTACT_DETAIL_TOOLBAR',
-        'CRM_COMPANY_DETAIL_TOOLBAR',
-        'CRM_SMART_INVOICE_DETAIL_TOOLBAR'
+        'CRM_QUOTE_LIST_TOOLBAR'
       ];
       
-      // CRM Detail Tab placements (the main ones you need!)
-      const detailTabPlacements = [
+      // DETAIL_TAB placements for LEAD, DEAL, SMART_INVOICE, QUOTE
+      const detailPlacements = [
         'CRM_LEAD_DETAIL_TAB',
-        'CRM_DEAL_DETAIL_TAB', 
-        'CRM_CONTACT_DETAIL_TAB',
-        'CRM_COMPANY_DETAIL_TAB',
-        'CRM_SMART_INVOICE_DETAIL_TAB'
+        'CRM_DEAL_DETAIL_TAB',
+        'CRM_SMART_INVOICE_DETAIL_TAB',
+        'CRM_QUOTE_DETAIL_TAB'
       ];
 
-      // Additional supported placements
-      const activityPlacements = [
-        'CRM_LEAD_ACTIVITY_TIMELINE_MENU',
-        'CRM_DEAL_ACTIVITY_TIMELINE_MENU',
-        'CRM_SMART_INVOICE_ACTIVITY_TIMELINE_MENU'
-      ];
-
-      // Bind toolbar placements (these are confirmed working)
-      for (const placement of toolbarPlacements) {
+      // Bind LIST placements
+      for (const placement of listPlacements) {
         try {
           const result = await client.call('placement.bind', {
             PLACEMENT: placement,
@@ -193,14 +179,14 @@ export async function installHandler({ req, env, ctx }) {
             TITLE: `${titlePrefix}SYNITY Báo Giá`,
             DESCRIPTION: 'Tạo báo giá chuyên nghiệp với SYNITY Quotation Generator'
           });
-          console.log(`✅ Bound ${placement}:`, result);
+          console.log(`✅ Bound list placement ${placement}:`, result);
         } catch (bindError) {
-          console.error(`❌ Failed to bind ${placement}:`, bindError);
+          console.error(`❌ Failed to bind list placement ${placement}:`, bindError);
         }
       }
 
-      // Bind CRM Detail Tab placements (main widgets!)
-      for (const placement of detailTabPlacements) {
+      // Bind DETAIL placements
+      for (const placement of detailPlacements) {
         try {
           const result = await client.call('placement.bind', {
             PLACEMENT: placement,
@@ -208,24 +194,9 @@ export async function installHandler({ req, env, ctx }) {
             TITLE: `${titlePrefix}SYNITY Báo Giá`,
             DESCRIPTION: 'Tạo báo giá chuyên nghiệp từ thông tin CRM này'
           });
-          console.log(`✅ Bound detail tab ${placement}:`, result);
+          console.log(`✅ Bound detail placement ${placement}:`, result);
         } catch (bindError) {
-          console.error(`❌ Failed to bind detail tab ${placement}:`, bindError);
-        }
-      }
-
-      // Bind activity timeline placements  
-      for (const placement of activityPlacements) {
-        try {
-          const result = await client.call('placement.bind', {
-            PLACEMENT: placement,
-            HANDLER: `${appUrl}/widget/quotation`,
-            TITLE: `${titlePrefix}SYNITY Báo Giá`,
-            DESCRIPTION: 'Tạo báo giá từ thông tin CRM này'
-          });
-          console.log(`✅ Bound activity ${placement}:`, result);
-        } catch (bindError) {
-          console.error(`❌ Failed to bind activity ${placement}:`, bindError);
+          console.error(`❌ Failed to bind detail placement ${placement}:`, bindError);
         }
       }
 
@@ -1044,16 +1015,16 @@ export async function debugPlacementsHandler({ req, env, ctx }) {
         
         <h2>Expected CRM Placements</h2>
         <ul>
-          <li>CRM_LEAD_LIST_MENU</li>
-          <li>CRM_DEAL_LIST_MENU</li>
-          <li>CRM_CONTACT_LIST_MENU</li>
-          <li>CRM_COMPANY_LIST_MENU</li>
-          <li>CRM_SMART_INVOICE_LIST_MENU</li>
+          <li><strong>LIST Placements:</strong></li>
+          <li>CRM_LEAD_LIST_TOOLBAR</li>
+          <li>CRM_DEAL_LIST_TOOLBAR</li>
+          <li>CRM_SMART_INVOICE_LIST_TOOLBAR</li>
+          <li>CRM_QUOTE_LIST_TOOLBAR</li>
+          <li><strong>DETAIL Placements:</strong></li>
           <li>CRM_LEAD_DETAIL_TAB</li>
           <li>CRM_DEAL_DETAIL_TAB</li>
-          <li>CRM_CONTACT_DETAIL_TAB</li>
-          <li>CRM_COMPANY_DETAIL_TAB</li>
           <li>CRM_SMART_INVOICE_DETAIL_TAB</li>
+          <li>CRM_QUOTE_DETAIL_TAB</li>
         </ul>
         
         <h2>Raw API Response</h2>
