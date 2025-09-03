@@ -1412,12 +1412,54 @@ export async function uninstallHandler({ req, env, ctx }) {
         console.log('🧹 Clearing all placement bindings...');
         console.log('📍 Client auth info:', { domain: client.auth?.domain, hasToken: !!client.auth?.access_token });
         
-        const placementResult = await client.call('placement.unbind');
-        console.log('📍 Placement.unbind result:', placementResult);
+        // First, get list of existing placements
+        let existingPlacements = [];
+        try {
+          const placementList = await client.call('placement.list');
+          console.log('📋 Current placements:', placementList);
+          if (placementList && placementList.result) {
+            existingPlacements = placementList.result;
+          }
+        } catch (listError) {
+          console.log('⚠️ Could not list placements:', listError.message);
+        }
         
-        placementsCleared = true;
-        uninstallStatus = 'Placements cleared';
-        console.log('✅ All placements unbound successfully');
+        // Try to unbind all placements at once
+        try {
+          const placementResult = await client.call('placement.unbind');
+          console.log('📍 Placement.unbind (all) result:', placementResult);
+          placementsCleared = true;
+        } catch (unbindAllError) {
+          console.log('⚠️ Unbind all failed, trying individual unbind...');
+          
+          // If unbind all fails, try unbinding each placement individually
+          if (existingPlacements.length > 0) {
+            let unbindCount = 0;
+            for (const placement of existingPlacements) {
+              try {
+                const result = await client.call('placement.unbind', {
+                  PLACEMENT: placement.placement || placement.PLACEMENT
+                });
+                console.log(`✅ Unbound ${placement.placement || placement.PLACEMENT}`);
+                unbindCount++;
+              } catch (individualError) {
+                console.error(`❌ Failed to unbind ${placement.placement || placement.PLACEMENT}:`, individualError.message);
+              }
+            }
+            
+            if (unbindCount > 0) {
+              placementsCleared = true;
+              console.log(`✅ Unbound ${unbindCount} of ${existingPlacements.length} placements`);
+            }
+          } else {
+            // No placements to unbind
+            placementsCleared = true;
+            console.log('ℹ️ No placements found to unbind');
+          }
+        }
+        
+        uninstallStatus = placementsCleared ? 'Placements cleared' : 'Failed to clear some placements';
+        console.log(placementsCleared ? '✅ Placements cleared successfully' : '⚠️ Some placements may remain');
       } catch (error) {
         console.error('❌ Failed to clear placements:', error);
         console.error('❌ Placement error details:', error.stack || error);
