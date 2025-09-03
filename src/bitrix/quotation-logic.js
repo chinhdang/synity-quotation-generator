@@ -28,38 +28,27 @@ export function getQuotationLogicScript() {
         
         console.log('✅ UI elements initialized with default values');
 
-        // 🚀 MAIN FUNCTION: Generate Quotation (Direct CRM Approach Only)
+        // 🚀 MAIN FUNCTION: Display Pre-generated Quotation
         window.generateQuotation = function() {
-            console.log('🚀 Generating quotation from CRM data...');
+            console.log('🚀 Displaying pre-generated quotation...');
             
-            // Kiểm tra CRM data có sẵn không
-            if (!window.SYNITY_CRM_DATA) {
-                console.error('❌ No CRM data available');
-                alert('Không có dữ liệu CRM. Vui lòng kiểm tra lại kết nối Bitrix24.');
+            // Check if pre-generated HTML is available
+            if (!window.SYNITY_QUOTATION_HTML) {
+                console.error('❌ No pre-generated quotation HTML available');
+                alert('Không có dữ liệu báo giá. Vui lòng refresh trang.');
                 return;
             }
             
-            console.log('📊 CRM Data received:', window.SYNITY_CRM_DATA);
+            console.log('📊 Using pre-generated HTML from server');
             
-            // Import direct template generator
-            const generateQuotationHTML = window.generateQuotationHTML;
-            if (!generateQuotationHTML) {
-                console.error('❌ Direct template generator not loaded');
-                alert('Template generator chưa được tải. Vui lòng refresh trang.');
-                return;
-            }
-            
-            // Generate HTML directly from CRM data - NO INTERMEDIATE PROCESSING
-            const quotationHtml = generateQuotationHTML(window.SYNITY_CRM_DATA);
-            
-            // Display in preview iframe
+            // Display pre-generated HTML in preview iframe
             const previewFrame = document.getElementById('preview-frame');
             if (previewFrame) {
-                previewFrame.srcdoc = quotationHtml;
-                console.log('✅ Quotation generated and displayed');
+                previewFrame.srcdoc = window.SYNITY_QUOTATION_HTML;
+                console.log('✅ Quotation displayed successfully');
                 
                 // Store for export
-                window.currentQuotationHtml = quotationHtml;
+                window.currentQuotationHtml = window.SYNITY_QUOTATION_HTML;
             } else {
                 console.error('❌ Preview frame not found');
             }
