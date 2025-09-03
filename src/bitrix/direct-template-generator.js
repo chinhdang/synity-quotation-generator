@@ -19,13 +19,13 @@ export function generateQuotationNumber(entityType, entityId) {
 }
 
 // Helper function to format currency (Vietnamese style)
-function formatCurrency(amount) {
+export function formatCurrency(amount) {
   if (isNaN(amount)) return '0';
   return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0));
 }
 
 // Helper function to format date (Vietnamese style)
-function formatDate(date) {
+export function formatDate(date) {
   if (!date) return '';
   const d = new Date(date);
   if (isNaN(d.getTime())) return '';

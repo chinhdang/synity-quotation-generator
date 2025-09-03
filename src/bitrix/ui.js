@@ -3,7 +3,7 @@
 
 import { getQuotationLogicScript } from './quotation-logic.js';
 import { getQuotationTemplate } from './quotation-template.js';
-import { generateQuotationHTML, generateQuotationNumber } from './direct-template-generator.js';
+import { generateQuotationHTML, generateQuotationNumber, formatDate, formatCurrency } from './direct-template-generator.js';
 
 // Helper function to analyze Bitrix products (extracted from original)
 function analyzeBitrixProducts(bitrixProducts) {
@@ -868,9 +868,16 @@ export function getAppUITemplate(crmData = {}) {
         });
 
         // Expose CRM data and template functions to window scope
-        window.SYNITY_CRM_DATA = ${JSON.stringify(crmData)};
+        window.SYNITY_CRM_DATA = ${JSON.stringify(crmData || {})};
         window.generateQuotationHTML = ${generateQuotationHTML.toString()};
         window.generateQuotationNumber = ${generateQuotationNumber.toString()};
+        window.formatDate = ${formatDate.toString()};
+        window.formatCurrency = ${formatCurrency.toString()};
+        
+        // Debug CRM data exposure
+        console.log('📊 CRM Data injected into window:', window.SYNITY_CRM_DATA);
+        console.log('📊 CRM Data type:', typeof window.SYNITY_CRM_DATA);
+        console.log('📊 CRM Data has entityId:', Boolean(window.SYNITY_CRM_DATA?.entityId));
 
         // SYNITY Quotation JavaScript Integration
         ${getQuotationLogicScript()}
