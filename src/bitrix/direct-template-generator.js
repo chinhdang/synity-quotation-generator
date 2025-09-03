@@ -37,7 +37,7 @@ export function formatDate(date) {
 }
 
 // Generate products table from CRM products
-function generateProductsTable(products) {
+export function generateProductsTable(products) {
   if (!products || products.length === 0) {
     return `
       <tr>
@@ -67,7 +67,7 @@ function generateProductsTable(products) {
 }
 
 // Calculate totals from CRM products
-function calculateTotals(products) {
+export function calculateTotals(products) {
   if (!products || products.length === 0) {
     return { subtotal: 0, vatAmount: 0, grandTotal: 0 };
   }

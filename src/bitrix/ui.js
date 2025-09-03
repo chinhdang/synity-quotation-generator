@@ -3,7 +3,7 @@
 
 import { getQuotationLogicScript } from './quotation-logic.js';
 import { getQuotationTemplate } from './quotation-template.js';
-import { generateQuotationHTML, generateQuotationNumber, formatDate, formatCurrency } from './direct-template-generator.js';
+import { generateQuotationHTML, generateQuotationNumber, formatDate, formatCurrency, calculateTotals, generateProductsTable } from './direct-template-generator.js';
 
 // Helper function to analyze Bitrix products (extracted from original)
 function analyzeBitrixProducts(bitrixProducts) {
@@ -873,6 +873,8 @@ export function getAppUITemplate(crmData = {}) {
         window.generateQuotationNumber = ${generateQuotationNumber.toString()};
         window.formatDate = ${formatDate.toString()};
         window.formatCurrency = ${formatCurrency.toString()};
+        window.calculateTotals = ${calculateTotals.toString()};
+        window.generateProductsTable = ${generateProductsTable.toString()};
         
         // Debug CRM data exposure
         console.log('📊 CRM Data injected into window:', window.SYNITY_CRM_DATA);
