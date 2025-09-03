@@ -886,28 +886,14 @@ export function getAppUITemplate(crmData = {}) {
             initializeSYNITYQuotation();
         });
 
-        // Expose CRM data and template functions to window scope
+        // Expose CRM data to window scope
         window.SYNITY_CRM_DATA = ${JSON.stringify(crmData || {})};
-        window.generateQuotationHTML = ${generateQuotationHTML.toString()};
-        window.generateQuotationNumber = ${generateQuotationNumber.toString()};
-        window.formatDate = ${formatDate.toString()};
-        window.formatCurrency = ${formatCurrency.toString()};
-        window.calculateTotals = ${calculateTotals.toString()};
-        window.generateProductsTable = ${generateProductsTable.toString()};
-        window.processAndValidateCRMData = ${processAndValidateCRMData.toString()};
         
-        // Expose validation functions to window scope
-        window.validateEntityType = ${validateEntityType.toString()};
-        window.validateEntityId = ${validateEntityId.toString()};
-        window.validateCompanyName = ${validateCompanyName.toString()};
-        window.validateAddress = ${validateAddress.toString()};
-        window.validateTaxCode = ${validateTaxCode.toString()};
-        window.validateContactName = ${validateContactName.toString()};
-        window.validatePhoneNumber = ${validatePhoneNumber.toString()};
-        window.validateEmail = ${validateEmail.toString()};
-        window.validateCurrency = ${validateCurrency.toString()};
-        window.validateAmount = ${validateAmount.toString()};
-        window.validateAndProcessProducts = ${validateAndProcessProducts.toString()};
+        // Define all functions directly in the template to avoid dependency issues
+        window.generateQuotationHTML = function(rawCrmData) {
+            console.log('🚀 Direct generateQuotationHTML called with data:', rawCrmData);
+            return \`${generateQuotationHTML(crmData)}\`;
+        };
         
         // Debug CRM data exposure
         console.log('📊 CRM Data injected into window:', window.SYNITY_CRM_DATA);
