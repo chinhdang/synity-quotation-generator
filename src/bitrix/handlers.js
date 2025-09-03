@@ -1421,7 +1421,17 @@ export async function uninstallHandler({ req, env, ctx }) {
       } catch (error) {
         console.error('❌ Failed to clear placements:', error);
         console.error('❌ Placement error details:', error.stack || error);
-        uninstallStatus = `Failed to clear placements: ${error.message}`;
+        console.error('❌ Error response:', error.result || 'No error result');
+        
+        // Even if unbind fails, it might mean no placements exist
+        // Check the error message to determine if this is actually an error
+        if (error.message && error.message.includes('PLACEMENT_NOT_FOUND')) {
+          placementsCleared = true;
+          uninstallStatus = 'No placements to clear';
+          console.log('ℹ️ No placements found to unbind - considering this success');
+        } else {
+          uninstallStatus = `Failed to clear placements: ${error.message}`;
+        }
       }
 
       // Clear KV storage
@@ -1442,7 +1452,8 @@ export async function uninstallHandler({ req, env, ctx }) {
           storageCleared = true;
           console.log('✅ KV storage cleared successfully');
         } else {
-          console.log('⚠️ No domain found for KV storage cleanup');
+          console.log('⚠️ No domain found for KV storage cleanup - nothing to clear');
+          storageCleared = true; // Consider this success since there's nothing to clear
         }
       } catch (error) {
         console.error('❌ Failed to clear KV storage:', error);
