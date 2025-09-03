@@ -79,19 +79,24 @@ export default {
             return indexHandler({ req: request, env, ctx });
         }
 
-        // 2.7. Handle App Uninstallation
-        if (url.pathname === '/uninstall') {
-            return uninstallHandler({ req: request, env, ctx });
-        }
-
-        // 2.8. Debug Placements Endpoint
+        // 2.7. Debug Placements Endpoint
         if (url.pathname === '/debug/placements' && request.method === 'GET') {
             return debugPlacementsHandler({ req: request, env, ctx });
         }
 
-        // 2.9. Widget List Endpoint
+        // 2.8. Widget List Endpoint
         if (url.pathname === '/debug/widget-list' && request.method === 'GET') {
             return widgetListHandler({ req: request, env, ctx });
+        }
+
+        // 2.9. Handle App Uninstallation (accepts both GET and POST)
+        if (url.pathname === '/uninstall') {
+            return uninstallHandler({ req: request, env, ctx });
+        }
+
+        // 2.10. Handle favicon requests
+        if (url.pathname === '/favicon.ico') {
+            return new Response(null, { status: 204 }); // No Content
         }
 
         // 3. Handle API Routes

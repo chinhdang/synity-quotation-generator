@@ -650,8 +650,8 @@ export function getAppUITemplate(crmData = {}) {
                     <div class="dev-info-item">
                         <div class="dev-info-label">Version</div>
                         <div class="dev-info-value">
-                            <span class="dev-commit-hash">v2.1.3</span>
-                            <span class="dev-commit-msg">🚧 Add DEV emoji prefix to widget titles</span>
+                            <span class="dev-commit-hash">v2.2.0</span>
+                            <span class="dev-commit-msg">🚧 Dev environment with uninstall feature & dev panel</span>
                         </div>
                     </div>
                     

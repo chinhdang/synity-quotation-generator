@@ -823,9 +823,9 @@ export function getB24UITemplate() {
                 
                 const devItems = [
                     { 
-                        icon: 'bi bi-git', 
-                        label: 'Git Version', 
-                        value: devInfo.gitVersion || 'Unknown'
+                        icon: 'bi bi-tag-fill', 
+                        label: 'App Version', 
+                        value: \`<strong>\${devInfo.gitVersion}</strong>\`
                     },
                     { 
                         icon: 'bi bi-cloud-arrow-up', 
@@ -834,7 +834,7 @@ export function getB24UITemplate() {
                     },
                     { 
                         icon: 'bi bi-info-circle', 
-                        label: 'Description', 
+                        label: 'Latest Changes', 
                         value: devInfo.description || 'Development Build'
                     },
                     { 
@@ -845,7 +845,7 @@ export function getB24UITemplate() {
                     { 
                         icon: 'bi bi-clock', 
                         label: 'Build Time', 
-                        value: devInfo.buildTime || new Date().toISOString()
+                        value: new Date(devInfo.buildTime).toLocaleString('vi-VN')
                     },
                     { 
                         icon: 'bi bi-server', 
@@ -878,12 +878,12 @@ export function getB24UITemplate() {
                 return {
                     gitVersion: urlParams.get('version') || 
                                sessionStorage.getItem('git-version') || 
-                               'feature/dev-prod-environments',
+                               'v2.2.0',
                     deployId: urlParams.get('deploy-id') || 
                              sessionStorage.getItem('deploy-id') || 
                              \`dev-\${Date.now().toString(36)}\`,
                     description: urlParams.get('description') || 
-                                'Enhanced Bitrix24 CRM Integration with Dev/Prod Environments',
+                                '🚧 Dev environment with uninstall feature & dev panel',
                     buildTime: new Date().toISOString(),
                     environment: hostname.includes('dev') ? 'Development' : 'Local Development'
                 };
