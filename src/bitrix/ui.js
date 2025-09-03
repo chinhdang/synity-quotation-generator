@@ -82,9 +82,6 @@ export function getAppUITemplate(crmData = {}) {
   // Analyze Bitrix products to suggest version
   const suggestedBitrixVersion = analyzeBitrixProducts(bitrixProducts);
 
-  // Pre-generate the quotation HTML to avoid template nesting issues
-  const preGeneratedQuotation = generateQuotationHTML(crmData);
-
   return `<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -889,17 +886,28 @@ export function getAppUITemplate(crmData = {}) {
             initializeSYNITYQuotation();
         });
 
-        // Expose CRM data to window scope
+        // Expose CRM data and all necessary functions to window scope
         window.SYNITY_CRM_DATA = ${JSON.stringify(crmData || {})};
+        window.generateQuotationHTML = ${generateQuotationHTML.toString()};
+        window.generateQuotationNumber = ${generateQuotationNumber.toString()};
+        window.formatDate = ${formatDate.toString()};
+        window.formatCurrency = ${formatCurrency.toString()};
+        window.calculateTotals = ${calculateTotals.toString()};
+        window.generateProductsTable = ${generateProductsTable.toString()};
+        window.processAndValidateCRMData = ${processAndValidateCRMData.toString()};
         
-        // Store the pre-generated quotation HTML
-        window.preGeneratedQuotationHTML = ${JSON.stringify(preGeneratedQuotation)};
-        
-        // Simple function that returns the pre-generated HTML
-        window.generateQuotationHTML = function(rawCrmData) {
-            console.log('🚀 Using pre-generated quotation HTML');
-            return window.preGeneratedQuotationHTML;
-        };
+        // Expose validation functions to window scope  
+        window.validateEntityType = ${validateEntityType.toString()};
+        window.validateEntityId = ${validateEntityId.toString()};
+        window.validateCompanyName = ${validateCompanyName.toString()};
+        window.validateAddress = ${validateAddress.toString()};
+        window.validateTaxCode = ${validateTaxCode.toString()};
+        window.validateContactName = ${validateContactName.toString()};
+        window.validatePhoneNumber = ${validatePhoneNumber.toString()};
+        window.validateEmail = ${validateEmail.toString()};
+        window.validateCurrency = ${validateCurrency.toString()};
+        window.validateAmount = ${validateAmount.toString()};
+        window.validateAndProcessProducts = ${validateAndProcessProducts.toString()};
         
         // Debug CRM data exposure
         console.log('📊 CRM Data injected into window:', window.SYNITY_CRM_DATA);
