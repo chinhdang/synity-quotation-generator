@@ -1387,20 +1387,39 @@ export async function uninstallHandler({ req, env, ctx }) {
     // Handle POST request from OnAppUninstall event
     if (req.method === 'POST') {
       try {
-        const postData = await req.formData();
-        authId = authId || postData.get('auth[access_token]') || postData.get('AUTH_ID');
-        domain = domain || postData.get('auth[domain]') || postData.get('DOMAIN');
+        const contentType = req.headers.get('content-type') || '';
         
-        console.log('📬 OnAppUninstall event received');
-        console.log('POST auth data:', { domain, hasToken: !!authId });
-        
-        // For OnAppUninstall event, just return success quickly
-        // The actual cleanup happens via the Bitrix24 system
-        if (authId && domain) {
-          return new Response('OK', { 
-            status: 200,
-            headers: { 'Content-Type': 'text/plain' }
-          });
+        // Handle JSON POST from OnAppUninstall event
+        if (contentType.includes('application/json')) {
+          const jsonData = await req.json();
+          console.log('📬 OnAppUninstall event received (JSON):', jsonData);
+          
+          // Extract auth from OnAppUninstall event structure
+          if (jsonData.event === 'ONAPPUNINSTALL') {
+            const auth = jsonData.auth;
+            const cleanData = jsonData.data?.CLEAN === 1; // User chose to clean data
+            
+            console.log('🗑️ OnAppUninstall details:', {
+              domain: auth?.domain,
+              cleanData,
+              language: jsonData.data?.LANGUAGE_ID
+            });
+            
+            // Return success immediately - Bitrix24 handles the cleanup
+            return new Response('OK', { 
+              status: 200,
+              headers: { 'Content-Type': 'text/plain' }
+            });
+          }
+        } 
+        // Handle FormData POST (from manual uninstall button)
+        else {
+          const postData = await req.formData();
+          authId = authId || postData.get('auth[access_token]') || postData.get('AUTH_ID');
+          domain = domain || postData.get('auth[domain]') || postData.get('DOMAIN');
+          
+          console.log('📬 Manual uninstall request (FormData)');
+          console.log('POST auth data:', { domain, hasToken: !!authId });
         }
       } catch (e) {
         console.log('Could not parse POST data:', e.message);
