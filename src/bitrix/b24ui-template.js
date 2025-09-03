@@ -523,10 +523,6 @@ export function getB24UITemplate() {
                         <i class="bi bi-arrow-repeat"></i>
                         Call Worker API
                     </button>
-                    <button id="btnCheckPlacements" class="b24-btn b24-btn--warning" type="button" onclick="checkPlacements()">
-                        <i class="bi bi-bug"></i>
-                        Check Widget Placements
-                    </button>
                     <button id="btnWidgetList" class="b24-btn b24-btn--warning" type="button" onclick="showWidgetList()">
                         <i class="bi bi-list-ul"></i>
                         Widget List
@@ -586,38 +582,6 @@ export function getB24UITemplate() {
         console.log('🔍 User Agent:', navigator.userAgent);
         console.log('🌐 Location:', window.location.href);
         console.log('🎨 B24UI Design System Activated');
-        
-        // Function to check widget placements
-        function checkPlacements() {
-            console.log('🔧 Checking widget placements...');
-            
-            if (typeof BX24 !== 'undefined') {
-                console.log('🔑 BX24 SDK available, getting auth for placements...');
-                
-                // Set timeout for BX24.getAuth
-                let authTimeout = setTimeout(() => {
-                    console.log('⏰ BX24.getAuth timeout, opening without auth');
-                    window.open('/debug/placements', '_blank');
-                }, 2000); // 2 second timeout
-                
-                try {
-                    BX24.getAuth(function(auth) {
-                        clearTimeout(authTimeout);
-                        console.log('🔐 Auth received for placements');
-                        const debugUrl = '/debug/placements?AUTH_ID=' + auth.access_token + '&DOMAIN=' + auth.domain;
-                        console.log('🔗 Opening:', debugUrl);
-                        window.open(debugUrl, '_blank');
-                    });
-                } catch (error) {
-                    clearTimeout(authTimeout);
-                    console.error('❌ BX24.getAuth failed:', error);
-                    window.open('/debug/placements', '_blank');
-                }
-            } else {
-                console.log('⚠️ BX24 SDK not available, opening without auth');
-                window.open('/debug/placements', '_blank');
-            }
-        }
         
         // Function to show widget list
         function showWidgetList() {
