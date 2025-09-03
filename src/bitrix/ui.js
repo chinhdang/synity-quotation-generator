@@ -82,6 +82,9 @@ export function getAppUITemplate(crmData = {}) {
   // Analyze Bitrix products to suggest version
   const suggestedBitrixVersion = analyzeBitrixProducts(bitrixProducts);
 
+  // Pre-generate the quotation HTML to avoid template nesting issues
+  const preGeneratedQuotation = generateQuotationHTML(crmData);
+
   return `<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -889,10 +892,13 @@ export function getAppUITemplate(crmData = {}) {
         // Expose CRM data to window scope
         window.SYNITY_CRM_DATA = ${JSON.stringify(crmData || {})};
         
-        // Define all functions directly in the template to avoid dependency issues
+        // Store the pre-generated quotation HTML
+        window.preGeneratedQuotationHTML = ${JSON.stringify(preGeneratedQuotation)};
+        
+        // Simple function that returns the pre-generated HTML
         window.generateQuotationHTML = function(rawCrmData) {
-            console.log('🚀 Direct generateQuotationHTML called with data:', rawCrmData);
-            return \`${generateQuotationHTML(crmData)}\`;
+            console.log('🚀 Using pre-generated quotation HTML');
+            return window.preGeneratedQuotationHTML;
         };
         
         // Debug CRM data exposure
