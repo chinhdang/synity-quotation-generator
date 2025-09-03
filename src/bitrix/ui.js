@@ -4,24 +4,12 @@
 import { getQuotationLogicScript } from './quotation-logic.js';
 import { getQuotationTemplate } from './quotation-template.js';
 import { 
-    generateQuotationHTML, 
     generateQuotationNumber, 
     formatDate, 
     formatCurrency, 
     calculateTotals, 
     generateProductsTable, 
-    processAndValidateCRMData,
-    validateEntityType,
-    validateEntityId,
-    validateCompanyName,
-    validateAddress,
-    validateTaxCode,
-    validateContactName,
-    validatePhoneNumber,
-    validateEmail,
-    validateCurrency,
-    validateAmount,
-    validateAndProcessProducts
+    processAndValidateCRMData
 } from './direct-template-generator.js';
 
 // Helper function to analyze Bitrix products (extracted from original)
@@ -889,8 +877,28 @@ export function getAppUITemplate(crmData = {}) {
         // Only expose CRM data to window scope - keep it simple
         window.SYNITY_CRM_DATA = ${JSON.stringify(crmData || {})};
         
-        // Pre-generate the HTML template at server-side with real data
-        window.SYNITY_QUOTATION_HTML = ${JSON.stringify(generateQuotationHTML(crmData))};
+        // Pre-generate complete HTML at server-side using template approach (like production)
+        const quotationTemplate = getQuotationTemplate();
+        const processedTemplate = quotationTemplate.replace(/\\\$\\\{([^}]+)\\\}/g, (match, key) => {
+            // Map common template variables to CRM data
+            const templateData = {
+                clientCompanyName: crmData?.clientCompanyName || 'Công ty TNHH ABC',
+                client_address: crmData?.client_address || '123 Đường ABC, Phường 1, Quận 2, TP. HCM',
+                client_tax_code: crmData?.client_tax_code || '0312345678',
+                contact_name: crmData?.contact_name || 'Nguyễn Văn A',
+                contact_phone: crmData?.contact_phone || '0123456789',
+                contact_email: crmData?.contact_email || 'contact@abccompany.com',
+                responsiblePersonName: crmData?.responsiblePersonName || 'Chinh Đặng',
+                responsiblePersonPhone: crmData?.responsiblePersonPhone || '0947100700',
+                responsiblePersonEmail: crmData?.responsiblePersonEmail || 'chinh@synity.vn',
+                quotationNumber: 'SYN-Q-' + new Date().toISOString().slice(0,10).replace(/-/g, '') + '-01',
+                dateCreated: new Date().toLocaleDateString('vi-VN'),
+                validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('vi-VN')
+            };
+            
+            return templateData[key] || match;
+        });
+        window.SYNITY_QUOTATION_HTML = processedTemplate;
         
         // Debug CRM data exposure
         console.log('📊 CRM Data injected into window:', window.SYNITY_CRM_DATA);
