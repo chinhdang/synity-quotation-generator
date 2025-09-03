@@ -4,7 +4,7 @@
  */
 
 // Function to generate quotation number based on entity type and ID
-function generateQuotationNumber(entityType, entityId) {
+export function generateQuotationNumber(entityType, entityId) {
   const mapping = {
     'lead': 'L',
     'deal': 'D', 

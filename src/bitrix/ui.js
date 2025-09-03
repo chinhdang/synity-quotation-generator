@@ -3,6 +3,7 @@
 
 import { getQuotationLogicScript } from './quotation-logic.js';
 import { getQuotationTemplate } from './quotation-template.js';
+import { generateQuotationHTML, generateQuotationNumber } from './direct-template-generator.js';
 
 // Helper function to analyze Bitrix products (extracted from original)
 function analyzeBitrixProducts(bitrixProducts) {
@@ -865,6 +866,11 @@ export function getAppUITemplate(crmData = {}) {
             
             initializeSYNITYQuotation();
         });
+
+        // Expose CRM data and template functions to window scope
+        window.SYNITY_CRM_DATA = ${JSON.stringify(crmData)};
+        window.generateQuotationHTML = ${generateQuotationHTML.toString()};
+        window.generateQuotationNumber = ${generateQuotationNumber.toString()};
 
         // SYNITY Quotation JavaScript Integration
         ${getQuotationLogicScript()}
