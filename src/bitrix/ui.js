@@ -3,7 +3,26 @@
 
 import { getQuotationLogicScript } from './quotation-logic.js';
 import { getQuotationTemplate } from './quotation-template.js';
-import { generateQuotationHTML, generateQuotationNumber, formatDate, formatCurrency, calculateTotals, generateProductsTable, processAndValidateCRMData } from './direct-template-generator.js';
+import { 
+    generateQuotationHTML, 
+    generateQuotationNumber, 
+    formatDate, 
+    formatCurrency, 
+    calculateTotals, 
+    generateProductsTable, 
+    processAndValidateCRMData,
+    validateEntityType,
+    validateEntityId,
+    validateCompanyName,
+    validateAddress,
+    validateTaxCode,
+    validateContactName,
+    validatePhoneNumber,
+    validateEmail,
+    validateCurrency,
+    validateAmount,
+    validateAndProcessProducts
+} from './direct-template-generator.js';
 
 // Helper function to analyze Bitrix products (extracted from original)
 function analyzeBitrixProducts(bitrixProducts) {
@@ -876,6 +895,19 @@ export function getAppUITemplate(crmData = {}) {
         window.calculateTotals = ${calculateTotals.toString()};
         window.generateProductsTable = ${generateProductsTable.toString()};
         window.processAndValidateCRMData = ${processAndValidateCRMData.toString()};
+        
+        // Expose validation functions to window scope
+        window.validateEntityType = ${validateEntityType.toString()};
+        window.validateEntityId = ${validateEntityId.toString()};
+        window.validateCompanyName = ${validateCompanyName.toString()};
+        window.validateAddress = ${validateAddress.toString()};
+        window.validateTaxCode = ${validateTaxCode.toString()};
+        window.validateContactName = ${validateContactName.toString()};
+        window.validatePhoneNumber = ${validatePhoneNumber.toString()};
+        window.validateEmail = ${validateEmail.toString()};
+        window.validateCurrency = ${validateCurrency.toString()};
+        window.validateAmount = ${validateAmount.toString()};
+        window.validateAndProcessProducts = ${validateAndProcessProducts.toString()};
         
         // Debug CRM data exposure
         console.log('📊 CRM Data injected into window:', window.SYNITY_CRM_DATA);

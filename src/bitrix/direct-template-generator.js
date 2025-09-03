@@ -138,7 +138,7 @@ export function processAndValidateCRMData(rawCrmData) {
 }
 
 // Individual validation functions
-function validateEntityType(entityType) {
+export function validateEntityType(entityType) {
   const validTypes = ['lead', 'deal', 'invoice', 'estimate', 'company', 'contact'];
   if (!entityType || !validTypes.includes(entityType.toLowerCase())) {
     console.warn('⚠️ Invalid entity type, defaulting to "deal":', entityType);
@@ -147,7 +147,7 @@ function validateEntityType(entityType) {
   return entityType.toLowerCase();
 }
 
-function validateEntityId(entityId) {
+export function validateEntityId(entityId) {
   const id = parseInt(entityId);
   if (isNaN(id) || id <= 0) {
     console.warn('⚠️ Invalid entity ID, defaulting to 1:', entityId);
@@ -156,7 +156,7 @@ function validateEntityId(entityId) {
   return id;
 }
 
-function validateCompanyName(companyName) {
+export function validateCompanyName(companyName) {
   if (!companyName || typeof companyName !== 'string' || companyName.trim().length === 0) {
     console.warn('⚠️ Invalid company name, using default:', companyName);
     return 'Công ty TNHH ABC';
@@ -164,7 +164,7 @@ function validateCompanyName(companyName) {
   return companyName.trim();
 }
 
-function validateAddress(address) {
+export function validateAddress(address) {
   if (!address || typeof address !== 'string' || address.trim().length === 0) {
     console.warn('⚠️ Invalid address, using default:', address);
     return '123 Đường ABC, Phường 1, Quận 1, TP. HCM';
@@ -172,7 +172,7 @@ function validateAddress(address) {
   return address.trim();
 }
 
-function validateTaxCode(taxCode) {
+export function validateTaxCode(taxCode) {
   if (!taxCode || typeof taxCode !== 'string' || taxCode.trim().length === 0) {
     console.warn('⚠️ Invalid tax code, using default:', taxCode);
     return '0312345678';
@@ -180,7 +180,7 @@ function validateTaxCode(taxCode) {
   return taxCode.trim();
 }
 
-function validateContactName(name) {
+export function validateContactName(name) {
   if (!name || typeof name !== 'string' || name.trim().length === 0) {
     console.warn('⚠️ Invalid contact name, using default:', name);
     return 'Nguyễn Văn A';
@@ -188,7 +188,7 @@ function validateContactName(name) {
   return name.trim();
 }
 
-function validatePhoneNumber(phone) {
+export function validatePhoneNumber(phone) {
   if (!phone || typeof phone !== 'string' || phone.trim().length === 0) {
     console.warn('⚠️ Invalid phone number, using default:', phone);
     return '0123456789';
@@ -201,7 +201,7 @@ function validatePhoneNumber(phone) {
   return phone.trim();
 }
 
-function validateEmail(email) {
+export function validateEmail(email) {
   if (!email || typeof email !== 'string' || email.trim().length === 0) {
     console.warn('⚠️ Invalid email, using default:', email);
     return 'contact@company.com';
@@ -214,7 +214,7 @@ function validateEmail(email) {
   return email.trim();
 }
 
-function validateCurrency(currency) {
+export function validateCurrency(currency) {
   const validCurrencies = ['VND', 'USD', 'EUR'];
   if (!currency || !validCurrencies.includes(currency.toUpperCase())) {
     console.warn('⚠️ Invalid currency, defaulting to VND:', currency);
@@ -223,7 +223,7 @@ function validateCurrency(currency) {
   return currency.toUpperCase();
 }
 
-function validateAmount(amount) {
+export function validateAmount(amount) {
   const num = parseFloat(amount);
   if (isNaN(num) || num < 0) {
     console.warn('⚠️ Invalid amount, defaulting to 0:', amount);
@@ -232,7 +232,7 @@ function validateAmount(amount) {
   return num;
 }
 
-function validateAndProcessProducts(products) {
+export function validateAndProcessProducts(products) {
   if (!Array.isArray(products) || products.length === 0) {
     console.warn('⚠️ No valid products found, returning empty array');
     return [];

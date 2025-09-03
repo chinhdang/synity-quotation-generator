@@ -191,7 +191,7 @@ export function getQuotationTemplate() {
 
             <!-- Introduction -->
             <p class="mb-8" style="color: var(--text-main);">
-                SYNITY kính gửi <span class="font-bold">Quý \${clientCompanyName}</span> bảng báo giá chi tiết cho HỆ SINH THÁI GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN SYNITY như sau:
+                SYNITY kính gửi <span class="font-bold">Quý công ty \${clientCompanyName}</span> bảng báo giá chi tiết cho HỆ SINH THÁI GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN SYNITY như sau:
             </p>
 
             <!-- Products Table - Original Tailwind Style -->
@@ -220,7 +220,7 @@ export function getQuotationTemplate() {
                 <div class="w-full sm:w-2/5 lg:w-2/5 bg-teal-50 p-4 rounded-lg border-l-4" style="border-color: var(--accent-main);">
                     <div class="text-sm">
                         <div class="flex justify-between py-2">
-                            <span style="color: var(--text-secondary);">Tổng cộng (A+B):</span>
+                            <span style="color: var(--text-secondary);">Tổng cộng:</span>
                             <span class="font-semibold" style="color: var(--text-main);">\${sub_total}</span>
                         </div>
                         <div class="flex justify-between py-2">
