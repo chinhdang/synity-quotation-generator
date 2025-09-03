@@ -145,9 +145,30 @@ export async function installHandler({ req, env, ctx }) {
         console.log('Existing placements:', existingPlacements);
         
         if (existingPlacements.result && existingPlacements.result.length > 0) {
-          console.log('Unbinding existing placements...');
-          await client.call('placement.unbind');
-          console.log('✅ Existing placements unbound');
+          console.log('Found existing placements, unbinding...');
+          
+          // Try to unbind each placement specifically with our handler
+          for (const existing of existingPlacements.result) {
+            if (existing.handler && existing.handler.includes('/widget/quotation')) {
+              try {
+                await client.call('placement.unbind', {
+                  PLACEMENT: existing.placement,
+                  HANDLER: existing.handler
+                });
+                console.log(`✅ Unbound: ${existing.placement} -> ${existing.handler}`);
+              } catch (e) {
+                console.log(`⚠️ Could not unbind ${existing.placement}: ${e.message}`);
+              }
+            }
+          }
+          
+          // Also try general unbind as fallback
+          try {
+            await client.call('placement.unbind');
+            console.log('✅ General placement unbind completed');
+          } catch (e) {
+            console.log('⚠️ General unbind not needed or failed:', e.message);
+          }
         }
       } catch (unbindError) {
         console.log('No existing placements to unbind or error:', unbindError.message);
@@ -212,6 +233,20 @@ export async function installHandler({ req, env, ctx }) {
       }
 
       console.log('Widget placements binding completed');
+      
+      // Verify app installation status
+      try {
+        const appInfo = await client.call('app.info');
+        console.log('📱 App installation status:', appInfo);
+        
+        if (appInfo.result && !appInfo.result.INSTALLED) {
+          console.log('⚠️ App shows as not fully installed, this may cause duplicate widgets');
+        } else {
+          console.log('✅ App installation verified');
+        }
+      } catch (infoError) {
+        console.log('Could not check app.info:', infoError.message);
+      }
     } catch (error) {
       console.error('Failed to bind widget placements:', error);
       // Non-critical error - continue with installation
