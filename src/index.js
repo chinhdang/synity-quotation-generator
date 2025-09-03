@@ -59,8 +59,8 @@ export default {
             return installHandler({ req: request, env, ctx });
         }
 
-        // 2.5. Handle Widget Quotation Endpoint (support both GET and POST)
-        if (url.pathname === '/widget/quotation') {
+        // 2.5. Handle Widget Quotation Endpoints (support both paths)
+        if (url.pathname === '/widget/quotation' || url.pathname === '/quotation') {
             console.log('🎯 WIDGET QUOTATION REQUEST:', {
                 pathname: url.pathname,
                 method: request.method,
