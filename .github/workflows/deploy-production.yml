@@ -1,0 +1,197 @@
+name: 🚀 Deploy to Production (Manual)
+
+# This workflow implements safe, manual production deployment
+# Following Phase 2 Week 5 requirements: "Production deployment remains manual for safety"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deployment:
+        description: 'Type "DEPLOY-TO-PRODUCTION" to confirm'
+        required: true
+        type: string
+      deployment_reason:
+        description: 'Reason for production deployment'
+        required: true
+        type: string
+
+jobs:
+  validate-input:
+    name: 🔍 Validate Deployment Request
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ✅ Validate confirmation input
+        run: |
+          if [ "${{ github.event.inputs.confirm_deployment }}" != "DEPLOY-TO-PRODUCTION" ]; then
+            echo "❌ Invalid confirmation. Please type 'DEPLOY-TO-PRODUCTION' exactly"
+            echo "🔒 This safety check prevents accidental production deployments"
+            exit 1
+          fi
+          
+          if [ -z "${{ github.event.inputs.deployment_reason }}" ]; then
+            echo "❌ Deployment reason is required"
+            echo "📝 Please provide a clear reason for this production deployment"
+            exit 1
+          fi
+          
+      - name: 📋 Deployment Details
+        run: |
+          echo "🎯 **PRODUCTION DEPLOYMENT REQUEST**"
+          echo "👤 Requested by: ${{ github.actor }}"
+          echo "🌿 Source branch: ${{ github.ref_name }}"
+          echo "📝 Reason: ${{ github.event.inputs.deployment_reason }}"
+          echo "🕐 Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+  pre-deployment-tests:
+    name: 🧪 Pre-Deployment Testing
+    runs-on: ubuntu-latest
+    needs: validate-input
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run full test suite
+        run: npm test
+        
+      - name: 🏗️ Validate production configuration
+        run: |
+          echo "🔍 Validating wrangler.toml for production..."
+          if [ -f "wrangler.toml" ]; then
+            echo "✅ wrangler.toml found"
+            
+            # Check for required production settings
+            if grep -q "APP_ENV.*production" wrangler.toml; then
+              echo "✅ Production environment configured"
+            else
+              echo "❌ Production environment not properly configured"
+              exit 1
+            fi
+            
+            if grep -q "LOG_LEVEL.*error" wrangler.toml; then
+              echo "✅ Production log level configured"
+            else
+              echo "⚠️ Consider setting LOG_LEVEL to 'error' for production"
+            fi
+          else
+            echo "❌ wrangler.toml missing"
+            exit 1
+          fi
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [validate-input, pre-deployment-tests]
+    environment: production
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🚨 Final Production Warning
+        run: |
+          echo "⚠️ ⚠️ ⚠️ PRODUCTION DEPLOYMENT STARTING ⚠️ ⚠️ ⚠️"
+          echo ""
+          echo "🎯 Target: bx-app-quotation-generator (Production)"
+          echo "👤 Deployer: ${{ github.actor }}"
+          echo "📝 Reason: ${{ github.event.inputs.deployment_reason }}"
+          echo ""
+          echo "📋 Pre-deployment checklist:"
+          echo "  ✅ Tests passed"
+          echo "  ✅ Configuration validated"
+          echo "  ✅ Manual confirmation provided"
+          echo ""
+          sleep 5
+          
+      - name: 🚀 Deploy to Production
+        run: npm run deploy:prod
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          
+      - name: 🎉 Production Deployment Success
+        if: success()
+        run: |
+          echo "🎉 Production deployment completed successfully!"
+          echo ""
+          echo "🌐 Production URL: https://bx-app-quotation-generator.{account}.workers.dev"
+          echo "👤 Deployed by: ${{ github.actor }}"
+          echo "📝 Deployment reason: ${{ github.event.inputs.deployment_reason }}"
+          echo "🕐 Deployed at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo ""
+          echo "📋 Post-deployment actions:"
+          echo "  🔍 Monitor application logs: npm run tail:prod"  
+          echo "  🧪 Run smoke tests on production URL"
+          echo "  📊 Check Cloudflare analytics for traffic/errors"
+          echo "  🚨 Monitor for any user-reported issues"
+          echo ""
+          echo "🔄 Rollback instructions (if needed):"
+          echo "  1. Identify previous working commit: git log --oneline"
+          echo "  2. Checkout to working commit: git checkout <commit-hash>"
+          echo "  3. Redeploy: npm run deploy:prod"
+          
+      - name: 🚨 Production Deployment Failed
+        if: failure()
+        run: |
+          echo "❌ Production deployment failed!"
+          echo ""
+          echo "🔧 Immediate actions required:"
+          echo "  1. Check deployment logs above for error details"
+          echo "  2. Verify Cloudflare secrets are correctly configured"
+          echo "  3. Test deployment locally: npm run deploy:prod"
+          echo "  4. If urgent, consider rolling back to previous version"
+          echo ""
+          echo "🆘 Emergency rollback:"
+          echo "  1. Identify last working production commit"
+          echo "  2. Deploy manually: git checkout <working-commit> && npm run deploy:prod"
+          echo ""
+          echo "📞 Contact information:"
+          echo "  - Check application monitoring dashboards"
+          echo "  - Review Cloudflare Workers logs"
+          echo "  - Notify development team of deployment failure"
+
+  post-deployment:
+    name: 📊 Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: success()
+    
+    steps:
+      - name: 📊 Deployment Summary
+        run: |
+          echo "📈 **Production Deployment Summary**"
+          echo ""
+          echo "✅ **Status**: Successfully Deployed"
+          echo "👤 **Deployed by**: ${{ github.actor }}"  
+          echo "🌿 **Branch**: ${{ github.ref_name }}"
+          echo "📝 **Reason**: ${{ github.event.inputs.deployment_reason }}"
+          echo "🕐 **Time**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo ""
+          echo "🎯 **Next Steps**:"
+          echo "  1. Monitor production logs for 15-30 minutes"
+          echo "  2. Verify key application functions work correctly"  
+          echo "  3. Check for any error spikes in monitoring"
+          echo "  4. Update team on deployment status"
+          echo ""
+          echo "📋 **Monitoring Commands**:"
+          echo "  • Production logs: \`npm run tail:prod\`"
+          echo "  • Local testing: \`npm run dev:prod\`"
