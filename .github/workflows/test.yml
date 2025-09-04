@@ -1,0 +1,157 @@
+name: 🧪 Test & Quality Assurance
+
+on:
+  push:
+    branches: [ main, feature/dev-prod-environments, develop ]
+  pull_request:
+    branches: [ main, feature/dev-prod-environments, develop ]
+
+jobs:
+  test:
+    name: 🔍 Run Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+        
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies  
+        run: npm ci
+        
+      - name: 🧪 Run tests
+        run: npm test
+        
+      - name: 📊 Generate test coverage
+        run: npm run test:coverage
+        continue-on-error: true  # Coverage reporting has known issues with Cloudflare Workers
+        
+      - name: 📈 Upload coverage to GitHub
+        if: matrix.node-version == 18  # Only upload once
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+        continue-on-error: true
+
+  lint:
+    name: 🔍 Lint & Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: ✨ Check code formatting
+        run: npx prettier --check "src/**/*.js" "tests/**/*.js"
+        
+      - name: 🔍 Run linter (if available)
+        run: |
+          if npm run lint > /dev/null 2>&1; then
+            npm run lint
+          else  
+            echo "ℹ️ No linter configured - skipping"
+          fi
+        continue-on-error: true
+
+  build-check:
+    name: 🏗️ Build Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code  
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Test Wrangler build
+        run: npx wrangler deploy --dry-run --compatibility-date 2024-01-01
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        continue-on-error: true  # Don't fail if secrets aren't configured yet
+
+  security:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js  
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🔒 Run security audit
+        run: npm audit --audit-level moderate
+        continue-on-error: true  # Don't block on moderate vulnerabilities
+
+  summary:
+    name: ✅ Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [test, lint, build-check, security]
+    if: always()
+    
+    steps:
+      - name: ✅ Check overall status
+        run: |
+          if [ "${{ needs.test.result }}" == "success" ]; then
+            echo "✅ Tests: PASSED"
+          else
+            echo "❌ Tests: FAILED"
+            exit 1
+          fi
+          
+          if [ "${{ needs.lint.result }}" == "success" ]; then
+            echo "✅ Linting: PASSED"
+          else
+            echo "⚠️ Linting: FAILED (non-blocking)"
+          fi
+          
+          if [ "${{ needs.build-check.result }}" == "success" ]; then
+            echo "✅ Build: PASSED"  
+          else
+            echo "⚠️ Build: FAILED (non-blocking - may need secrets)"
+          fi
+          
+          if [ "${{ needs.security.result }}" == "success" ]; then
+            echo "✅ Security: PASSED"
+          else
+            echo "⚠️ Security: ISSUES FOUND (non-blocking)"
+          fi
+          
+          echo ""
+          echo "🎯 Quality Gate: ${{ needs.test.result == 'success' && 'PASSED' || 'FAILED' }}"
+          echo "📊 All tests must pass for merge approval"

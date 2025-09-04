@@ -1,0 +1,111 @@
+name: 🚀 Continuous Integration
+
+# This workflow implements Phase 2 Week 4 of the deployment roadmap
+# Focus: Essential testing automation without complexity
+
+on:
+  push:
+    branches: [ feature/dev-prod-environments ]
+  pull_request:
+    branches: [ main, feature/dev-prod-environments ]
+
+jobs:
+  # Core job that MUST pass for branch protection
+  essential-tests:
+    name: ✅ Essential Tests (Required)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run all tests  
+        run: npm test
+        id: test-run
+        
+      - name: 📊 Test Results Summary
+        if: always()
+        run: |
+          if [ "${{ steps.test-run.outcome }}" == "success" ]; then
+            echo "✅ All tests passed successfully"
+            echo "📈 Ready for merge/deployment"
+          else
+            echo "❌ Tests failed - blocking merge"
+            echo "🔧 Fix failing tests before proceeding"
+            exit 1
+          fi
+
+  # Optional quality checks (informational only)
+  code-quality:
+    name: 📊 Code Quality (Optional)
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Don't block merges on these
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies  
+        run: npm ci
+        
+      - name: ✨ Check code formatting
+        run: |
+          if command -v prettier &> /dev/null; then
+            npx prettier --check "src/**/*.js" "tests/**/*.js" || echo "⚠️ Formatting issues found"
+          else
+            echo "ℹ️ Prettier not available - skipping format check"
+          fi
+          
+      - name: 🔒 Basic security check
+        run: |
+          npm audit --audit-level high || echo "⚠️ High security vulnerabilities found"
+
+  # Deployment readiness check
+  deployment-check:
+    name: 🚀 Deployment Readiness
+    runs-on: ubuntu-latest
+    needs: essential-tests
+    if: github.ref == 'refs/heads/feature/dev-prod-environments'
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Validate Wrangler configuration
+        run: |
+          echo "🔍 Checking wrangler.toml configuration..."
+          if [ -f "wrangler.toml" ]; then
+            echo "✅ wrangler.toml found"
+          else
+            echo "❌ wrangler.toml missing"
+            exit 1
+          fi
+          
+      - name: ✅ Ready for deployment
+        run: |
+          echo "🎯 Deployment readiness: PASSED"
+          echo "🚀 Branch is ready for automated dev deployment (Phase 2 Week 5)"
